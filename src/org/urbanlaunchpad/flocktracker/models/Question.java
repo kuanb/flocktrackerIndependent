@@ -14,7 +14,7 @@ public class Question {
 
   private int questionNumber;
   private String questionText;
-  private static String[] answers;
+  private String[] answers;
   private String questionID;
   private boolean otherEnabled;
 

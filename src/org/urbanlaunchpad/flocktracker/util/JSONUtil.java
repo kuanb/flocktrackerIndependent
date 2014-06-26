@@ -85,6 +85,7 @@ public class JSONUtil {
     Question question = new Question();
     question.setQuestionID(jsonQuestion.getString("id"));
     question.setType(QuestionUtil.getQuestionTypeFromString(jsonQuestion.getString("Kind")));
+    question.setQuestionText(jsonQuestion.getString("Question"));
 
     if (jsonQuestion.has("Answers")) {
       JSONArray jsonAnswers = jsonQuestion.getJSONArray("Answers");
