@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.*;
+import android.widget.TextView;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.views.NavButtonsManager;
@@ -21,6 +22,7 @@ public abstract class QuestionFragment extends Fragment {
 
 	private Question question;
 	private QuestionType questionType;
+  private TextView questionView;
 
 	public QuestionFragment(QuestionActionListener listener, Question question,
 			QuestionType questionType) {
@@ -38,6 +40,8 @@ public abstract class QuestionFragment extends Fragment {
 		navButtonsManager = (NavButtonsManager) rootView
 				.findViewById(R.id.questionButtons);
 		navButtonsManager.setQuestionType(listener, questionType);
+    questionView = (TextView) rootView.findViewById(R.id.question_view);
+    questionView.setText(question.getQuestionText());
 
 		setupLayout(rootView);
 		prepopulateQuestion();
