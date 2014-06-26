@@ -66,7 +66,7 @@ public class HubPageFragment extends Fragment {
     startSurveyButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        listener.onStartTrip();
+        listener.onStartSurvey();
       }
     });
 

@@ -50,7 +50,8 @@ import java.util.*;
 
 public class SurveyorActivity extends Activity implements
 		GooglePlayServicesClient.ConnectionCallbacks,
-		GooglePlayServicesClient.OnConnectionFailedListener {
+		GooglePlayServicesClient.OnConnectionFailedListener,
+    QuestionController.QuestionControllerListener {
 
 	public static final Integer INCOMPLETE_CHAPTER = R.drawable.complete_red;
 	public static final Integer COMPLETE_CHAPTER = R.drawable.complete_green;
@@ -168,7 +169,7 @@ public class SurveyorActivity extends Activity implements
 
     SubmissionHelper submissionHelper = new SubmissionHelper();
     statistics = new Statistics(this, metadata);
-    questionController = new QuestionController(this, metadata, getFragmentManager(), submissionHelper);
+    questionController = new QuestionController(this, metadata, getFragmentManager(), submissionHelper, this);
     hubPageController = new HubPageController(metadata, questionController);
     statisticsPageController = new StatisticsPageController(this, statistics);
     dataController = new DataController(metadata, statistics);
@@ -954,7 +955,12 @@ public class SurveyorActivity extends Activity implements
 		statisticsPageController.stopTrip();
 	}
 
-	private enum EVENT_TYPE {
+  @Override
+  public void onReachedEndOfTrackerSurvey() {
+    showHubPage();
+  }
+
+  private enum EVENT_TYPE {
 		MALE_UPDATE, FEMALE_UPDATE, UPDATE_STATS_PAGE, UPDATE_HUB_PAGE, SHOW_NAV_BUTTONS, SUBMITTED_SURVEY, SUBMIT_FAILED
 	}
 

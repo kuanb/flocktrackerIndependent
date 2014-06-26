@@ -36,13 +36,15 @@ public class QuestionController implements QuestionActionListener {
   private int loopIteration = -1; // Iteration step where the loop process is.
 
   private boolean isAskingTripQuestions = false;
+  private QuestionControllerListener listener;
 
   public QuestionController(Context context, Metadata metadata, FragmentManager fragmentManager,
-      SubmissionHelper submissionHelper) {
+      SubmissionHelper submissionHelper, QuestionControllerListener listener) {
     this.context = context;
     this.metadata = metadata;
     this.fragmentManager = fragmentManager;
     this.submissionHelper = submissionHelper;
+    this.listener = listener;
     resetSurvey();
     resetTrip();
 
@@ -142,7 +144,7 @@ public class QuestionController implements QuestionActionListener {
     if (isAskingTripQuestions) {
       if (trackerQuestionPosition == trackingQuestions.length - 1) {
         // show hub page and start tracking
-
+        listener.onReachedEndOfTrackerSurvey();
       } else {
         trackerQuestionPosition++;
         showCurrentQuestion();
@@ -222,5 +224,9 @@ public class QuestionController implements QuestionActionListener {
 
   private Chapter getCurrentChapter() {
     return chapterList[chapterPosition];
+  }
+
+  public interface QuestionControllerListener {
+    void onReachedEndOfTrackerSurvey();
   }
 }
