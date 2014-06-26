@@ -63,6 +63,10 @@ public class QuestionController implements QuestionActionListener {
     showCurrentQuestion();
   }
 
+  public void startSurvey() {
+    showCurrentQuestion();
+  }
+
   public void showCurrentQuestion() {
     Question currentQuestion = getCurrentQuestion();
     QuestionFragment fragment = null;
@@ -144,6 +148,7 @@ public class QuestionController implements QuestionActionListener {
     if (isAskingTripQuestions) {
       if (trackerQuestionPosition == trackingQuestions.length - 1) {
         // show hub page and start tracking
+        isAskingTripQuestions = false;
         listener.onReachedEndOfTrackerSurvey();
       } else {
         trackerQuestionPosition++;

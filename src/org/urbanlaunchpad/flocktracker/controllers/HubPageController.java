@@ -21,6 +21,8 @@ public class HubPageController implements HubPageManager.HubPageActionListener {
   @Override
   public void onStartSurvey() {
     // TODO(adchia): implement
+    metadata.setSurveyID("S" + createID());
+    questionController.startSurvey();
   }
 
   @Override
