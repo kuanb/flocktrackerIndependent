@@ -38,7 +38,8 @@ public class OrderedListQuestionFragment extends QuestionFragment implements Dyn
     super(listener, question, questionType);
   }
 
-  public void setupLayout() {
+  @Override
+  public void setupLayout(View rootView) {
 
 //    answerList = new ArrayList<String>(Arrays.asList(getQuestion().getAnswers()));
 //

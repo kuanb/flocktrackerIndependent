@@ -39,13 +39,13 @@ public abstract class QuestionFragment extends Fragment {
 				.findViewById(R.id.questionButtons);
 		navButtonsManager.setQuestionType(listener, questionType);
 
-		setupLayout();
+		setupLayout(rootView);
 		prepopulateQuestion();
 
 		return rootView;
 	}
 
-	abstract void setupLayout();
+	abstract void setupLayout(View rootView);
 
 	abstract void prepopulateQuestion();
 

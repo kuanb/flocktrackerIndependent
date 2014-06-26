@@ -28,7 +28,7 @@ public class ImageQuestionFragment extends QuestionFragment {
     super(listener, question, questionType);
   }
 
-  public void setupLayout() {
+  public void setupLayout(View rootView) {
 		ImageView cameraButton = new ImageView(getActivity());
 		cameraButton.setImageResource(R.drawable.camera);
 		cameraButton.setOnClickListener(cameraButtonOnClickListener);

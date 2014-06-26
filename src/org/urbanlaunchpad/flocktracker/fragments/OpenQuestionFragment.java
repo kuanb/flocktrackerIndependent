@@ -32,7 +32,8 @@ public class OpenQuestionFragment extends QuestionFragment {
     super(listener, question, questionType);
   }
 
-  public void setupLayout() {
+  @Override
+  public void setupLayout(View rootView) {
     Question.QuestionType questionType = getQuestion().getType();
 		if (questionType.equals(Question.QuestionType.OPEN) || questionType.equals(Question.QuestionType.LOOP)) {
       askingNumbers = true;

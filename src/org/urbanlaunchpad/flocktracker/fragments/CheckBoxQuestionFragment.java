@@ -59,7 +59,8 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 		}
 	}
 
-	public void setupLayout() {
+  @Override
+	public void setupLayout(View rootView) {
 
     boolean hasOther = getQuestion().isOtherEnabled();
     String[] answers = getQuestion().getAnswers();

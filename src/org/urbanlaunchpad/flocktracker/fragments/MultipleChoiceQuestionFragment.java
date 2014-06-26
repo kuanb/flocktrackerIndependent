@@ -1,5 +1,6 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
+import android.os.Bundle;
 import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
@@ -30,12 +31,11 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 	public MultipleChoiceQuestionFragment(QuestionActionListener listener,
 			Question question, QuestionType questionType) {
 		super(listener, question, questionType);
-
-		answersContainer = (LinearLayout) getView().findViewById(
-				R.id.answer_layout);
 	}
 
-	public void setupLayout() {
+  @Override
+  public void setupLayout(View rootView) {
+    answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
 
 		boolean hasOther = getQuestion().isOtherEnabled();
 		String[] answers = getQuestion().getAnswers();
