@@ -18,8 +18,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="15dp"
+        android:fontFamily="sans-serif"
         android:textColor="@color/text_color_light"
-        android:textSize="17sp" />
+        android:textSize="22sp" />
 
     <ScrollView
         android:id="@+id/answer_scroll_container"

@@ -18,7 +18,7 @@ import org.urbanlaunchpad.flocktracker.models.Question;
 public class OpenQuestionFragment extends QuestionFragment {
 	EditText openET;
 	Boolean askingNumbers;
-	LinearLayout answerLayout;
+  private LinearLayout answersContainer;
 
 	private OnClickListener onClickListener = new OnClickListener() {
 
@@ -34,6 +34,8 @@ public class OpenQuestionFragment extends QuestionFragment {
 
   @Override
   public void setupLayout(View rootView) {
+    answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
+
     Question.QuestionType questionType = getQuestion().getType();
 		if (questionType.equals(Question.QuestionType.OPEN) || questionType.equals(Question.QuestionType.LOOP)) {
       askingNumbers = true;
@@ -51,7 +53,7 @@ public class OpenQuestionFragment extends QuestionFragment {
 		openET.setTextSize(20);
 		openET.setTextColor(getResources().getColor(R.color.text_color_light));
 		openET.setBackgroundResource(R.drawable.edit_text);
-		answerLayout.addView(openET);
+    answersContainer.addView(openET);
 		openET.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,

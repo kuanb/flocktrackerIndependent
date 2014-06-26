@@ -90,20 +90,20 @@ public class NavButtonsView extends LinearLayout implements NavButtonsManager {
 
     switch (type) {
       case TRIP_FIRST:
-        submitSurveyButton.setVisibility(GONE);
+        submitSurveyButton.setVisibility(INVISIBLE);
       case FIRST:
-        previousQuestionButton.setVisibility(GONE);
+        previousQuestionButton.setVisibility(INVISIBLE);
         nextQuestionButton.setVisibility(VISIBLE);
         break;
       case TRIP_NORMAL:
-        submitSurveyButton.setVisibility(GONE);
+        submitSurveyButton.setVisibility(INVISIBLE);
       case NORMAL:
         previousQuestionButton.setVisibility(VISIBLE);
         nextQuestionButton.setVisibility(VISIBLE);
         break;
       case LAST:
         previousQuestionButton.setVisibility(VISIBLE);
-        nextQuestionButton.setVisibility(GONE);
+        nextQuestionButton.setVisibility(INVISIBLE);
         break;
     }
   }
