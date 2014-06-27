@@ -505,7 +505,6 @@ public class SurveyorActivity extends Activity implements
 		fixedNavigationList.setItemChecked(0, true);
 		chapterDrawerList.setItemChecked(-1, true);
 		setTitle(getString(R.string.hub_page_title));
-		chapterDrawerLayout.closeDrawer(drawer);
 	}
 
 
@@ -986,7 +985,7 @@ public class SurveyorActivity extends Activity implements
 						SurveyHelper.STATS_PAGE_QUESTION_POSITION);
 				showStatusPage();
 			}
-		}
+    }
 	}
 
 	private class DrawerItemClickListener implements
@@ -1001,6 +1000,7 @@ public class SurveyorActivity extends Activity implements
 			}
 			questionController.updateSurveyPosition(position, 0);
 			showCurrentQuestion();
+      chapterDrawerLayout.closeDrawer(drawer);
 		}
 	}
 
