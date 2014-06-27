@@ -32,3 +32,11 @@
 -keep class com.google.api.services.drive.** {
 *;
 }
+
+-keepattributes *Annotation*
+
+-keepclassmembers,allowobfuscation class * {
+@javax.inject.* *;
+@dagger.* *;
+<init>();
+}

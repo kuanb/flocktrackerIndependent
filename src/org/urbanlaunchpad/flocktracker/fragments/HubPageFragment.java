@@ -1,18 +1,26 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
+import org.urbanlaunchpad.flocktracker.SurveyorActivity;
+import org.urbanlaunchpad.flocktracker.controllers.QuestionController;
 import org.urbanlaunchpad.flocktracker.fragments.HubPageManager.HubPageActionListener;
 import org.urbanlaunchpad.flocktracker.R;
 
+import javax.inject.Inject;
+
 public class HubPageFragment extends Fragment {
 
-  private View startTripButton;
+  private View rootView;
+  private ImageView startTripButton;
   private View startSurveyButton;
   private View statisticsButton;
   private View moreMenButton;
@@ -26,20 +34,31 @@ public class HubPageFragment extends Fragment {
   private HubPageActionListener listener;
   private int maleCount = 0;
   private int femaleCount = 0;
+  @Inject Bus eventBus;
 
-  public HubPageFragment(HubPageActionListener listener, int maleCount, int femaleCount) {
-    super();
+  public void init(HubPageActionListener listener, int maleCount, int femaleCount) {
     this.listener = listener;
     this.maleCount = maleCount;
     this.femaleCount = femaleCount;
   }
 
+  @Subscribe
+  public void startTrip(QuestionController.ReachedEndOfTrackerSurveyEvent event) {
+    startTripButton.setImageResource(R.drawable.ft_grn_st1);
+  }
+
+  public void stopTrip() {
+    startTripButton.setImageResource(R.drawable.ft_red_st);
+  }
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    View rootView = inflater.inflate(R.layout.fragment_hub_page, container, false);
+    if (rootView == null) {
+      rootView = inflater.inflate(R.layout.fragment_hub_page, container, false);
+    }
 
-    this.startTripButton = rootView.findViewById(R.id.start_trip_button);
+    this.startTripButton = (ImageView) rootView.findViewById(R.id.start_trip_button);
     this.startSurveyButton = rootView.findViewById(R.id.startSurveyButton);
     this.statisticsButton = rootView.findViewById(R.id.statsButton);
     this.moreMenButton = rootView.findViewById(R.id.moreMenButton);
@@ -51,6 +70,8 @@ public class HubPageFragment extends Fragment {
     this.totalCountView = (TextView) rootView.findViewById(R.id.totalPersonCount);
 
     setupClickListeners();
+    ((SurveyorActivity) getActivity()).getObjectGraph().inject(this);
+    eventBus.register(this);
 
     return rootView;
   }
@@ -59,7 +80,7 @@ public class HubPageFragment extends Fragment {
     startTripButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        listener.onStartTrip();
+        listener.onToggleTrip();
       }
     });
 

@@ -12,6 +12,21 @@ public class Metadata {
   private int femaleCount;
   private double speed;
 
+  public Metadata() {
+  }
+
+  public Metadata(String timeStamp, String surveyID, String tripID,
+      String imagePaths, Location location, int maleCount, int femaleCount, double speed) {
+    this.timeStamp = timeStamp;
+    this.surveyID = surveyID;
+    this.tripID = tripID;
+    this.imagePaths = imagePaths;
+    this.location = location;
+    this.maleCount = maleCount;
+    this.femaleCount = femaleCount;
+    this.speed = speed;
+  }
+
   public String getTimeStamp() {
     return timeStamp;
   }
@@ -74,5 +89,10 @@ public class Metadata {
 
   public void setSpeed(double speed) {
     this.speed = speed;
+  }
+
+  @Override
+  protected Object clone() throws CloneNotSupportedException {
+    return new Metadata(timeStamp, surveyID, tripID, imagePaths, location, maleCount, femaleCount, speed);
   }
 }

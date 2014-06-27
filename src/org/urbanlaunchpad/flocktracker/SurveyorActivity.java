@@ -32,6 +32,9 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
+import dagger.ObjectGraph;
 import org.urbanlaunchpad.flocktracker.adapters.DrawerListViewAdapter;
 import org.urbanlaunchpad.flocktracker.controllers.*;
 import org.urbanlaunchpad.flocktracker.fragments.HubPageFragment;
@@ -44,21 +47,18 @@ import org.urbanlaunchpad.flocktracker.models.Metadata;
 import org.urbanlaunchpad.flocktracker.models.Statistics;
 import org.urbanlaunchpad.flocktracker.util.LocationUtil;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
 
 public class SurveyorActivity extends Activity implements
 		GooglePlayServicesClient.ConnectionCallbacks,
-		GooglePlayServicesClient.OnConnectionFailedListener,
-    QuestionController.QuestionControllerListener {
+		GooglePlayServicesClient.OnConnectionFailedListener {
 
 	public static final Integer INCOMPLETE_CHAPTER = R.drawable.complete_red;
 	public static final Integer COMPLETE_CHAPTER = R.drawable.complete_green;
 	public static final Integer HALF_COMPLETE_CHAPTER = R.drawable.complete_orange;
-	public static final String TRACKER_TYPE = "Tracker";
-	public static final String SURVEY_TYPE = "Survey";
-	public static final String LOOP_TYPE = "Loop";
 	public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
 	private static final int MILLISECONDS_PER_SECOND = 1000;
 	private static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND
@@ -71,6 +71,7 @@ public class SurveyorActivity extends Activity implements
 	public static boolean submittingSubmission = false;
 	public static boolean savingSurveySubmission = false;
 	public static boolean savingTrackerSubmission = false;
+  private ObjectGraph objectGraph;
 
 	// Stored queues of surveys to submit
 	private final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
@@ -89,10 +90,11 @@ public class SurveyorActivity extends Activity implements
 	private CharSequence title;
 	private List<RowItem> rowItems;
 	private QuestionFragment currentQuestionFragment;
+  private HubPageFragment hubPageFragment = new HubPageFragment();
 	private SurveyHelper surveyHelper;
 
   // Controllers
-  private QuestionController questionController;
+  @Inject QuestionController questionController;
   private HubPageController hubPageController;
   private StatisticsPageController statisticsPageController;
   private DataController dataController;
@@ -108,22 +110,14 @@ public class SurveyorActivity extends Activity implements
 	private Integer femaleCount = 0;
 	private boolean isTripStarted = false;
 
+  @Inject Bus eventBus;
+
 	@SuppressLint("HandlerLeak")
 	private Handler messageHandler = new Handler() {
 
 		@SuppressWarnings("deprecation")
 		public void handleMessage(Message msg) {
-			if (msg.what == EVENT_TYPE.UPDATE_HUB_PAGE.ordinal()) {
-				askingTripQuestions = false;
-
-				if (isTripStarted) {
-					ImageView gear = (ImageView) findViewById(R.id.start_trip_button);
-					gear.setImageResource(R.drawable.ft_grn_st1);
-				} else {
-					ImageView gear = (ImageView) findViewById(R.id.start_trip_button);
-					gear.setImageResource(R.drawable.ft_red_st);
-				}
-			} else if (msg.what == EVENT_TYPE.SUBMITTED_SURVEY.ordinal()) {
+			if (msg.what == EVENT_TYPE.SUBMITTED_SURVEY.ordinal()) {
 				Toast toast = Toast.makeText(getApplicationContext(),
 						getResources().getString(R.string.survey_submitted),
 						Toast.LENGTH_SHORT);
@@ -147,7 +141,6 @@ public class SurveyorActivity extends Activity implements
 		setContentView(R.layout.activity_surveyor);
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-
 		username = ProjectConfig.get().getUsername();
 		surveyHelper = new SurveyHelper(this);
 
@@ -160,6 +153,10 @@ public class SurveyorActivity extends Activity implements
     mLocationRequest.setInterval(UPDATE_INTERVAL);
     mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
 
+    objectGraph = ObjectGraph.create(new FlocktrackerModule(this));
+    objectGraph.inject(this);
+    eventBus.register(this);
+
     // Creating a random survey ID
 
     surveyID = "S" + createID();
@@ -169,8 +166,10 @@ public class SurveyorActivity extends Activity implements
 
     SubmissionHelper submissionHelper = new SubmissionHelper();
     statistics = new Statistics(this, metadata);
-    questionController = new QuestionController(this, metadata, getFragmentManager(), submissionHelper, this);
+    questionController.setMetadata(metadata);
     hubPageController = new HubPageController(metadata, questionController);
+    hubPageFragment.init(hubPageController, metadata.getMaleCount(), metadata.getFemaleCount());
+    hubPageController.setFragment(hubPageFragment);
     statisticsPageController = new StatisticsPageController(this, statistics);
     dataController = new DataController(metadata, statistics);
     trackerController = new TrackerController(metadata, submissionHelper, mLocationClient);
@@ -260,7 +259,7 @@ public class SurveyorActivity extends Activity implements
 
 	@Override
 	public void onBackPressed() {
-		if (askingTripQuestions) {
+		if (isTripStarted) {
 			if (surveyHelper.prevTrackingPositions.empty()
 					|| surveyHelper.getTrackerQuestionPosition() == 0) {
 				surveyHelper
@@ -496,10 +495,8 @@ public class SurveyorActivity extends Activity implements
 	private void showHubPage() {
 		// Update fragments
 		FragmentManager fragmentManager = getFragmentManager();
-		Fragment fragment = new HubPageFragment(hubPageController, metadata.getMaleCount(), metadata.getFemaleCount());
-
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
-		transaction.replace(R.id.surveyor_frame, fragment);
+		transaction.replace(R.id.surveyor_frame, hubPageFragment);
 		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 		transaction.addToBackStack(null);
 		transaction.commit();
@@ -509,9 +506,6 @@ public class SurveyorActivity extends Activity implements
 		chapterDrawerList.setItemChecked(-1, true);
 		setTitle(getString(R.string.hub_page_title));
 		chapterDrawerLayout.closeDrawer(drawer);
-
-		// update ui
-		messageHandler.sendEmptyMessage(EVENT_TYPE.UPDATE_HUB_PAGE.ordinal());
 	}
 
 	private void showStatusPage() {
@@ -955,8 +949,8 @@ public class SurveyorActivity extends Activity implements
 		statisticsPageController.stopTrip();
 	}
 
-  @Override
-  public void onReachedEndOfTrackerSurvey() {
+  @Subscribe
+  public void onReachedEndOfTrackerSurvey(QuestionController.ReachedEndOfTrackerSurveyEvent event) {
     showHubPage();
   }
 
@@ -1003,4 +997,9 @@ public class SurveyorActivity extends Activity implements
 			showCurrentQuestion();
 		}
 	}
+
+  public ObjectGraph getObjectGraph() {
+    return objectGraph;
+  }
+
 }

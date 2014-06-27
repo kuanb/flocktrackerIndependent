@@ -1,21 +1,32 @@
 package org.urbanlaunchpad.flocktracker.controllers;
 
+import org.urbanlaunchpad.flocktracker.fragments.HubPageFragment;
 import org.urbanlaunchpad.flocktracker.fragments.HubPageManager;
 import org.urbanlaunchpad.flocktracker.models.Metadata;
 
 public class HubPageController implements HubPageManager.HubPageActionListener {
   private Metadata metadata;
   private QuestionController questionController;
+  private HubPageFragment fragment;
 
   public HubPageController(Metadata metadata, QuestionController questionController) {
     this.metadata = metadata;
     this.questionController = questionController;
   }
 
+  public void setFragment(HubPageFragment fragment) {
+    this.fragment = fragment;
+  }
+
   @Override
-  public void onStartTrip() {
-    metadata.setTripID("T" + createID());
-    questionController.startTrip();
+  public void onToggleTrip() {
+    if (metadata.getTripID() == null) {
+      metadata.setTripID("T" + createID());
+      questionController.startTrip();
+    } else {
+      metadata.setTripID(null);
+      fragment.stopTrip();
+    }
   }
 
   @Override

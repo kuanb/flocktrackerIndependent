@@ -1,9 +1,11 @@
 package org.urbanlaunchpad.flocktracker.controllers;
 
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.widget.Toast;
+import com.squareup.otto.Bus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.urbanlaunchpad.flocktracker.ProjectConfig;
@@ -18,6 +20,8 @@ import org.urbanlaunchpad.flocktracker.models.Metadata;
 import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.models.Submission;
 import org.urbanlaunchpad.flocktracker.util.QuestionUtil;
+
+import javax.inject.Inject;
 
 public class QuestionController implements QuestionActionListener {
   private Context context;
@@ -36,15 +40,15 @@ public class QuestionController implements QuestionActionListener {
   private int loopIteration = -1; // Iteration step where the loop process is.
 
   private boolean isAskingTripQuestions = false;
-  private QuestionControllerListener listener;
+  private ReachedEndOfTrackerSurveyEvent reachedEndOfTrackerSurveyEvent = new ReachedEndOfTrackerSurveyEvent();
+  private Bus eventBus;
 
-  public QuestionController(Context context, Metadata metadata, FragmentManager fragmentManager,
-      SubmissionHelper submissionHelper, QuestionControllerListener listener) {
+  @Inject
+  public QuestionController(Context context, SubmissionHelper submissionHelper, Bus eventBus) {
     this.context = context;
-    this.metadata = metadata;
-    this.fragmentManager = fragmentManager;
+    this.fragmentManager = ((Activity) context).getFragmentManager();
     this.submissionHelper = submissionHelper;
-    this.listener = listener;
+    this.eventBus = eventBus;
     resetSurvey();
     resetTrip();
 
@@ -55,6 +59,10 @@ public class QuestionController implements QuestionActionListener {
         new ColumnCheckHelper(chapterList, trackingQuestions).runChecks();
       }
     }).run();
+  }
+
+  public void setMetadata(Metadata metadata) {
+    this.metadata = metadata;
   }
 
   public void startTrip() {
@@ -149,7 +157,7 @@ public class QuestionController implements QuestionActionListener {
       if (trackerQuestionPosition == trackingQuestions.length - 1) {
         // show hub page and start tracking
         isAskingTripQuestions = false;
-        listener.onReachedEndOfTrackerSurvey();
+        eventBus.post(reachedEndOfTrackerSurveyEvent);
       } else {
         trackerQuestionPosition++;
         showCurrentQuestion();
@@ -231,7 +239,5 @@ public class QuestionController implements QuestionActionListener {
     return chapterList[chapterPosition];
   }
 
-  public interface QuestionControllerListener {
-    void onReachedEndOfTrackerSurvey();
-  }
+  public class ReachedEndOfTrackerSurveyEvent {}
 }
