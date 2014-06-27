@@ -257,44 +257,44 @@ public class SurveyorActivity extends Activity implements
 		chapterDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
-	@Override
-	public void onBackPressed() {
-		if (isTripStarted) {
-			if (surveyHelper.prevTrackingPositions.empty()
-					|| surveyHelper.getTrackerQuestionPosition() == 0) {
-				surveyHelper
-						.updateTrackerPositionOnBack(SurveyHelper.HUB_PAGE_QUESTION_POSITION);
-				showHubPage();
-				return;
-			}
-			// Pop last question off
-			Integer prevPosition = surveyHelper.prevTrackingPositions.pop();
-			surveyHelper.updateTrackerPositionOnBack(prevPosition);
-			showCurrentQuestion();
-			return;
-		}
-
-		if (surveyHelper.prevPositions.isEmpty()) {
-			finish();
-			return;
-		}
-
-		Tuple prevPosition = surveyHelper.prevPositions.pop();
-		// Pop last question off
-		surveyHelper.updateSurveyPositionOnBack(prevPosition.chapterPosition,
-				prevPosition.questionPosition);
-
-		if (surveyHelper.wasJustAtHubPage(prevPosition)) {
-			showHubPage();
-			return;
-		} else if (surveyHelper.wasJustAtStatsPage(prevPosition)) {
-			showStatusPage();
-			return;
-		}
-
-		showCurrentQuestion();
-		return;
-	}
+//	@Override
+//	public void onBackPressed() {
+//		if (isTripStarted) {
+//			if (surveyHelper.prevTrackingPositions.empty()
+//					|| surveyHelper.getTrackerQuestionPosition() == 0) {
+//				surveyHelper
+//						.updateTrackerPositionOnBack(SurveyHelper.HUB_PAGE_QUESTION_POSITION);
+//				showHubPage();
+//				return;
+//			}
+//			// Pop last question off
+//			Integer prevPosition = surveyHelper.prevTrackingPositions.pop();
+//			surveyHelper.updateTrackerPositionOnBack(prevPosition);
+//			showCurrentQuestion();
+//			return;
+//		}
+//
+//		if (surveyHelper.prevPositions.isEmpty()) {
+//			finish();
+//			return;
+//		}
+//
+//		Tuple prevPosition = surveyHelper.prevPositions.pop();
+//		// Pop last question off
+//		surveyHelper.updateSurveyPositionOnBack(prevPosition.chapterPosition,
+//				prevPosition.questionPosition);
+//
+//		if (surveyHelper.wasJustAtHubPage(prevPosition)) {
+//			showHubPage();
+//			return;
+//		} else if (surveyHelper.wasJustAtStatsPage(prevPosition)) {
+//			showStatusPage();
+//			return;
+//		}
+//
+//		showCurrentQuestion();
+//		return;
+//	}
 
 	public void startTrip() {
 		isTripStarted = true;
@@ -507,6 +507,12 @@ public class SurveyorActivity extends Activity implements
 		setTitle(getString(R.string.hub_page_title));
 		chapterDrawerLayout.closeDrawer(drawer);
 	}
+
+
+  @Subscribe
+  public void handleStatisticsRequest(HubPageFragment.RequestStatisticsEvent event) {
+    showStatusPage();
+  }
 
 	private void showStatusPage() {
 		FragmentManager fragmentManager = getFragmentManager();

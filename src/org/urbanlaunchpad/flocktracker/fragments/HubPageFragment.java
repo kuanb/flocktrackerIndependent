@@ -35,6 +35,7 @@ public class HubPageFragment extends Fragment {
   private int maleCount = 0;
   private int femaleCount = 0;
   @Inject Bus eventBus;
+  private RequestStatisticsEvent requestStatisticsEvent = new RequestStatisticsEvent();
 
   public void init(HubPageActionListener listener, int maleCount, int femaleCount) {
     this.listener = listener;
@@ -94,7 +95,7 @@ public class HubPageFragment extends Fragment {
     statisticsButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        listener.onGetStatistics();
+        eventBus.post(requestStatisticsEvent);
       }
     });
 
@@ -151,5 +152,9 @@ public class HubPageFragment extends Fragment {
     totalCountView.setText(Integer.toString(maleCount + femaleCount));
     fewerMenButton.setEnabled(maleCount > 0);
     fewerWomenButton.setEnabled(femaleCount > 0);
+  }
+
+  public class RequestStatisticsEvent {
+
   }
 }
