@@ -72,6 +72,7 @@ public class QuestionController implements QuestionActionListener {
   }
 
   public void startSurvey() {
+    questionPosition = 0;
     showCurrentQuestion();
   }
 
