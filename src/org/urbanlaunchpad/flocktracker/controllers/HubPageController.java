@@ -8,17 +8,10 @@ import javax.inject.Inject;
 
 public class HubPageController implements HubPageManager.HubPageActionListener {
   private Metadata metadata;
-  private QuestionController questionController;
-  private HubPageFragment fragment;
 
   @Inject
-  public HubPageController(Metadata metadata, QuestionController questionController) {
+  public HubPageController(Metadata metadata) {
     this.metadata = metadata;
-    this.questionController = questionController;
-  }
-
-  public void setFragment(HubPageFragment fragment) {
-    this.fragment = fragment;
   }
 
   @Override

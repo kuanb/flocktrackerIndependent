@@ -26,7 +26,6 @@ public class LocationController implements
   private Context context;
   private Metadata metadata;
   private SubmissionHelper submissionHelper;
-  private QuestionController questionController;
   private Statistics statistics;
   private LocationClient locationClient;
   private LocationRequest locationRequest;
@@ -42,7 +41,7 @@ public class LocationController implements
 
   @Inject
   public LocationController(Context context, SubmissionHelper submissionHelper, Metadata metadata,
-      Statistics statistics, QuestionController questionController) {
+      Statistics statistics) {
     this.context = context;
     this.submissionHelper = submissionHelper;
     this.metadata = metadata;
