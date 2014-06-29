@@ -150,7 +150,7 @@ public class Statistics {
     if (metadata.getCurrentLocation() == null) {
       return;
     }
-    
+
     distanceDelta = metadata.getCurrentLocation().distanceTo(location);
     tripDistance += distanceDelta;
   }

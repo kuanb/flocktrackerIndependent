@@ -822,11 +822,12 @@ public class SurveyorActivity extends Activity {
       metadata.setTripID("T" + StringUtil.createID());
       questionController.askTripQuestions();
     } else {
+      cancelTracker();
+      locationController.disconnect();
       metadata.setTripID(null);
       metadata.setCurrentLocation(null);
       statisticsPageController.stopTrip();
       hubPageFragment.stopTrip();
-      cancelTracker();
     }
   }
 
