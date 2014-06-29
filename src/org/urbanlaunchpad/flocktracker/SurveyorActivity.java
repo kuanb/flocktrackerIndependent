@@ -376,9 +376,11 @@ public class SurveyorActivity extends Activity {
 
   @Subscribe
   public void onQuestionShown(QuestionFragment.QuestionAttachedEvent event) {
-    Question question = questionController.getCurrentQuestion();
+    Question question = questionController.getCurrentDisplayedQuestion();
+    if (question.equals(questionController.getCurrentQuestion())) {
+      return;
+    }
     questionController.updateSurveyPosition(question.getChapter().getChapterNumber(), question.getQuestionNumber());
-    questionController.showCurrentQuestion();
     drawerController.selectSurveyChapter(question.getChapter().getChapterNumber());
   }
 

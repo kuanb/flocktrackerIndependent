@@ -110,6 +110,10 @@ public class QuestionController implements QuestionActionListener {
     transaction.commit();
   }
 
+  public Question getCurrentDisplayedQuestion() {
+    return currentQuestionFragment.getQuestion();
+  }
+
   public Question getCurrentQuestion() {
     Question currentQuestion;
     if (isAskingTripQuestions) {

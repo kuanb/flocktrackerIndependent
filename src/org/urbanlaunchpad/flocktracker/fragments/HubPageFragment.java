@@ -88,7 +88,9 @@ public class HubPageFragment extends Fragment {
   @Override
   public void onAttach(Activity activity) {
     super.onAttach(activity);
-    eventBus.post(hubPageAttachedEvent);
+    if (eventBus != null) {
+      eventBus.post(hubPageAttachedEvent);
+    }
   }
 
   private void setupClickListeners() {

@@ -64,7 +64,7 @@ public abstract class QuestionFragment extends Fragment {
 
   abstract void prepopulateQuestion();
 
-  protected Question getQuestion() {
+  public Question getQuestion() {
     return question;
   }
 

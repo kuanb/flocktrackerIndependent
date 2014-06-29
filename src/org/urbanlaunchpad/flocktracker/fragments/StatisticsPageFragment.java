@@ -59,7 +59,9 @@ public class StatisticsPageFragment extends Fragment {
   @Override
   public void onAttach(Activity activity) {
     super.onAttach(activity);
-    eventBus.post(statisticsPageAttachedEvent);
+    if (eventBus != null) {
+      eventBus.post(statisticsPageAttachedEvent);
+    }
   }
 
   @Override
