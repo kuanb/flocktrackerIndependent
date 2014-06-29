@@ -15,91 +15,59 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.*;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import dagger.ObjectGraph;
-import org.urbanlaunchpad.flocktracker.adapters.DrawerListViewAdapter;
-import org.urbanlaunchpad.flocktracker.controllers.HubPageController;
-import org.urbanlaunchpad.flocktracker.controllers.LocationController;
-import org.urbanlaunchpad.flocktracker.controllers.QuestionController;
-import org.urbanlaunchpad.flocktracker.controllers.StatisticsPageController;
+import org.urbanlaunchpad.flocktracker.controllers.*;
 import org.urbanlaunchpad.flocktracker.fragments.HubPageFragment;
-import org.urbanlaunchpad.flocktracker.fragments.StatisticsPageFragment;
 import org.urbanlaunchpad.flocktracker.helpers.GoogleDriveHelper;
 import org.urbanlaunchpad.flocktracker.helpers.ImageHelper;
-import org.urbanlaunchpad.flocktracker.menu.RowItem;
 import org.urbanlaunchpad.flocktracker.models.Metadata;
 import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.util.LocationUtil;
 import org.urbanlaunchpad.flocktracker.util.StringUtil;
+import org.urbanlaunchpad.flocktracker.views.DrawerView;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class SurveyorActivity extends Activity {
-
-  public static final Integer INCOMPLETE_CHAPTER = R.drawable.complete_red;
-  public static final Integer COMPLETE_CHAPTER = R.drawable.complete_green;
-  public static final Integer HALF_COMPLETE_CHAPTER = R.drawable.complete_orange;
-  // Stored queues of surveys to submit
   public static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
   public static GoogleDriveHelper driveHelper;
-  @Inject
-  QuestionController questionController;
-  @Inject
-  HubPageController hubPageController;
-  @Inject
-  StatisticsPageController statisticsPageController;
-  @Inject
-  LocationController locationController;
-  @Inject
-  Metadata metadata;
-  @Inject
-  Bus eventBus;
-  @Inject
-  TrackerAlarm trackerAlarm;
+  @Inject QuestionController questionController;
+  @Inject HubPageController hubPageController;
+  @Inject StatisticsPageController statisticsPageController;
+  @Inject LocationController locationController;
+  @Inject DrawerController drawerController;
+  @Inject Metadata metadata;
+  @Inject Bus eventBus;
+  @Inject TrackerAlarm trackerAlarm;
   private ObjectGraph objectGraph;
-  // Drawer fields
-  private DrawerLayout drawerLayout;
-  private ListView fixedNavigationList;
-  private ListView chapterDrawerList;
-  private LinearLayout drawer;
-  private ActionBarDrawerToggle chapterDrawerToggle;
-  private CharSequence chapterDrawerTitle;
-  private CharSequence title;
-  private List<RowItem> rowItems;
-  private HubPageFragment hubPageFragment;
   @SuppressLint("HandlerLeak")
   private Handler messageHandler = new Handler() {
 
     @SuppressWarnings("deprecation")
     public void handleMessage(Message msg) {
-      if (msg.what == EVENT_TYPE.SUBMITTED_SURVEY.ordinal()) {
-        Toast toast = Toast.makeText(getApplicationContext(),
-            getResources().getString(R.string.survey_submitted),
-            Toast.LENGTH_SHORT);
-        toast.show();
+//      if (msg.what == EVENT_TYPE.SUBMITTED_SURVEY.ordinal()) {
+//        Toast toast = Toast.makeText(getApplicationContext(),
+//            getResources().getString(R.string.survey_submitted),
+//            Toast.LENGTH_SHORT);
+//        toast.show();
 //				surveyHelper.updateSurveyPosition(
 //						SurveyHelper.HUB_PAGE_CHAPTER_POSITION,
 //						SurveyHelper.HUB_PAGE_QUESTION_POSITION);
-        showHubPage();
-      } else if (msg.what == EVENT_TYPE.SUBMIT_FAILED.ordinal()) {
-        Toast toast = Toast.makeText(getApplicationContext(),
-            getResources().getString(R.string.submit_failed),
-            Toast.LENGTH_SHORT);
-        toast.show();
-      }
+//        showHubPage();
+//      } else if (msg.what == EVENT_TYPE.SUBMIT_FAILED.ordinal()) {
+//        Toast toast = Toast.makeText(getApplicationContext(),
+//            getResources().getString(R.string.submit_failed),
+//            Toast.LENGTH_SHORT);
+//        toast.show();
+//      }
     }
   };
 
@@ -117,52 +85,8 @@ public class SurveyorActivity extends Activity {
     // Check for location services.
     LocationUtil.checkLocationConfig(this);
 
-    hubPageFragment = new HubPageFragment(hubPageController, metadata.getMaleCount(), metadata.getFemaleCount());
-
-    // Navigation drawer information.
-    title = chapterDrawerTitle = getTitle();
-    drawerLayout = (DrawerLayout) findViewById(R.id.chapter_drawer_layout);
-    chapterDrawerList = (ListView) findViewById(R.id.chapter_drawer);
-    fixedNavigationList = (ListView) findViewById(R.id.fixed_navigation);
-    drawer = (LinearLayout) findViewById(R.id.drawer);
-    rowItems = new ArrayList<RowItem>();
-    for (String chapterTitle : questionController.getChapterTitles()) {
-      RowItem rowItem = new RowItem(INCOMPLETE_CHAPTER, chapterTitle);
-      rowItems.add(rowItem);
-    }
-
-    // set a custom shadow that overlays the main content when the drawer
-    // opens
-    drawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
-        GravityCompat.START);
-    // set up the drawer's list view with items and click listener
-    fixedNavigationList.setAdapter((new ArrayAdapter<String>(this,
-        R.layout.old_chapter_list_item, new String[]{
-        getString(R.string.hub_page_title),
-        getString(R.string.statistics_page_title)}
-    )));
-    fixedNavigationList
-        .setOnItemClickListener(new FixedNavigationItemClickListener());
-    chapterDrawerList.setAdapter(new DrawerListViewAdapter(this,
-        R.layout.chapter_drawer_list_item, rowItems));
-    chapterDrawerList.setOnItemClickListener(new DrawerItemClickListener());
     getActionBar().setDisplayHomeAsUpEnabled(true);
     getActionBar().setHomeButtonEnabled(true);
-    chapterDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
-        drawerLayout, /* DrawerLayout object */
-        R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
-        R.string.chapter_drawer_open, /* For accessibility */
-        R.string.chapter_drawer_close /* For accessibility */) {
-      public void onDrawerClosed(View view) {
-        getActionBar().setTitle(title);
-      }
-
-      public void onDrawerOpened(View drawerView) {
-        getActionBar().setTitle(chapterDrawerTitle);
-      }
-    };
-
-    drawerLayout.setDrawerListener(chapterDrawerToggle);
 
     if (savedInstanceState == null) {
       showHubPage();
@@ -200,15 +124,13 @@ public class SurveyorActivity extends Activity {
   @Override
   protected void onPostCreate(Bundle savedInstanceState) {
     super.onPostCreate(savedInstanceState);
-    // Sync the toggle state after onRestoreInstanceState has occurred.
-    chapterDrawerToggle.syncState();
+    drawerController.onPostCreate();
   }
 
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
-    // Pass any configuration change to the drawer toggles
-    chapterDrawerToggle.onConfigurationChanged(newConfig);
+    drawerController.onConfigurationChanged(newConfig);
   }
 
 //	@Override
@@ -242,7 +164,7 @@ public class SurveyorActivity extends Activity {
 //			showHubPage();
 //			return;
 //		} else if (surveyHelper.wasJustAtStatsPage(prevPosition)) {
-//			showStatusPage();
+//			showStatisticsPage();
 //			return;
 //		}
 //
@@ -362,58 +284,24 @@ public class SurveyorActivity extends Activity {
 	 */
 
   public boolean onOptionsItemSelected(MenuItem item) {
-    // To make the action bar home/up action should open or close the
-    // drawer.
-    chapterDrawerToggle.onOptionsItemSelected(item);
+    drawerController.onOptionsItemSelected(item);
     return true;
   }
 
   private void showHubPage() {
-    // Update fragments
-    FragmentManager fragmentManager = getFragmentManager();
-    FragmentTransaction transaction = fragmentManager.beginTransaction();
-    transaction.replace(R.id.surveyor_frame, hubPageFragment);
-    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-    transaction.addToBackStack(null);
-    transaction.commit();
-
-    // update selected item and title, then close the drawer.
-    fixedNavigationList.setItemChecked(0, true);
-    chapterDrawerList.setItemChecked(-1, true);
+    hubPageController.showHubPage();
+    drawerController.showHubPage();
     setTitle(getString(R.string.hub_page_title));
   }
 
-  private void showStatusPage() {
-    FragmentManager fragmentManager = getFragmentManager();
-    Fragment fragment = new StatisticsPageFragment();
-
-    FragmentTransaction transaction = fragmentManager.beginTransaction();
-    transaction.replace(R.id.surveyor_frame, fragment);
-    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-    transaction.addToBackStack(null);
-    transaction.commit();
-
-    // update selected item and title, then close the drawer.
-    fixedNavigationList.setItemChecked(1, true);
-    chapterDrawerList.setItemChecked(-1, true);
-    setTitle(getString(R.string.statistics_page_title));
-    drawerLayout.closeDrawer(drawer);
-  }
-
-	/*
-	 * Displaying different pages
-	 */
-
-  @Override
-  public void setTitle(CharSequence title) {
-    this.title = title;
-    getActionBar().setTitle(this.title);
+  private void showStatisticsPage() {
+    statisticsPageController.showStatisticsPage();
+    drawerController.showStatisticsPage();
   }
 
 	/*
 	 * Hub Page Event Handlers
 	 */
-
 
   public void stopTripDialog() {
     Builder dialog;
@@ -448,23 +336,28 @@ public class SurveyorActivity extends Activity {
 
   public void stopTrip() {
     locationController.stopTrip();
-    messageHandler.sendEmptyMessage(EVENT_TYPE.UPDATE_HUB_PAGE.ordinal());
     questionController.resetTrip();
     statisticsPageController.stopTrip();
   }
 
+  public ObjectGraph getObjectGraph() {
+    return objectGraph;
+  }
+
+  /*
+   * EventBus event handling
+   */
 
   @Subscribe
   public void handleStatisticsRequest(HubPageFragment.RequestStatisticsEvent event) {
-    showStatusPage();
+    showStatisticsPage();
   }
 
   @Subscribe
   public void startSurvey(HubPageFragment.RequestStartSurveyEvent event) {
     metadata.setSurveyID("S" + StringUtil.createID());
     questionController.startSurvey();
-    fixedNavigationList.setItemChecked(-1, true);
-    chapterDrawerList.setItemChecked(0, true);
+    drawerController.selectSurveyChapter(0);
   }
 
   @Subscribe
@@ -477,7 +370,7 @@ public class SurveyorActivity extends Activity {
       metadata.setTripID(null);
       metadata.setCurrentLocation(null);
       statisticsPageController.stopTrip();
-      hubPageFragment.stopTrip();
+      hubPageController.stopTrip();
     }
   }
 
@@ -488,50 +381,33 @@ public class SurveyorActivity extends Activity {
     statisticsPageController.startTrip();
   }
 
-  public ObjectGraph getObjectGraph() {
-    return objectGraph;
-  }
-
-  private enum EVENT_TYPE {
-    MALE_UPDATE, FEMALE_UPDATE, UPDATE_STATS_PAGE, UPDATE_HUB_PAGE, SHOW_NAV_BUTTONS, SUBMITTED_SURVEY, SUBMIT_FAILED
-  }
-
-  private class FixedNavigationItemClickListener implements
-      ListView.OnItemClickListener {
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position,
-        long id) {
-      Log.d("Clicked on fixed position", position + "");
-      if (questionController.isAskingTripQuestions()) {
-        questionController.resetTrip();
-      }
-
-      questionController.updateSurveyPosition(0, 0);
-      if (position == 0) {
-        showHubPage();
-      } else {
-        showStatusPage();
-      }
-      drawerLayout.closeDrawer(drawer);
+  @Subscribe
+  public void onHubPageRequested(DrawerView.ShowHubPageEvent event) {
+    if (questionController.isAskingTripQuestions()) {
+      questionController.resetTrip();
     }
+
+    questionController.updateSurveyPosition(0, 0);
+    showHubPage();
   }
 
-  private class DrawerItemClickListener implements
-      ListView.OnItemClickListener {
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position,
-        long id) {
-      Log.d("Clicked on drawer position", position + "");
-      if (questionController.isAskingTripQuestions()) {
-        questionController.resetTrip();
-      }
-      questionController.updateSurveyPosition(position, 0);
-      questionController.showCurrentQuestion();
-      fixedNavigationList.setItemChecked(-1, true);
-      drawerLayout.closeDrawer(drawer);
+  @Subscribe
+  public void onStatisticsPageRequested(DrawerView.ShowStatisticsPageEvent event) {
+    if (questionController.isAskingTripQuestions()) {
+      questionController.resetTrip();
     }
+    questionController.updateSurveyPosition(0, 0);
+    showStatisticsPage();
+  }
+
+  @Subscribe
+  public void onChapterRequested(DrawerView.SelectChapterEvent event) {
+    if (questionController.isAskingTripQuestions()) {
+      questionController.resetTrip();
+    }
+    questionController.updateSurveyPosition(event.chapterNumber, 0);
+    questionController.showCurrentQuestion();
+    drawerController.selectSurveyChapter(event.chapterNumber);
   }
 
 }
