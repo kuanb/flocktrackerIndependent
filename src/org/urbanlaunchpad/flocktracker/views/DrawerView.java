@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.squareup.otto.Bus;
+import org.urbanlaunchpad.flocktracker.CommonEvents;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.adapters.DrawerListViewAdapter;
 import org.urbanlaunchpad.flocktracker.menu.RowItem;
@@ -21,8 +22,6 @@ public class DrawerView extends DrawerLayout {
   private ListView fixedNavigationListView;
   private Bus eventBus;
 
-  private ShowHubPageEvent showHubPageEvent = new ShowHubPageEvent();
-  private ShowStatisticsPageEvent showStatisticsPageEvent = new ShowStatisticsPageEvent();
   private SelectChapterEvent selectChapterEvent = new SelectChapterEvent(-1);
 
   public DrawerView(Context context, AttributeSet attrs) {
@@ -82,9 +81,9 @@ public class DrawerView extends DrawerLayout {
         long id) {
       Log.d("Clicked on fixed position", position + "");
       if (position == 0) {
-        eventBus.post(showHubPageEvent);
+        eventBus.post(CommonEvents.requestHubPageEvent);
       } else {
-        eventBus.post(showStatisticsPageEvent);
+        eventBus.post(CommonEvents.requestStatisticsPageEvent);
       }
     }
   }
@@ -108,6 +107,4 @@ public class DrawerView extends DrawerLayout {
     }
   }
 
-  public class ShowHubPageEvent {}
-  public class ShowStatisticsPageEvent {}
 }

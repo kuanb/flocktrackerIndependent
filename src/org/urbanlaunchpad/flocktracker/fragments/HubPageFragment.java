@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+import org.urbanlaunchpad.flocktracker.CommonEvents;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.controllers.QuestionController;
@@ -35,7 +36,6 @@ public class HubPageFragment extends Fragment {
   private int maleCount = 0;
   private int femaleCount = 0;
   private RequestToggleTripEvent requestToggleTripEvent = new RequestToggleTripEvent();
-  private RequestStatisticsEvent requestStatisticsEvent = new RequestStatisticsEvent();
   private RequestStartSurveyEvent requestStartSurveyEvent = new RequestStartSurveyEvent();
 
   public HubPageFragment(HubPageActionListener listener, int maleCount, int femaleCount) {
@@ -101,7 +101,7 @@ public class HubPageFragment extends Fragment {
     statisticsButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        eventBus.post(requestStatisticsEvent);
+        eventBus.post(CommonEvents.requestStatisticsPageEvent);
       }
     });
 
@@ -160,12 +160,6 @@ public class HubPageFragment extends Fragment {
     fewerWomenButton.setEnabled(femaleCount > 0);
   }
 
-  public class RequestToggleTripEvent {
-  }
-
-  public class RequestStatisticsEvent {
-  }
-
-  public class RequestStartSurveyEvent {
-  }
+  public class RequestToggleTripEvent {}
+  public class RequestStartSurveyEvent {}
 }

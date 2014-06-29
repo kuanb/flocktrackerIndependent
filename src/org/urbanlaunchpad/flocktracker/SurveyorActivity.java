@@ -289,12 +289,22 @@ public class SurveyorActivity extends Activity {
   }
 
   private void showHubPage() {
+    if (questionController.isAskingTripQuestions()) {
+      questionController.resetTrip();
+    }
+
+    questionController.updateSurveyPosition(0, 0);
     hubPageController.showHubPage();
     drawerController.showHubPage();
     setTitle(getString(R.string.hub_page_title));
   }
 
   private void showStatisticsPage() {
+    if (questionController.isAskingTripQuestions()) {
+      questionController.resetTrip();
+    }
+
+    questionController.updateSurveyPosition(0, 0);
     statisticsPageController.showStatisticsPage();
     drawerController.showStatisticsPage();
   }
@@ -349,18 +359,6 @@ public class SurveyorActivity extends Activity {
    */
 
   @Subscribe
-  public void handleStatisticsRequest(HubPageFragment.RequestStatisticsEvent event) {
-    showStatisticsPage();
-  }
-
-  @Subscribe
-  public void startSurvey(HubPageFragment.RequestStartSurveyEvent event) {
-    metadata.setSurveyID("S" + StringUtil.createID());
-    questionController.startSurvey();
-    drawerController.selectSurveyChapter(0);
-  }
-
-  @Subscribe
   public void onToggleTrip(HubPageFragment.RequestToggleTripEvent event) {
     if (metadata.getTripID() == null) {
       metadata.setTripID("T" + StringUtil.createID());
@@ -382,21 +380,19 @@ public class SurveyorActivity extends Activity {
   }
 
   @Subscribe
-  public void onHubPageRequested(DrawerView.ShowHubPageEvent event) {
-    if (questionController.isAskingTripQuestions()) {
-      questionController.resetTrip();
-    }
+  public void startSurvey(HubPageFragment.RequestStartSurveyEvent event) {
+    metadata.setSurveyID("S" + StringUtil.createID());
+    questionController.startSurvey();
+    drawerController.selectSurveyChapter(0);
+  }
 
-    questionController.updateSurveyPosition(0, 0);
+  @Subscribe
+  public void onHubPageRequested(CommonEvents.RequestHubPageEvent event) {
     showHubPage();
   }
 
   @Subscribe
-  public void onStatisticsPageRequested(DrawerView.ShowStatisticsPageEvent event) {
-    if (questionController.isAskingTripQuestions()) {
-      questionController.resetTrip();
-    }
-    questionController.updateSurveyPosition(0, 0);
+  public void onStatisticsPageRequested(CommonEvents.RequestStatisticsPageEvent event) {
     showStatisticsPage();
   }
 
