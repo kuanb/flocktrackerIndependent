@@ -44,10 +44,11 @@ public class QuestionController implements QuestionActionListener {
   private Bus eventBus;
 
   @Inject
-  public QuestionController(Context context, SubmissionHelper submissionHelper, Bus eventBus) {
+  public QuestionController(Context context, SubmissionHelper submissionHelper, Metadata metadata, Bus eventBus) {
     this.context = context;
     this.fragmentManager = ((Activity) context).getFragmentManager();
     this.submissionHelper = submissionHelper;
+    this.metadata = metadata;
     this.eventBus = eventBus;
     resetSurvey();
     resetTrip();
@@ -61,11 +62,7 @@ public class QuestionController implements QuestionActionListener {
     }).run();
   }
 
-  public void setMetadata(Metadata metadata) {
-    this.metadata = metadata;
-  }
-
-  public void startTrip() {
+  public void askTripQuestions() {
     trackerQuestionPosition = 0;
     isAskingTripQuestions = true;
     showCurrentQuestion();
@@ -112,7 +109,7 @@ public class QuestionController implements QuestionActionListener {
     transaction.commit();
   }
 
-  private Question getCurrentQuestion() {
+  public Question getCurrentQuestion() {
     Question currentQuestion;
     if (isAskingTripQuestions) {
       if (inLoop) {
@@ -220,7 +217,7 @@ public class QuestionController implements QuestionActionListener {
     questionPosition = 0;
   }
 
-  private void resetTrip() {
+  public void resetTrip() {
     JSONObject surveyJSONObject = null;
 
     // parse json survey
@@ -234,6 +231,10 @@ public class QuestionController implements QuestionActionListener {
     // Tracking information.
     trackingQuestions = JSONUtil.parseTrackingQuestions(context, surveyJSONObject);
     trackerQuestionPosition = 0;
+  }
+
+  public boolean isAskingTripQuestions() {
+    return isAskingTripQuestions;
   }
 
   private Chapter getCurrentChapter() {

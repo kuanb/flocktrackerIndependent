@@ -1,9 +1,11 @@
 package org.urbanlaunchpad.flocktracker.controllers;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import org.urbanlaunchpad.flocktracker.*;
 import org.urbanlaunchpad.flocktracker.models.Statistics;
 
+import javax.inject.Inject;
 import java.util.Calendar;
 
 public class StatisticsPageController {
@@ -12,8 +14,9 @@ public class StatisticsPageController {
   private SharedPreferences prefs;
   private Statistics statistics;
 
-  public StatisticsPageController(SurveyorActivity surveyorActivity, Statistics statistics) {
-    this.surveyorActivity = surveyorActivity;
+  @Inject
+  public StatisticsPageController(Context context, Statistics statistics) {
+    this.surveyorActivity = (SurveyorActivity) context;
     this.statistics = statistics;
 
     prefs = ProjectConfig.get().getSharedPreferences();

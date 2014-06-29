@@ -8,12 +8,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 import android.util.Log;
-import org.urbanlaunchpad.flocktracker.controllers.TrackerController;
+import org.urbanlaunchpad.flocktracker.controllers.LocationController;
+
+import javax.inject.Inject;
 
 public class TrackerAlarm extends BroadcastReceiver {
 
+  public static final String TAG = "TrackerAlarm";
   public static final Integer TRACKER_INTERVAL = 30000;
-  public static TrackerController trackerController;
+  private LocationController locationController;
+
+  @Inject
+  public TrackerAlarm(LocationController locationController) {
+    this.locationController = locationController;
+  }
 
   @SuppressLint("Wakelock")
   @Override
@@ -25,10 +33,10 @@ public class TrackerAlarm extends BroadcastReceiver {
         PowerManager.PARTIAL_WAKE_LOCK, "");
     wl.acquire();
 
-    if (trackerController != null) {
+    if (locationController != null) {
       new Thread(new Runnable() {
         public void run() {
-          trackerController.saveLocation();
+          locationController.saveLocation();
         }
       }).start();
     } else {

@@ -9,16 +9,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import org.urbanlaunchpad.flocktracker.ProjectConfig;
 import org.urbanlaunchpad.flocktracker.R;
+import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.models.Statistics;
 import org.w3c.dom.Text;
 
+import javax.inject.Inject;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class StatisticsPageFragment extends Fragment {
 
   private Timer timer;
-  private Statistics statistics;
+  @Inject Statistics statistics;
 
   private TextView tripTimeText;
   private TextView tripDistanceText;
@@ -27,16 +29,21 @@ public class StatisticsPageFragment extends Fragment {
   private TextView usernameText;
   private TextView surveysCompletedText;
   private TextView ridesCompletedText;
+  private View rootView;
 
-  public StatisticsPageFragment(Statistics statistics) {
-    this.statistics = statistics;
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    ((SurveyorActivity) getActivity()).getObjectGraph().inject(this);
   }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    View rootView = inflater.inflate(R.layout.fragment_status, container, false);
+    if (rootView == null) {
+      rootView = inflater.inflate(R.layout.fragment_status, container, false);
+    }
     tripTimeText = (TextView) rootView.findViewById(R.id.tripTime);
     tripDistanceText = (TextView) rootView.findViewById(R.id.tripDistance);
     totalDistanceText = (TextView) rootView.findViewById(R.id.totalDistance);

@@ -39,14 +39,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".fragments.HubPageFragment"
-            android:label="@string/hub_page_title"
-            android:screenOrientation="portrait" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.urbanlaunchpad.flocktracker.Survey_agree" />
-        </activity>
 
         <activity
             android:name=".IniconfigActivity"
@@ -71,8 +63,6 @@
         <meta-data
             android:name="com.google.android.apps.drive.APP_ID"
             android:value="id=AIzaSyB4Nn1k2sML-0aBN2Fk3qOXLF-4zlaNwmg" />
-
-        <receiver android:name=".TrackerAlarm" />
     </application>
 
 </manifest>

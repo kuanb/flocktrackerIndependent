@@ -6,13 +6,12 @@ import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,14 +22,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.*;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -38,50 +30,33 @@ import dagger.ObjectGraph;
 import org.urbanlaunchpad.flocktracker.adapters.DrawerListViewAdapter;
 import org.urbanlaunchpad.flocktracker.controllers.*;
 import org.urbanlaunchpad.flocktracker.fragments.HubPageFragment;
-import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment;
 import org.urbanlaunchpad.flocktracker.fragments.StatisticsPageFragment;
 import org.urbanlaunchpad.flocktracker.helpers.*;
-import org.urbanlaunchpad.flocktracker.helpers.SurveyHelper.Tuple;
 import org.urbanlaunchpad.flocktracker.menu.RowItem;
 import org.urbanlaunchpad.flocktracker.models.Metadata;
-import org.urbanlaunchpad.flocktracker.models.Statistics;
+import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.util.LocationUtil;
+import org.urbanlaunchpad.flocktracker.util.StringUtil;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.*;
 
-public class SurveyorActivity extends Activity implements
-		GooglePlayServicesClient.ConnectionCallbacks,
-		GooglePlayServicesClient.OnConnectionFailedListener {
+public class SurveyorActivity extends Activity {
 
 	public static final Integer INCOMPLETE_CHAPTER = R.drawable.complete_red;
 	public static final Integer COMPLETE_CHAPTER = R.drawable.complete_green;
 	public static final Integer HALF_COMPLETE_CHAPTER = R.drawable.complete_orange;
-	public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
-	private static final int MILLISECONDS_PER_SECOND = 1000;
-	private static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND
-			* UPDATE_INTERVAL_IN_SECONDS;
-	private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
-	private static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND
-			* FASTEST_INTERVAL_IN_SECONDS;
+
 	public static GoogleDriveHelper driveHelper;
-	public static Boolean askingTripQuestions = false;
-	public static boolean submittingSubmission = false;
-	public static boolean savingSurveySubmission = false;
-	public static boolean savingTrackerSubmission = false;
   private ObjectGraph objectGraph;
 
 	// Stored queues of surveys to submit
-	private final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-	public LocationClient mLocationClient;
-
-	// Define an object that holds accuracy and frequency parameters
-	LocationRequest mLocationRequest;
+	public static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
 	// Drawer fields
-	private DrawerLayout chapterDrawerLayout;
+	private DrawerLayout drawerLayout;
 	private ListView fixedNavigationList;
 	private ListView chapterDrawerList;
 	private LinearLayout drawer;
@@ -89,28 +64,15 @@ public class SurveyorActivity extends Activity implements
 	private CharSequence chapterDrawerTitle;
 	private CharSequence title;
 	private List<RowItem> rowItems;
-	private QuestionFragment currentQuestionFragment;
-  private HubPageFragment hubPageFragment = new HubPageFragment();
-	private SurveyHelper surveyHelper;
+  private HubPageFragment hubPageFragment;
 
-  // Controllers
   @Inject QuestionController questionController;
-  private HubPageController hubPageController;
-  private StatisticsPageController statisticsPageController;
-  private DataController dataController;
-  private TrackerController trackerController;
-
-	// Metadata
-  private Metadata metadata = new Metadata();
-  private Statistics statistics;
-	private String username;
-	private String surveyID;
-	private String tripID;
-	private Integer maleCount = 0;
-	private Integer femaleCount = 0;
-	private boolean isTripStarted = false;
-
+  @Inject HubPageController hubPageController;
+  @Inject StatisticsPageController statisticsPageController;
+  @Inject LocationController locationController;
+  @Inject Metadata metadata;
   @Inject Bus eventBus;
+  @Inject TrackerAlarm trackerAlarm;
 
 	@SuppressLint("HandlerLeak")
 	private Handler messageHandler = new Handler() {
@@ -122,9 +84,9 @@ public class SurveyorActivity extends Activity implements
 						getResources().getString(R.string.survey_submitted),
 						Toast.LENGTH_SHORT);
 				toast.show();
-				surveyHelper.updateSurveyPosition(
-						SurveyHelper.HUB_PAGE_CHAPTER_POSITION,
-						SurveyHelper.HUB_PAGE_QUESTION_POSITION);
+//				surveyHelper.updateSurveyPosition(
+//						SurveyHelper.HUB_PAGE_CHAPTER_POSITION,
+//						SurveyHelper.HUB_PAGE_QUESTION_POSITION);
 				showHubPage();
 			} else if (msg.what == EVENT_TYPE.SUBMIT_FAILED.ordinal()) {
 				Toast toast = Toast.makeText(getApplicationContext(),
@@ -139,44 +101,22 @@ public class SurveyorActivity extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_surveyor);
-		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-		username = ProjectConfig.get().getUsername();
-		surveyHelper = new SurveyHelper(this);
 
     driveHelper = new GoogleDriveHelper(this);
-
-    mLocationClient = new LocationClient(this, this, this);
-
-    mLocationRequest = LocationRequest.create();
-    mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    mLocationRequest.setInterval(UPDATE_INTERVAL);
-    mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
 
     objectGraph = ObjectGraph.create(new FlocktrackerModule(this));
     objectGraph.inject(this);
     eventBus.register(this);
 
-    // Creating a random survey ID
-
-    surveyID = "S" + createID();
-
     // Check for location services.
     LocationUtil.checkLocationConfig(this);
 
-    SubmissionHelper submissionHelper = new SubmissionHelper();
-    statistics = new Statistics(this, metadata);
-    questionController.setMetadata(metadata);
-    hubPageController = new HubPageController(metadata, questionController);
-    hubPageFragment.init(hubPageController, metadata.getMaleCount(), metadata.getFemaleCount());
+    hubPageFragment = new HubPageFragment(hubPageController, metadata.getMaleCount(), metadata.getFemaleCount());
     hubPageController.setFragment(hubPageFragment);
-    statisticsPageController = new StatisticsPageController(this, statistics);
-    dataController = new DataController(metadata, statistics);
-    trackerController = new TrackerController(metadata, submissionHelper, mLocationClient);
 
 		// Navigation drawer information.
 		title = chapterDrawerTitle = getTitle();
-		chapterDrawerLayout = (DrawerLayout) findViewById(R.id.chapter_drawer_layout);
+		drawerLayout = (DrawerLayout) findViewById(R.id.chapter_drawer_layout);
 		chapterDrawerList = (ListView) findViewById(R.id.chapter_drawer);
 		fixedNavigationList = (ListView) findViewById(R.id.fixed_navigation);
 		drawer = (LinearLayout) findViewById(R.id.drawer);
@@ -188,22 +128,23 @@ public class SurveyorActivity extends Activity implements
 
 		// set a custom shadow that overlays the main content when the drawer
 		// opens
-		chapterDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
-				GravityCompat.START);
+		drawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
+        GravityCompat.START);
 		// set up the drawer's list view with items and click listener
 		fixedNavigationList.setAdapter((new ArrayAdapter<String>(this,
-				R.layout.old_chapter_list_item, new String[] {
-						getString(R.string.hub_page_title),
-						getString(R.string.statistics_page_title) })));
+        R.layout.old_chapter_list_item, new String[]{
+        getString(R.string.hub_page_title),
+        getString(R.string.statistics_page_title)}
+    )));
 		fixedNavigationList
 				.setOnItemClickListener(new FixedNavigationItemClickListener());
 		chapterDrawerList.setAdapter(new DrawerListViewAdapter(this,
-				R.layout.chapter_drawer_list_item, rowItems));
+        R.layout.chapter_drawer_list_item, rowItems));
 		chapterDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
 		chapterDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
-		chapterDrawerLayout, /* DrawerLayout object */
+        drawerLayout, /* DrawerLayout object */
 		R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
 		R.string.chapter_drawer_open, /* For accessibility */
 		R.string.chapter_drawer_close /* For accessibility */) {
@@ -216,10 +157,7 @@ public class SurveyorActivity extends Activity implements
 			}
 		};
 
-		chapterDrawerLayout.setDrawerListener(chapterDrawerToggle);
-
-		maleCount = 0;
-		femaleCount = 0;
+		drawerLayout.setDrawerListener(chapterDrawerToggle);
 
 		if (savedInstanceState == null) {
 			showHubPage();
@@ -233,8 +171,8 @@ public class SurveyorActivity extends Activity implements
 	@Override
 	protected void onDestroy() {
 		cancelTracker();
-		surveyHelper.resetTracker();
-		mLocationClient.disconnect();
+		questionController.resetTrip();
+    locationController.disconnect();
 		super.onDestroy();
 	}
 
@@ -243,7 +181,19 @@ public class SurveyorActivity extends Activity implements
 		// No call for super(). Bug on API Level > 11.
 	}
 
-	@Override
+  @Override
+  protected void onResume() {
+    super.onResume();
+    registerReceiver(trackerAlarm, new IntentFilter(TrackerAlarm.TAG));
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    unregisterReceiver(trackerAlarm);
+  }
+
+  @Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		// Sync the toggle state after onRestoreInstanceState has occurred.
@@ -296,52 +246,12 @@ public class SurveyorActivity extends Activity implements
 //		return;
 //	}
 
-	public void startTrip() {
-		isTripStarted = true;
-		mLocationClient.connect();
-		tripID = "T" + createID();
-	}
-
-	/*
-	 * Starting and stopping trip logic
-	 */
-
-	public String createID() {
-		String ID = null;
-		Integer randy;
-		for (int i = 0; i < 7; ++i) {
-			randy = (int) (Math.random() * ((9) + 1));
-			if (i == 0) {
-				ID = randy.toString();
-			} else {
-				ID = ID + randy.toString();
-			}
-		}
-
-		return ID;
-	}
-
-	public void resetSurvey() {
-		surveyID = "S" + createID();
-		surveyHelper.resetSurvey();
-
-		for (RowItem rowItem : rowItems) {
-			rowItem.setImageId(INCOMPLETE_CHAPTER);
-		}
-	}
-
-	public void resetTrackerSurvey() {
-		askingTripQuestions = false;
-		surveyHelper.prevTrackingPositions = new Stack<Integer>();
-	}
-
 	public void saveSurvey() {
-		savingSurveySubmission = true;
-		// connect if not tracking
-		if (!mLocationClient.isConnected()) {
-			mLocationClient.connect();
-		}
-		if (mLocationClient.isConnected()) {
+//		// connect if not tracking
+//		if (!mLocationClient.isConnected()) {
+//			mLocationClient.connect();
+//		}
+//		if (mLocationClient.isConnected()) {
 //			new Thread(new Runnable() {
 //				public void run() {
 //					String jsurvString = surveyHelper.jsurv.toString();
@@ -375,10 +285,10 @@ public class SurveyorActivity extends Activity implements
 //					statisticsPageController.surveysCompleted++;
 //				}
 //			}).start();
-
-			messageHandler.sendEmptyMessage(EVENT_TYPE.SUBMITTED_SURVEY
-					.ordinal());
-		}
+//
+//			messageHandler.sendEmptyMessage(EVENT_TYPE.SUBMITTED_SURVEY
+//					.ordinal());
+//		}
 	}
 
 	@Override
@@ -396,17 +306,18 @@ public class SurveyorActivity extends Activity implements
 			break;
 		case GoogleDriveHelper.REQUEST_AUTHORIZATION:
 			if (resultCode == Activity.RESULT_OK) {
-				if (askingTripQuestions) {
+				if (questionController.isAskingTripQuestions()) {
 					ArrayList<Integer> key = new ArrayList<Integer>(
 							Arrays.asList(
-									surveyHelper.getTrackerQuestionPosition(), -1,
+									questionController.getCurrentQuestion().getQuestionNumber(), -1,
 									-1));
 //					SurveyHelper.prevTrackerImages
 //							.put(key, driveHelper.fileUri);
 				} else {
+          Question question = questionController.getCurrentQuestion();
 					ArrayList<Integer> key = new ArrayList<Integer>(
-							Arrays.asList(surveyHelper.getChapterPosition(),
-									surveyHelper.getQuestionPosition(), -1, -1));
+							Arrays.asList(question.getChapter().getChapterNumber(),
+                  question.getQuestionNumber(), -1, -1));
 //					SurveyHelper.prevImages.put(key, driveHelper.fileUri);
 				}
 //				currentQuestionFragment.ImageLayout();
@@ -437,17 +348,18 @@ public class SurveyorActivity extends Activity implements
 			}
 
 			if (resultCode == Activity.RESULT_OK) {
-				if (askingTripQuestions) {
+				if (questionController.isAskingTripQuestions()) {
 					ArrayList<Integer> key = new ArrayList<Integer>(
 							Arrays.asList(
-									surveyHelper.getTrackerQuestionPosition(), -1,
+                  questionController.getCurrentQuestion().getQuestionNumber(), -1,
 									-1));
 //					SurveyHelper.prevTrackerImages
 //							.put(key, driveHelper.fileUri);
 				} else {
-					ArrayList<Integer> key = new ArrayList<Integer>(
-							Arrays.asList(surveyHelper.getChapterPosition(),
-									surveyHelper.getQuestionPosition(), -1, -1));
+          Question question = questionController.getCurrentQuestion();
+          ArrayList<Integer> key = new ArrayList<Integer>(
+              Arrays.asList(question.getChapter().getChapterNumber(),
+                  question.getQuestionNumber(), -1, -1));
 //					SurveyHelper.prevImages.put(key, driveHelper.fileUri);
 				}
 //				currentQuestionFragment.ImageLayout();
@@ -507,15 +419,9 @@ public class SurveyorActivity extends Activity implements
 		setTitle(getString(R.string.hub_page_title));
 	}
 
-
-  @Subscribe
-  public void handleStatisticsRequest(HubPageFragment.RequestStatisticsEvent event) {
-    showStatusPage();
-  }
-
 	private void showStatusPage() {
 		FragmentManager fragmentManager = getFragmentManager();
-		Fragment fragment = new StatisticsPageFragment(statistics);
+		Fragment fragment = new StatisticsPageFragment();
 
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
 		transaction.replace(R.id.surveyor_frame, fragment);
@@ -527,7 +433,7 @@ public class SurveyorActivity extends Activity implements
 		fixedNavigationList.setItemChecked(1, true);
 		chapterDrawerList.setItemChecked(-1, true);
 		setTitle(getString(R.string.statistics_page_title));
-		chapterDrawerLayout.closeDrawer(drawer);
+		drawerLayout.closeDrawer(drawer);
 	}
 
 	private void showCurrentQuestion() {
@@ -546,7 +452,7 @@ public class SurveyorActivity extends Activity implements
 //			loopPosition = surveyHelper.getLoopPosition();
 //		}
 //
-//		if (askingTripQuestions) {
+//		if (questionController.isAskingTripQuestions()) {
 //			chapterPosition = 0;
 //			questionPosition = surveyHelper.getChapterPosition();
 //
@@ -569,7 +475,7 @@ public class SurveyorActivity extends Activity implements
 //			fixedNavigationList.setItemChecked(-1, true);
 //			chapterDrawerList.setItemChecked(chapterPosition, true);
 //			setTitle(surveyHelper.getChapterTitles()[chapterPosition]);
-//			chapterDrawerLayout.closeDrawer(drawer);
+//			drawerLayout.closeDrawer(drawer);
 //
 //			// Get current question
 //			try {
@@ -610,8 +516,8 @@ public class SurveyorActivity extends Activity implements
 //		}
 //
 //		// selectively show previous question button
-//		if ((askingTripQuestions && surveyHelper.getTrackerQuestionPosition() == 0)
-//				|| (!askingTripQuestions && questionPosition == 0)) {
+//		if ((questionController.isAskingTripQuestions() && surveyHelper.getTrackerQuestionPosition() == 0)
+//				|| (!questionController.isAskingTripQuestions() && questionPosition == 0)) {
 //			navButtons.getView().findViewById(R.id.previous_question_button)
 //					.setVisibility(View.INVISIBLE);
 //		} else {
@@ -621,7 +527,7 @@ public class SurveyorActivity extends Activity implements
 
 //		transaction.replace(R.id.surveyor_frame, currentQuestionFragment);
 //		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-//		if (!askingTripQuestions) {
+//		if (!questionController.isAskingTripQuestions()) {
 //			transaction.addToBackStack(null);
 //		}
 //		transaction.commit();
@@ -637,61 +543,6 @@ public class SurveyorActivity extends Activity implements
 		getActionBar().setTitle(this.title);
 	}
 
-	@Override
-	public void onConnectionFailed(ConnectionResult connectionResult) {
-		if (connectionResult.hasResolution()) {
-			try {
-				// Start an Activity that tries to resolve the error
-				connectionResult.startResolutionForResult(this,
-						CONNECTION_FAILURE_RESOLUTION_REQUEST);
-				/*
-				 * Thrown if Google Play services canceled the original
-				 * PendingIntent
-				 */
-			} catch (IntentSender.SendIntentException e) {
-				// Log the error
-				e.printStackTrace();
-			}
-		} else {
-			/*
-			 * If no resolution is available, display a dialog to the user with
-			 * the error.
-			 */
-			Toast.makeText(this, connectionResult.getErrorCode(),
-					Toast.LENGTH_SHORT).show();
-		}
-	}
-
-	@Override
-	public void onConnected(Bundle connectionHint) {
-
-		mLocationClient.requestLocationUpdates(mLocationRequest,
-				new LocationListener() {
-					@Override
-					public void onLocationChanged(final Location location) {
-						dataController.onLocationChanged(isTripStarted, location);
-					}
-				});
-
-		if (savingSurveySubmission) { // connecting for submitting survey and
-			// not
-			// tracking
-			new Thread(new Runnable() {
-				public void run() {
-					saveSurvey();
-				}
-			}).start();
-		} else { // connecting for tracking
-			dataController.onLocationChanged(isTripStarted, mLocationClient.getLastLocation());
-			Toast.makeText(this, R.string.tracking_on, Toast.LENGTH_SHORT).show();
-		}
-	}
-
-	@Override
-	public void onDisconnected() {
-		// Display the connection status
-		Toast.makeText(this, R.string.disconnected, Toast.LENGTH_SHORT).show();
-	}
 //
 //	/*
 //	 * Callback Handlers for Connecting to Google Play (Authentication)
@@ -702,24 +553,24 @@ public class SurveyorActivity extends Activity implements
 //
 //		case PREVIOUS:
 //			currentQuestionFragment.saveState();
-//			surveyHelper.onPrevQuestionPressed(askingTripQuestions);
+//			surveyHelper.onPrevQuestionPressed(questionController.isAskingTripQuestions());
 //			onBackPressed();
 //			break;
 //		case NEXT:
 //			currentQuestionFragment.saveState();
 //			NextQuestionResult result = surveyHelper
-//					.onNextQuestionPressed(askingTripQuestions);
+//					.onNextQuestionPressed(questionController.isAskingTripQuestions());
 //
-//			if (askingTripQuestions) {
+//			if (questionController.isAskingTripQuestions()) {
 //				if (result == NextQuestionResult.END) {
-//					askingTripQuestions = false;
+//					questionController.isAskingTripQuestions() = false;
 //					surveyHelper.updateSurveyPosition(
 //							SurveyHelper.HUB_PAGE_CHAPTER_POSITION,
 //							SurveyHelper.HUB_PAGE_QUESTION_POSITION);
 //					surveyHelper.prevTrackingPositions = new Stack<Integer>();
 //					showHubPage();
-//					startTrip();
-//					statisticsPageController.startTrip();
+//					askTripQuestions();
+//					statisticsPageController.askTripQuestions();
 //					startTracker();
 //					break;
 //				}
@@ -762,11 +613,11 @@ public class SurveyorActivity extends Activity implements
 //				receivedLoopTotal = Integer.parseInt(answerStringReceive);
 //				if ((currentLoopTotal != receivedLoopTotal)
 //						|| (receivedLoopTotal == 0)) {
-//					surveyHelper.clearLoopAnswerHashMap(questionkey.get(0),questionkey.get(1), askingTripQuestions);
+//					surveyHelper.clearLoopAnswerHashMap(questionkey.get(0),questionkey.get(1), questionController.isAskingTripQuestions());
 //					surveyHelper.loopTotal = receivedLoopTotal;
 //					surveyHelper.updateLoopLimit();
 //					surveyHelper.initializeLoop();
-//					if (!askingTripQuestions) {
+//					if (!questionController.isAskingTripQuestions()) {
 //						surveyHelper.answerCurrentQuestion(answerStringReceive,
 //								selectedAnswers);
 //					} else {
@@ -777,7 +628,7 @@ public class SurveyorActivity extends Activity implements
 //			}
 //
 //		} else if ((answerStringReceive != null)) {
-//			if (!askingTripQuestions) {
+//			if (!questionController.isAskingTripQuestions()) {
 //				surveyHelper.answerCurrentQuestion(answerStringReceive,
 //						selectedAnswers);
 //			} else {
@@ -826,7 +677,7 @@ public class SurveyorActivity extends Activity implements
 //				stopTripDialog();
 //			} else {
 //				surveyHelper.resetTracker();
-//				askingTripQuestions = true;
+//				questionController.isAskingTripQuestions() = true;
 //
 //				// Starting question fragment and passing json question
 //				// information.
@@ -842,7 +693,7 @@ public class SurveyorActivity extends Activity implements
 //			showCurrentQuestion();
 //			break;
 //		case STATISTICS:
-//			if (askingTripQuestions) {
+//			if (questionController.isAskingTripQuestions()) {
 //				surveyHelper
 //						.updateTrackerPosition(SurveyHelper.STATS_PAGE_QUESTION_POSITION);
 //			} else {
@@ -895,7 +746,7 @@ public class SurveyorActivity extends Activity implements
 
 	public void startTracker() {
 		AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		Intent intentAlarm = new Intent(this, TrackerAlarm.class);
+		Intent intentAlarm = new Intent(TrackerAlarm.TAG);
 		PendingIntent pi = PendingIntent.getBroadcast(this, 1, intentAlarm,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
@@ -937,7 +788,6 @@ public class SurveyorActivity extends Activity implements
 					}
 				});
 		dialog.show();
-
 	}
 
 	/*
@@ -945,18 +795,46 @@ public class SurveyorActivity extends Activity implements
 	 */
 
 	public void stopTrip() {
-		isTripStarted = false;
-		mLocationClient.disconnect();
-		tripID = "";
+    locationController.disconnect();
 		cancelTracker();
 		messageHandler.sendEmptyMessage(EVENT_TYPE.UPDATE_HUB_PAGE.ordinal());
-		surveyHelper.resetTracker();
+		questionController.resetTrip();
 		statisticsPageController.stopTrip();
 	}
 
+
+  @Subscribe
+  public void handleStatisticsRequest(HubPageFragment.RequestStatisticsEvent event) {
+    showStatusPage();
+  }
+
+  @Subscribe
+  public void startSurvey(HubPageFragment.RequestStartSurveyEvent event) {
+    metadata.setSurveyID("S" + StringUtil.createID());
+    questionController.startSurvey();
+    fixedNavigationList.setItemChecked(-1, true);
+    chapterDrawerList.setItemChecked(0, true);
+  }
+
+  @Subscribe
+  public void onToggleTrip(HubPageFragment.RequestToggleTripEvent event) {
+    if (metadata.getTripID() == null) {
+      metadata.setTripID("T" + StringUtil.createID());
+      questionController.askTripQuestions();
+    } else {
+      metadata.setTripID(null);
+      metadata.setCurrentLocation(null);
+      statisticsPageController.stopTrip();
+      hubPageFragment.stopTrip();
+      cancelTracker();
+    }
+  }
+
   @Subscribe
   public void onReachedEndOfTrackerSurvey(QuestionController.ReachedEndOfTrackerSurveyEvent event) {
+    startTracker();
     showHubPage();
+    statisticsPageController.startTrip();
   }
 
   private enum EVENT_TYPE {
@@ -970,21 +848,17 @@ public class SurveyorActivity extends Activity implements
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
 			Log.d("Clicked on fixed position", position + "");
-			if (askingTripQuestions) {
-				resetTrackerSurvey();
+			if (questionController.isAskingTripQuestions()) {
+				questionController.resetTrip();
 			}
 
-			if (position == 0) {
-				surveyHelper.updateSurveyPosition(
-						SurveyHelper.HUB_PAGE_CHAPTER_POSITION,
-						SurveyHelper.HUB_PAGE_QUESTION_POSITION);
+      questionController.updateSurveyPosition(0, 0);
+      if (position == 0) {
 				showHubPage();
 			} else {
-				surveyHelper.updateSurveyPosition(
-						SurveyHelper.STATS_PAGE_CHAPTER_POSITION,
-						SurveyHelper.STATS_PAGE_QUESTION_POSITION);
 				showStatusPage();
 			}
+      drawerLayout.closeDrawer(drawer);
     }
 	}
 
@@ -995,12 +869,13 @@ public class SurveyorActivity extends Activity implements
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
 			Log.d("Clicked on drawer position", position + "");
-			if (askingTripQuestions) {
-				resetTrackerSurvey();
+			if (questionController.isAskingTripQuestions()) {
+				questionController.resetTrip();
 			}
 			questionController.updateSurveyPosition(position, 0);
 			showCurrentQuestion();
-      chapterDrawerLayout.closeDrawer(drawer);
+      fixedNavigationList.setItemChecked(-1, true);
+      drawerLayout.closeDrawer(drawer);
 		}
 	}
 

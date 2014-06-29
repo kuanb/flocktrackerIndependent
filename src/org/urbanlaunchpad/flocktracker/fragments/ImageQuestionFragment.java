@@ -1,19 +1,12 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
-import org.json.JSONException;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
-import org.urbanlaunchpad.flocktracker.helpers.ImageHelper;
-import org.urbanlaunchpad.flocktracker.helpers.SurveyHelper;
 import org.urbanlaunchpad.flocktracker.models.Question;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ImageQuestionFragment extends QuestionFragment {
 

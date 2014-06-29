@@ -145,11 +145,9 @@ public class Statistics {
     return distanceDelta / (TrackerAlarm.TRACKER_INTERVAL) * SECONDS_PER_HOUR;
   }
 
-  public void updateLocation(boolean isTripStarted, Location location) {
+  public void updateLocation(Location location) {
     // update location + distance
-    if (isTripStarted) {
-      distanceDelta = metadata.getCurrentLocation().distanceTo(location);
-      tripDistance += distanceDelta;
-    }
+    distanceDelta = metadata.getCurrentLocation().distanceTo(location);
+    tripDistance += distanceDelta;
   }
 }

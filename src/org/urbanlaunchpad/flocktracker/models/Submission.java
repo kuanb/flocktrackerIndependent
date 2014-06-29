@@ -84,15 +84,21 @@ public class Submission {
   /**
    * Helper method to upload images associated with this submission.
    *
-   * @return
+   * @return true if success, false otherwise.
    */
   private boolean submitImages() {
+    if (chapters == null) {
+      return true;
+    }
+
     try {
       for (Chapter chapter : chapters) {
         for (Question question : chapter.getQuestions()) {
           // Upload images
-          String fileLink = question.getImage().toString();
-          SurveyorActivity.driveHelper.saveFileToDrive(fileLink);
+          if (question.getImage() != null) {
+            String fileLink = question.getImage().toString();
+            SurveyorActivity.driveHelper.saveFileToDrive(fileLink);
+          }
         }
       }
     } catch (IOException e) {
@@ -112,14 +118,6 @@ public class Submission {
     StringBuilder questionIDString = new StringBuilder();
     StringBuilder answerString = new StringBuilder();
 
-    for (Chapter chapter : chapters) {
-      for (Question question : chapter.getQuestions()) {
-        // Get question ID's and answers
-        questionIDString.append(question.getQuestionID() + ",");
-        answerString.append("'" + question.getSelectedAnswers().toString() + "','");
-      }
-    }
-
     Location currentLocation = metadata.getCurrentLocation();
     String locationString = LocationUtil.getLngLatAlt(currentLocation);
     String query = "";
@@ -128,10 +126,8 @@ public class Submission {
       case TRACKER:
         query = "INSERT INTO "
             + ProjectConfig.get().getTrackerTableID()
-            + " ("
-            + questionIDString
-            + "Location,Lat,Lng,Alt,Date,TripID,Username,TotalCount,FemaleCount,MaleCount,Speed) VALUES ("
-            + answerString + "<Point><coordinates>" + locationString
+            + " (Location,Lat,Lng,Alt,Date,TripID,Username,TotalCount,FemaleCount,MaleCount,Speed) VALUES ("
+            + "'<Point><coordinates>" + locationString
             + "</coordinates></Point>','" + currentLocation.getLatitude() + "','" + currentLocation.getLongitude()
             + "','" + currentLocation.getAltitude() + "','" + metadata.getTimeStamp() + "','" + metadata.getTripID()
             + "','" + ProjectConfig.get().getUsername() + "','"
@@ -139,6 +135,14 @@ public class Submission {
             + metadata.getFemaleCount() + "','" + metadata.getMaleCount() + "','" + metadata.getSpeed() + "');";
         break;
       case SURVEY:
+        for (Chapter chapter : chapters) {
+          for (Question question : chapter.getQuestions()) {
+            // Get question ID's and answers
+            questionIDString.append(question.getQuestionID() + ",");
+            answerString.append("'" + question.getSelectedAnswers().toString() + "','");
+          }
+        }
+
         query = "INSERT INTO "
             + ProjectConfig.get().getSurveyUploadTableID()
             + " ("

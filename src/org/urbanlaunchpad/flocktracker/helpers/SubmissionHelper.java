@@ -1,17 +1,16 @@
 package org.urbanlaunchpad.flocktracker.helpers;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.urbanlaunchpad.flocktracker.ProjectConfig;
-import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Submission;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -52,13 +51,16 @@ public class SubmissionHelper {
   }
 
   public void saveSubmission(Submission submission) {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    String timestamp = sdf.format(new Date());
+    submission.getMetadata().setTimeStamp(timestamp);
+
     if (submission.getType().equals(Submission.Type.TRACKER)) {
       savingTrackerSubmission = true;
       synchronized (trackerSubmissionQueue) {
         trackerSubmissionQueue.add(submission);
         prefs.edit().putString("trackerSubmissionQueue", new Gson().toJson(trackerSubmissionQueue)).commit();
         savingTrackerSubmission = false;
-        trackerSubmissionQueue.notify();
       }
     } else if (submission.getType().equals(Submission.Type.SURVEY)) {
       savingSurveySubmission = true;
@@ -66,7 +68,6 @@ public class SubmissionHelper {
         surveySubmissionQueue.add(submission);
         prefs.edit().putString("surveySubmissionQueue", new Gson().toJson(surveySubmissionQueue)).commit();
         savingSurveySubmission = false;
-        surveySubmissionQueue.notify();
       }
     }
 
@@ -102,28 +103,28 @@ public class SubmissionHelper {
           }
 
           // Iterate through queues to submit surveys
-          for (Iterator<Submission> i = surveySubmissionQueue.iterator(); i.hasNext(); ) {
-            Submission submission = i.next();
-            if (submission.submit()) {
-              i.remove();
-              prefs.edit().putString("surveySubmissionQueue", new Gson().toJson(surveySubmissionQueue)).commit();
-            } else { // Failed. Try again
-              try {
-                Thread.sleep(3000);
-              } catch (InterruptedException e) {
-                e.printStackTrace();
+          while (!surveySubmissionQueue.isEmpty()) {
+            Submission submission = surveySubmissionQueue.pop();
+              if (submission.submit()) {
+                prefs.edit().putString("surveySubmissionQueue", new Gson().toJson(surveySubmissionQueue)).commit();
+              } else { // Failed. Try again
+                try {
+                  surveySubmissionQueue.add(submission);
+                  Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                  e.printStackTrace();
+                }
               }
-            }
           }
 
           // Iterate through queues to submit tracker updates
-          for (Iterator<Submission> i = trackerSubmissionQueue.iterator(); i.hasNext(); ) {
-            Submission submission = i.next();
+          while (!trackerSubmissionQueue.isEmpty()) {
+            Submission submission = trackerSubmissionQueue.pop();
             if (submission.submit()) {
-              i.remove();
               prefs.edit().putString("trackerSubmissionQueue", new Gson().toJson(trackerSubmissionQueue)).commit();
             } else { // Failed. Try again
               try {
+                trackerSubmissionQueue.add(submission);
                 Thread.sleep(3000);
               } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -131,6 +132,7 @@ public class SubmissionHelper {
             }
           }
         }
+        submittingSubmission = false;
       }
     }).start();
   }

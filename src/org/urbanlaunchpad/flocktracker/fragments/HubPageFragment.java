@@ -35,9 +35,11 @@ public class HubPageFragment extends Fragment {
   private int maleCount = 0;
   private int femaleCount = 0;
   @Inject Bus eventBus;
+  private RequestToggleTripEvent requestToggleTripEvent = new RequestToggleTripEvent();
   private RequestStatisticsEvent requestStatisticsEvent = new RequestStatisticsEvent();
+  private RequestStartSurveyEvent requestStartSurveyEvent = new RequestStartSurveyEvent();
 
-  public void init(HubPageActionListener listener, int maleCount, int femaleCount) {
+  public HubPageFragment(HubPageActionListener listener, int maleCount, int femaleCount) {
     this.listener = listener;
     this.maleCount = maleCount;
     this.femaleCount = femaleCount;
@@ -50,6 +52,12 @@ public class HubPageFragment extends Fragment {
 
   public void stopTrip() {
     startTripButton.setImageResource(R.drawable.ft_red_st);
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    ((SurveyorActivity) getActivity()).getObjectGraph().inject(this);
   }
 
   @Override
@@ -71,7 +79,6 @@ public class HubPageFragment extends Fragment {
     this.totalCountView = (TextView) rootView.findViewById(R.id.totalPersonCount);
 
     setupClickListeners();
-    ((SurveyorActivity) getActivity()).getObjectGraph().inject(this);
     eventBus.register(this);
 
     return rootView;
@@ -81,14 +88,14 @@ public class HubPageFragment extends Fragment {
     startTripButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        listener.onToggleTrip();
+        eventBus.post(requestToggleTripEvent);
       }
     });
 
     startSurveyButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        listener.onStartSurvey();
+        eventBus.post(requestStartSurveyEvent);
       }
     });
 
@@ -154,7 +161,8 @@ public class HubPageFragment extends Fragment {
     fewerWomenButton.setEnabled(femaleCount > 0);
   }
 
-  public class RequestStatisticsEvent {
+  public class RequestToggleTripEvent {}
+  public class RequestStatisticsEvent {}
 
-  }
+  public class RequestStartSurveyEvent {}
 }
