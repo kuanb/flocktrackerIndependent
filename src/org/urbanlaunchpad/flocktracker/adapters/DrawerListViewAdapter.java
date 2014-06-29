@@ -15,39 +15,39 @@ import java.util.List;
 
 public class DrawerListViewAdapter extends ArrayAdapter<RowItem> {
 
-    Context context;
+  Context context;
 
-    public DrawerListViewAdapter(Context context, int resourceId,
-        List<RowItem> items) {
-        super(context, resourceId, items);
-        this.context = context;
+  public DrawerListViewAdapter(Context context, int resourceId,
+      List<RowItem> items) {
+    super(context, resourceId, items);
+    this.context = context;
+  }
+
+  public View getView(int position, View convertView, ViewGroup parent) {
+    ViewHolder holder = null;
+    RowItem rowItem = getItem(position);
+
+    LayoutInflater mInflater = (LayoutInflater) context
+        .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+    if (convertView == null) {
+      convertView = mInflater.inflate(R.layout.chapter_drawer_list_item, null);
+      holder = new ViewHolder();
+      holder.txtTitle = (TextView) convertView.findViewById(R.id.list_text);
+      holder.imageView = (ImageView) convertView.findViewById(R.id.list_image);
+      convertView.setTag(holder);
+    } else {
+      holder = (ViewHolder) convertView.getTag();
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
-        RowItem rowItem = getItem(position);
+    holder.txtTitle.setText(rowItem.getTitle());
+    holder.imageView.setImageResource(rowItem.getImageId());
 
-        LayoutInflater mInflater = (LayoutInflater) context
-            .getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.chapter_drawer_list_item, null);
-            holder = new ViewHolder();
-            holder.txtTitle = (TextView) convertView.findViewById(R.id.list_text);
-            holder.imageView = (ImageView) convertView.findViewById(R.id.list_image);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
+    return convertView;
+  }
 
-        holder.txtTitle.setText(rowItem.getTitle());
-        holder.imageView.setImageResource(rowItem.getImageId());
+  private class ViewHolder {
 
-        return convertView;
-    }
-
-    private class ViewHolder {
-
-        ImageView imageView;
-        TextView txtTitle;
-    }
+    ImageView imageView;
+    TextView txtTitle;
+  }
 }

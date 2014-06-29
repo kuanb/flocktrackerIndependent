@@ -9,7 +9,6 @@ import org.urbanlaunchpad.flocktracker.ProjectConfig;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Chapter;
 import org.urbanlaunchpad.flocktracker.models.Question;
-import org.urbanlaunchpad.flocktracker.util.QuestionUtil;
 
 public class JSONUtil {
   /**
@@ -47,7 +46,7 @@ public class JSONUtil {
     } catch (JSONException e) {
       e.printStackTrace();
       Toast.makeText(context, R.string.chapters_not_parsed,
-        Toast.LENGTH_SHORT).show();
+          Toast.LENGTH_SHORT).show();
     }
 
     return null;
@@ -73,7 +72,7 @@ public class JSONUtil {
       return trackingQuestions;
     } catch (JSONException e2) {
       Toast.makeText(context, R.string.no_tracker_questions,
-        Toast.LENGTH_SHORT).show();
+          Toast.LENGTH_SHORT).show();
       e2.printStackTrace();
     }
 

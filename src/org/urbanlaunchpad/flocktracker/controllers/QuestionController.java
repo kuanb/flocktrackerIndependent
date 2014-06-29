@@ -11,14 +11,14 @@ import org.json.JSONObject;
 import org.urbanlaunchpad.flocktracker.ProjectConfig;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.fragments.*;
-import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment.*;
+import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment.QuestionActionListener;
 import org.urbanlaunchpad.flocktracker.helpers.ColumnCheckHelper;
-import org.urbanlaunchpad.flocktracker.util.JSONUtil;
 import org.urbanlaunchpad.flocktracker.helpers.SubmissionHelper;
 import org.urbanlaunchpad.flocktracker.models.Chapter;
 import org.urbanlaunchpad.flocktracker.models.Metadata;
 import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.models.Submission;
+import org.urbanlaunchpad.flocktracker.util.JSONUtil;
 import org.urbanlaunchpad.flocktracker.util.QuestionUtil;
 
 import javax.inject.Inject;
@@ -241,5 +241,6 @@ public class QuestionController implements QuestionActionListener {
     return chapterList[chapterPosition];
   }
 
-  public class ReachedEndOfTrackerSurveyEvent {}
+  public class ReachedEndOfTrackerSurveyEvent {
+  }
 }

@@ -2,7 +2,8 @@ package org.urbanlaunchpad.flocktracker.controllers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import org.urbanlaunchpad.flocktracker.*;
+import org.urbanlaunchpad.flocktracker.ProjectConfig;
+import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.models.Statistics;
 
 import javax.inject.Inject;

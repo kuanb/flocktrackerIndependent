@@ -15,7 +15,6 @@ import java.util.HashSet;
 
 /**
  * ColumnCheckHelper checks to make sure the tables online have the necessary columns.
- *
  */
 public class ColumnCheckHelper {
   private Chapter[] surveyChapters;
@@ -38,11 +37,11 @@ public class ColumnCheckHelper {
 
   private void checkSurveyColumns() {
     String[] metadataColumnNames = new String[]{"Location", "Date", "Lat",
-      "Alt", "Lng", "SurveyID", "TripID", "TotalCount",
-      "FemaleCount", "MaleCount", "Speed", "Username"};
+        "Alt", "Lng", "SurveyID", "TripID", "TotalCount",
+        "FemaleCount", "MaleCount", "Speed", "Username"};
     String[] metadataColumnTypes = new String[]{"LOCATION", "DATETIME",
-      "NUMBER", "NUMBER", "NUMBER", "STRING", "STRING", "NUMBER",
-      "NUMBER", "NUMBER", "NUMBER", "STRING"};
+        "NUMBER", "NUMBER", "NUMBER", "STRING", "STRING", "NUMBER",
+        "NUMBER", "NUMBER", "NUMBER", "STRING"};
 
     String surveyTableID = ProjectConfig.get().getSurveyUploadTableID();
 
@@ -78,12 +77,12 @@ public class ColumnCheckHelper {
   }
 
   private void checkTrackerColumns() {
-    String[] metadataColumnNames = new String[] { "Location", "Date", "Lat",
-      "Alt", "Lng", "TripID", "TotalCount", "FemaleCount",
-      "MaleCount", "Speed", "Username" };
-    String[] metadataColumnTypes = new String[] { "LOCATION", "DATETIME",
-      "NUMBER", "NUMBER", "NUMBER", "STRING", "NUMBER", "NUMBER",
-      "NUMBER", "NUMBER", "STRING" };
+    String[] metadataColumnNames = new String[]{"Location", "Date", "Lat",
+        "Alt", "Lng", "TripID", "TotalCount", "FemaleCount",
+        "MaleCount", "Speed", "Username"};
+    String[] metadataColumnTypes = new String[]{"LOCATION", "DATETIME",
+        "NUMBER", "NUMBER", "NUMBER", "STRING", "NUMBER", "NUMBER",
+        "NUMBER", "NUMBER", "STRING"};
     String trackerTableID = ProjectConfig.get().getTrackerTableID();
 
     // Getting the types and names of the columns in the fusion table.
@@ -96,7 +95,7 @@ public class ColumnCheckHelper {
           // TODO: check column type
         } else {
           requestColumnCreate(metadataColumnNames[i], metadataColumnTypes[i],
-            trackerTableID);
+              trackerTableID);
         }
       }
 
@@ -119,7 +118,7 @@ public class ColumnCheckHelper {
   private HashSet<String> getColumnListNames(String tableID) throws IOException {
     // Returns the column list
     Fusiontables.Column.List columnRequest = IniconfigActivity.fusiontables
-      .column().list(tableID);
+        .column().list(tableID);
     columnRequest.setKey(ProjectConfig.get().getApiKey());
     columnRequest.setMaxResults((long) 500);
     ColumnList columnList = columnRequest.execute();
@@ -139,7 +138,7 @@ public class ColumnCheckHelper {
     // If it doesn't already exist, make the column.
     if (!columnNames.contains(question.getQuestionID())) {
       requestColumnCreate(question.getQuestionID(),
-        QuestionUtil.getColumnTypeFromQuestionType(question.getType()), tableID);
+          QuestionUtil.getColumnTypeFromQuestionType(question.getType()), tableID);
     }
   }
 
@@ -151,7 +150,7 @@ public class ColumnCheckHelper {
     Fusiontables.Column.Insert columnRequest;
     try {
       columnRequest = IniconfigActivity.fusiontables.column().insert(
-        tableID, newColumn);
+          tableID, newColumn);
       columnRequest.setKey(ProjectConfig.get().getApiKey());
       columnRequest.execute();
       Log.v("requestColumnCreate", "Column created!");

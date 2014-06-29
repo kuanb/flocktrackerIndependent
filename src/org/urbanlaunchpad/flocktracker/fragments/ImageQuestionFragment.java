@@ -10,24 +10,24 @@ import org.urbanlaunchpad.flocktracker.models.Question;
 
 public class ImageQuestionFragment extends QuestionFragment {
 
-	private OnClickListener cameraButtonOnClickListener = new OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			SurveyorActivity.driveHelper.startCameraIntent();
-		}
-	};
+  private OnClickListener cameraButtonOnClickListener = new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      SurveyorActivity.driveHelper.startCameraIntent();
+    }
+  };
 
   public ImageQuestionFragment(QuestionActionListener listener, Question question, QuestionType questionType) {
     super(listener, question, questionType);
   }
 
   public void setupLayout(View rootView) {
-		ImageView cameraButton = new ImageView(getActivity());
-		cameraButton.setImageResource(R.drawable.camera);
-		cameraButton.setOnClickListener(cameraButtonOnClickListener);
-		// answerlayout.addView(cameraButton);
-		addThumbnail();
-	}
+    ImageView cameraButton = new ImageView(getActivity());
+    cameraButton.setImageResource(R.drawable.camera);
+    cameraButton.setOnClickListener(cameraButtonOnClickListener);
+    // answerlayout.addView(cameraButton);
+    addThumbnail();
+  }
 
   @Override
   public void prepopulateQuestion() {
@@ -74,5 +74,5 @@ public class ImageQuestionFragment extends QuestionFragment {
 //				}
 //			}
 //		}
-	}
+  }
 }

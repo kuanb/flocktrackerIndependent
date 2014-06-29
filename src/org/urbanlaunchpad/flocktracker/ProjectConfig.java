@@ -18,6 +18,7 @@ public class ProjectConfig {
   private String apiKey;
 
   private SharedPreferences sharedPreferences;
+
   /**
    * Private constructor to ensure static instance.
    */

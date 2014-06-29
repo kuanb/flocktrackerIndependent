@@ -16,9 +16,9 @@ import java.util.Locale;
 
 public class Statistics {
 
-  private Context context;
-
+  private static final double SECONDS_PER_HOUR = 3600;
   public int surveysCompleted = 0;
+  private Context context;
   private Calendar startTripTime = null;
   private double tripDistance = 0; // distance in meters
   private double distanceDelta = 0;
@@ -26,8 +26,6 @@ public class Statistics {
   private int ridesCompleted = 0;
   private List<Address> addresses;
   private Metadata metadata;
-
-  private static final double SECONDS_PER_HOUR = 3600;
 
   public Statistics(Context context, Metadata metadata) {
     this.context = context;

@@ -36,8 +36,8 @@ public class IniconfigActivity extends Activity implements IniconfigListener {
 
   public static GoogleAccountCredential credential;
   public static Fusiontables fusiontables;
-  private SharedPreferences prefs;
   String jsonSurveyString;
+  private SharedPreferences prefs;
   private IniconfigManager iniconfigManager;
 
   @Override
@@ -48,7 +48,7 @@ public class IniconfigActivity extends Activity implements IniconfigListener {
     prefs = this.getSharedPreferences("org.urbanlaunchpad.flocktracker", Context.MODE_PRIVATE);
     // get credential with scopes
     credential = GoogleAccountCredential.usingOAuth2(this,
-      Arrays.asList(FUSION_TABLE_SCOPE, DriveScopes.DRIVE));
+        Arrays.asList(FUSION_TABLE_SCOPE, DriveScopes.DRIVE));
 
     iniconfigManager = (IniconfigManager) findViewById(R.id.iniconfig_view);
     iniconfigManager.initialize(this, prefs.getString("lastProject", null));
@@ -72,7 +72,7 @@ public class IniconfigActivity extends Activity implements IniconfigListener {
   public void displayUsernameSelection() {
     // Google credentials
     startActivityForResult(credential.newChooseAccountIntent(),
-      REQUEST_ACCOUNT_PICKER);
+        REQUEST_ACCOUNT_PICKER);
   }
 
   @Override
@@ -98,8 +98,8 @@ public class IniconfigActivity extends Activity implements IniconfigListener {
           credential.setSelectedAccountName(username);
 
           fusiontables = new Fusiontables.Builder(HTTP_TRANSPORT,
-            JSON_FACTORY, credential)
-            .setApplicationName("UXMexico").build();
+              JSON_FACTORY, credential)
+              .setApplicationName("UXMexico").build();
 
           // update our username field
           iniconfigManager.setUsername(username);
@@ -110,7 +110,7 @@ public class IniconfigActivity extends Activity implements IniconfigListener {
           parseSurvey();
         } else {
           startActivityForResult(credential.newChooseAccountIntent(),
-            REQUEST_ACCOUNT_PICKER);
+              REQUEST_ACCOUNT_PICKER);
         }
         break;
     }
@@ -119,8 +119,8 @@ public class IniconfigActivity extends Activity implements IniconfigListener {
   public boolean getSurvey(String tableId) throws UserRecoverableAuthIOException, IOException {
     String MASTER_TABLE_ID = ProjectConfig.get().getSurveyDownloadTableID();
     Sql sql = fusiontables.query().sql(
-      "SELECT survey_json FROM " + MASTER_TABLE_ID
-      + " WHERE table_id = '" + tableId + "'"
+        "SELECT survey_json FROM " + MASTER_TABLE_ID
+            + " WHERE table_id = '" + tableId + "'"
     );
     sql.setKey(ProjectConfig.get().getApiKey());
 
@@ -175,7 +175,7 @@ public class IniconfigActivity extends Activity implements IniconfigListener {
             iniconfigManager.onSurveyParsedCorrectly();
           } catch (JSONException e) {
             Log.e("JSON Parser",
-              "Error parsing data " + e.toString());
+                "Error parsing data " + e.toString());
             iniconfigManager.onSurveyParsedIncorrectly();
             ProjectConfig.get().setOriginalJSONSurveyString(null);
           }

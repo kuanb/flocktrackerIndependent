@@ -7,18 +7,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.controllers.QuestionController;
 import org.urbanlaunchpad.flocktracker.fragments.HubPageManager.HubPageActionListener;
-import org.urbanlaunchpad.flocktracker.R;
 
 import javax.inject.Inject;
 
 public class HubPageFragment extends Fragment {
 
+  @Inject
+  Bus eventBus;
   private View rootView;
   private ImageView startTripButton;
   private View startSurveyButton;
@@ -30,11 +31,9 @@ public class HubPageFragment extends Fragment {
   private TextView maleCountView;
   private TextView femaleCountView;
   private TextView totalCountView;
-
   private HubPageActionListener listener;
   private int maleCount = 0;
   private int femaleCount = 0;
-  @Inject Bus eventBus;
   private RequestToggleTripEvent requestToggleTripEvent = new RequestToggleTripEvent();
   private RequestStatisticsEvent requestStatisticsEvent = new RequestStatisticsEvent();
   private RequestStartSurveyEvent requestStartSurveyEvent = new RequestStartSurveyEvent();
@@ -161,8 +160,12 @@ public class HubPageFragment extends Fragment {
     fewerWomenButton.setEnabled(femaleCount > 0);
   }
 
-  public class RequestToggleTripEvent {}
-  public class RequestStatisticsEvent {}
+  public class RequestToggleTripEvent {
+  }
 
-  public class RequestStartSurveyEvent {}
+  public class RequestStatisticsEvent {
+  }
+
+  public class RequestStartSurveyEvent {
+  }
 }

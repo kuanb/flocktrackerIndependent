@@ -26,27 +26,32 @@ public class FlocktrackerModule {
     this.activity = activity;
   }
 
-  @Provides @Singleton
+  @Provides
+  @Singleton
   Context provideContext() {
     return activity;
   }
 
-  @Provides @Singleton
+  @Provides
+  @Singleton
   SubmissionHelper provideSubmissionHelper() {
     return new SubmissionHelper();
   }
 
-  @Provides @Singleton
+  @Provides
+  @Singleton
   Bus provideEventBus() {
     return new Bus();
   }
 
-  @Provides @Singleton
+  @Provides
+  @Singleton
   Metadata provideMetadata() {
     return new Metadata();
   }
 
-  @Provides @Singleton
+  @Provides
+  @Singleton
   Statistics provideStatistics(Context context, Metadata metadata) {
     return new Statistics(context, metadata);
   }

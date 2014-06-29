@@ -1,38 +1,28 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.urbanlaunchpad.flocktracker.R;
-import org.urbanlaunchpad.flocktracker.adapters.StableArrayAdapter;
-import org.urbanlaunchpad.flocktracker.menu.DynamicListView;
-
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ScrollView;
+import org.urbanlaunchpad.flocktracker.R;
+import org.urbanlaunchpad.flocktracker.menu.DynamicListView;
 import org.urbanlaunchpad.flocktracker.models.Question;
+
+import java.util.ArrayList;
 
 public class OrderedListQuestionFragment extends QuestionFragment implements DynamicListView.SwappingEnded {
 
-	ArrayList<String> answerList = null;
-	Button skipButton;
+  ArrayList<String> answerList = null;
+  Button skipButton;
 
-	private OnClickListener skipButtonOnClickListener = new OnClickListener() {
+  private OnClickListener skipButtonOnClickListener = new OnClickListener() {
 
-		@Override
-		public void onClick(View v) {
-			skipButton.setEnabled(false);
-			skipButton.setText(R.string.question_skipped);
-		}
+    @Override
+    public void onClick(View v) {
+      skipButton.setEnabled(false);
+      skipButton.setText(R.string.question_skipped);
+    }
 
-	};
+  };
 
   public OrderedListQuestionFragment(QuestionActionListener listener, Question question, QuestionType questionType) {
     super(listener, question, questionType);
@@ -79,14 +69,14 @@ public class OrderedListQuestionFragment extends QuestionFragment implements Dyn
 //
 //		prepopulateQuestion();
 //		sendAnswer();
-	}
+  }
 
-//	@Override
-	public void sendAnswer() {
-		if (skipButton != null) {
-			skipButton.setEnabled(true);
-			skipButton.setText(R.string.skip_question);
-		}
+  //	@Override
+  public void sendAnswer() {
+    if (skipButton != null) {
+      skipButton.setEnabled(true);
+      skipButton.setText(R.string.skip_question);
+    }
 //		answerString = getorderedAnswers();
 //		selectedAnswers = new ArrayList<Integer>();
 //
@@ -98,10 +88,10 @@ public class OrderedListQuestionFragment extends QuestionFragment implements Dyn
 //				}
 //			}
 //		}
-	}
-	
-	private String getorderedAnswers() {
-		String answer = null;
+  }
+
+  private String getorderedAnswers() {
+    String answer = null;
 //		StableArrayAdapter List = (StableArrayAdapter) answerlistView
 //				.getAdapter();
 //		for (int i = 0; i < answerList.size(); ++i) {
@@ -115,24 +105,24 @@ public class OrderedListQuestionFragment extends QuestionFragment implements Dyn
 //				answer = answer + ")";
 //			}
 //		}
-		return answer;
-	}
+    return answer;
+  }
 
-	@Override
-	public void prepopulateQuestion() {
-		// TODO Fix prepopulation
-		// getselectedAnswers();
-		ArrayList<Integer> selectedAnswers = null;
-		if (selectedAnswers != null) {
-			ArrayList<String> answerTempList = new ArrayList<String>();
-			for (int i = 0; i < answerList.size(); ++i) {
-				answerTempList.add(answerList.get(selectedAnswers.get(i)));
-			}
-			answerList.clear();
-			answerList.addAll(answerTempList);
-		}
-		
-	}
+  @Override
+  public void prepopulateQuestion() {
+    // TODO Fix prepopulation
+    // getselectedAnswers();
+    ArrayList<Integer> selectedAnswers = null;
+    if (selectedAnswers != null) {
+      ArrayList<String> answerTempList = new ArrayList<String>();
+      for (int i = 0; i < answerList.size(); ++i) {
+        answerTempList.add(answerList.get(selectedAnswers.get(i)));
+      }
+      answerList.clear();
+      answerList.addAll(answerTempList);
+    }
+
+  }
 
 
 }

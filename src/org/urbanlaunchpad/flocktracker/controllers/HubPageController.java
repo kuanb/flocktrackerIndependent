@@ -1,6 +1,5 @@
 package org.urbanlaunchpad.flocktracker.controllers;
 
-import org.urbanlaunchpad.flocktracker.fragments.HubPageFragment;
 import org.urbanlaunchpad.flocktracker.fragments.HubPageManager;
 import org.urbanlaunchpad.flocktracker.models.Metadata;
 

@@ -3,7 +3,9 @@ package org.urbanlaunchpad.flocktracker.fragments;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
@@ -11,59 +13,57 @@ import org.urbanlaunchpad.flocktracker.views.NavButtonsManager;
 
 public abstract class QuestionFragment extends Fragment {
 
-	private QuestionActionListener listener;
-	private NavButtonsManager navButtonsManager;
-
-	// Loop stuff
-	Boolean inLoopBoolean;
-	Integer loopTotalInteger;
-	Integer loopIterationInteger;
-	Integer loopPositionInteger;
-
-	private Question question;
-	private QuestionType questionType;
+  // Loop stuff
+  Boolean inLoopBoolean;
+  Integer loopTotalInteger;
+  Integer loopIterationInteger;
+  Integer loopPositionInteger;
+  private QuestionActionListener listener;
+  private NavButtonsManager navButtonsManager;
+  private Question question;
+  private QuestionType questionType;
   private TextView questionView;
 
-	public QuestionFragment(QuestionActionListener listener, Question question,
-			QuestionType questionType) {
-		this.listener = listener;
-		this.question = question;
-		this.questionType = questionType;
-	}
+  public QuestionFragment(QuestionActionListener listener, Question question,
+      QuestionType questionType) {
+    this.listener = listener;
+    this.question = question;
+    this.questionType = questionType;
+  }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_question, container,
-				false);
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+      Bundle savedInstanceState) {
+    View rootView = inflater.inflate(R.layout.fragment_question, container,
+        false);
 
-		navButtonsManager = (NavButtonsManager) rootView
-				.findViewById(R.id.questionButtons);
-		navButtonsManager.setQuestionType(listener, questionType);
+    navButtonsManager = (NavButtonsManager) rootView
+        .findViewById(R.id.questionButtons);
+    navButtonsManager.setQuestionType(listener, questionType);
     questionView = (TextView) rootView.findViewById(R.id.question_view);
     questionView.setText(question.getQuestionText());
 
-		setupLayout(rootView);
-		prepopulateQuestion();
+    setupLayout(rootView);
+    prepopulateQuestion();
 
-		return rootView;
-	}
+    return rootView;
+  }
 
-	abstract void setupLayout(View rootView);
+  abstract void setupLayout(View rootView);
 
-	abstract void prepopulateQuestion();
+  abstract void prepopulateQuestion();
 
-	protected Question getQuestion() {
-		return question;
-	}
+  protected Question getQuestion() {
+    return question;
+  }
 
-	protected QuestionType getQuestionType() {
-		return questionType;
-	}
+  protected QuestionType getQuestionType() {
+    return questionType;
+  }
 
-	protected QuestionActionListener getListener() {
-		return listener;
-	}
+  protected QuestionActionListener getListener() {
+    return listener;
+  }
 
   protected LayoutInflater getInflater() {
     return (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);

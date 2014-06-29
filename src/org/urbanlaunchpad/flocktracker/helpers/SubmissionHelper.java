@@ -9,9 +9,7 @@ import org.urbanlaunchpad.flocktracker.models.Submission;
 
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 public class SubmissionHelper {
@@ -105,16 +103,16 @@ public class SubmissionHelper {
           // Iterate through queues to submit surveys
           while (!surveySubmissionQueue.isEmpty()) {
             Submission submission = surveySubmissionQueue.pop();
-              if (submission.submit()) {
-                prefs.edit().putString("surveySubmissionQueue", new Gson().toJson(surveySubmissionQueue)).commit();
-              } else { // Failed. Try again
-                try {
-                  surveySubmissionQueue.add(submission);
-                  Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                  e.printStackTrace();
-                }
+            if (submission.submit()) {
+              prefs.edit().putString("surveySubmissionQueue", new Gson().toJson(surveySubmissionQueue)).commit();
+            } else { // Failed. Try again
+              try {
+                surveySubmissionQueue.add(submission);
+                Thread.sleep(3000);
+              } catch (InterruptedException e) {
+                e.printStackTrace();
               }
+            }
           }
 
           // Iterate through queues to submit tracker updates

@@ -28,13 +28,6 @@ import javax.inject.Inject;
 public class LocationController implements
     GooglePlayServicesClient.ConnectionCallbacks,
     GooglePlayServicesClient.OnConnectionFailedListener {
-  private Context context;
-  private Metadata metadata;
-  private SubmissionHelper submissionHelper;
-  private Statistics statistics;
-  private LocationClient locationClient;
-  private LocationRequest locationRequest;
-
   public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
   private static final int MILLISECONDS_PER_SECOND = 1000;
   private static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND
@@ -42,6 +35,12 @@ public class LocationController implements
   private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
   private static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND
       * FASTEST_INTERVAL_IN_SECONDS;
+  private Context context;
+  private Metadata metadata;
+  private SubmissionHelper submissionHelper;
+  private Statistics statistics;
+  private LocationClient locationClient;
+  private LocationRequest locationRequest;
   private boolean isTripStarted;
 
   @Inject
@@ -116,7 +115,8 @@ public class LocationController implements
               metadata.setCurrentLocation(location);
             }
           }
-        });
+        }
+    );
 
     metadata.setCurrentLocation(locationClient.getLastLocation());
     statistics.updateLocation(locationClient.getLastLocation());
@@ -136,7 +136,7 @@ public class LocationController implements
         // Start an Activity that tries to resolve the error
         connectionResult.startResolutionForResult((Activity) context,
             SurveyorActivity.CONNECTION_FAILURE_RESOLUTION_REQUEST);
-				/*
+        /*
 				 * Thrown if Google Play services canceled the original
 				 * PendingIntent
 				 */

@@ -2,7 +2,6 @@ package org.urbanlaunchpad.flocktracker.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,6 @@ import org.urbanlaunchpad.flocktracker.ProjectConfig;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.models.Statistics;
-import org.w3c.dom.Text;
 
 import javax.inject.Inject;
 import java.util.Timer;
@@ -19,9 +17,9 @@ import java.util.TimerTask;
 
 public class StatisticsPageFragment extends Fragment {
 
+  @Inject
+  Statistics statistics;
   private Timer timer;
-  @Inject Statistics statistics;
-
   private TextView tripTimeText;
   private TextView tripDistanceText;
   private TextView totalDistanceText;
@@ -39,7 +37,7 @@ public class StatisticsPageFragment extends Fragment {
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                           Bundle savedInstanceState) {
+      Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     if (rootView == null) {
       rootView = inflater.inflate(R.layout.fragment_status, container, false);
