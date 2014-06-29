@@ -33,11 +33,17 @@ public class StatisticsPageController {
   }
 
   public void showStatisticsPage() {
-    FragmentTransaction transaction = fragmentManager.beginTransaction();
-    transaction.replace(R.id.surveyor_frame, fragment);
-    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-    transaction.addToBackStack(null);
-    transaction.commit();
+    if (!isStatisticsPageShowing()) {
+      FragmentTransaction transaction = fragmentManager.beginTransaction();
+      transaction.replace(R.id.surveyor_frame, fragment);
+      transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+      transaction.addToBackStack(null);
+      transaction.commit();
+    }
+  }
+
+  public boolean isStatisticsPageShowing() {
+    return fragment.isVisible();
   }
 
   public void startTrip() {

@@ -3,6 +3,7 @@ package org.urbanlaunchpad.flocktracker.fragments;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import com.squareup.otto.Bus;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.menu.DynamicListView;
 import org.urbanlaunchpad.flocktracker.models.Question;
@@ -24,8 +25,9 @@ public class OrderedListQuestionFragment extends QuestionFragment implements Dyn
 
   };
 
-  public OrderedListQuestionFragment(QuestionActionListener listener, Question question, QuestionType questionType) {
-    super(listener, question, questionType);
+  public OrderedListQuestionFragment(QuestionActionListener listener, Question question, QuestionType questionType,
+      Bus eventBus) {
+    super(listener, question, questionType, eventBus);
   }
 
   @Override

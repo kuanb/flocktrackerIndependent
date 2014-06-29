@@ -25,11 +25,17 @@ public class HubPageController implements HubPageManager.HubPageActionListener {
 
   public void showHubPage() {
     // Update fragments
-    FragmentTransaction transaction = fragmentManager.beginTransaction();
-    transaction.replace(R.id.surveyor_frame, hubPageFragment);
-    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-    transaction.addToBackStack(null);
-    transaction.commit();
+    if (!isHubPageShowing()) {
+      FragmentTransaction transaction = fragmentManager.beginTransaction();
+      transaction.replace(R.id.surveyor_frame, hubPageFragment);
+      transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+      transaction.addToBackStack(null);
+      transaction.commit();
+    }
+  }
+
+  public boolean isHubPageShowing() {
+    return hubPageFragment.isVisible();
   }
 
   public void stopTrip() {

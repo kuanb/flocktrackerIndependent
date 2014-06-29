@@ -7,6 +7,7 @@ import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.squareup.otto.Bus;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
 
@@ -28,8 +29,9 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
     }
   };
 
-  public CheckBoxQuestionFragment(QuestionActionListener listener, Question question, QuestionType questionType) {
-    super(listener, question, questionType);
+  public CheckBoxQuestionFragment(QuestionActionListener listener, Question question, QuestionType questionType,
+      Bus eventBus) {
+    super(listener, question, questionType, eventBus);
   }
 
   private void toggleCheckBox(LinearLayout v) {

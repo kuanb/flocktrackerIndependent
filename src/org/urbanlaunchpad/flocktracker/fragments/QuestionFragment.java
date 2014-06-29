@@ -1,5 +1,6 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.squareup.otto.Bus;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.views.NavButtonsManager;
@@ -23,12 +25,15 @@ public abstract class QuestionFragment extends Fragment {
   private Question question;
   private QuestionType questionType;
   private TextView questionView;
+  private Bus eventBus;
+  private QuestionAttachedEvent questionAttachedEvent = new QuestionAttachedEvent();
 
   public QuestionFragment(QuestionActionListener listener, Question question,
-      QuestionType questionType) {
+      QuestionType questionType, Bus eventBus) {
     this.listener = listener;
     this.question = question;
     this.questionType = questionType;
+    this.eventBus = eventBus;
   }
 
   @Override
@@ -47,6 +52,12 @@ public abstract class QuestionFragment extends Fragment {
     prepopulateQuestion();
 
     return rootView;
+  }
+
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    eventBus.post(questionAttachedEvent);
   }
 
   abstract void setupLayout(View rootView);
@@ -88,4 +99,6 @@ public abstract class QuestionFragment extends Fragment {
 
     void onSubmitButtonClicked();
   }
+
+  public class QuestionAttachedEvent {}
 }

@@ -3,6 +3,7 @@ package org.urbanlaunchpad.flocktracker.fragments;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
+import com.squareup.otto.Bus;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.views.AnswerView;
@@ -28,8 +29,8 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
   };
 
   public MultipleChoiceQuestionFragment(QuestionActionListener listener,
-      Question question, QuestionType questionType) {
-    super(listener, question, questionType);
+      Question question, QuestionType questionType, Bus eventBus) {
+    super(listener, question, questionType, eventBus);
   }
 
   @Override

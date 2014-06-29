@@ -1,11 +1,13 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.squareup.otto.Bus;
 import org.urbanlaunchpad.flocktracker.ProjectConfig;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
@@ -17,8 +19,9 @@ import java.util.TimerTask;
 
 public class StatisticsPageFragment extends Fragment {
 
-  @Inject
-  Statistics statistics;
+  @Inject Statistics statistics;
+  @Inject Bus eventBus;
+  private StatisticsPageAttachedEvent statisticsPageAttachedEvent = new StatisticsPageAttachedEvent();
   private Timer timer;
   private TextView tripTimeText;
   private TextView tripDistanceText;
@@ -54,6 +57,12 @@ public class StatisticsPageFragment extends Fragment {
   }
 
   @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    eventBus.post(statisticsPageAttachedEvent);
+  }
+
+  @Override
   public void onStart() {
     super.onStart();
     timer = new Timer();
@@ -85,4 +94,6 @@ public class StatisticsPageFragment extends Fragment {
       }
     });
   }
+
+  public class StatisticsPageAttachedEvent {}
 }

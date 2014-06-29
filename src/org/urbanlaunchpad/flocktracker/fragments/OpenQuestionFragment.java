@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.squareup.otto.Bus;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
 
@@ -27,8 +28,9 @@ public class OpenQuestionFragment extends QuestionFragment {
     }
   };
 
-  public OpenQuestionFragment(QuestionActionListener listener, Question question, QuestionType questionType) {
-    super(listener, question, questionType);
+  public OpenQuestionFragment(QuestionActionListener listener, Question question, QuestionType questionType,
+      Bus eventBus) {
+    super(listener, question, questionType, eventBus);
   }
 
   @Override

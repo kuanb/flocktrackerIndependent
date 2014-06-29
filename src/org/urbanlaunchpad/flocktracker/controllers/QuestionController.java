@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.widget.Toast;
 import com.squareup.otto.Bus;
 import org.json.JSONException;
@@ -28,6 +29,7 @@ public class QuestionController implements QuestionActionListener {
   private Metadata metadata;
   private FragmentManager fragmentManager;
   private SubmissionHelper submissionHelper;
+  private QuestionFragment currentQuestionFragment;
 
   private int chapterPosition = 0;
   private int questionPosition = 0;
@@ -75,35 +77,34 @@ public class QuestionController implements QuestionActionListener {
 
   public void showCurrentQuestion() {
     Question currentQuestion = getCurrentQuestion();
-    QuestionFragment fragment = null;
 
     switch (currentQuestion.getType()) {
       case MULTIPLE_CHOICE:
-        fragment = new MultipleChoiceQuestionFragment(this, currentQuestion,
-            QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length));
+        currentQuestionFragment = new MultipleChoiceQuestionFragment(this, currentQuestion,
+            QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
       case OPEN:
-        fragment = new OpenQuestionFragment(this, currentQuestion,
-            QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length));
+        currentQuestionFragment = new OpenQuestionFragment(this, currentQuestion,
+            QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
       case IMAGE:
-        fragment = new ImageQuestionFragment(this, currentQuestion,
-            QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length));
+        currentQuestionFragment = new ImageQuestionFragment(this, currentQuestion,
+            QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
       case CHECKBOX:
-        fragment = new CheckBoxQuestionFragment(this, currentQuestion,
-            QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length));
+        currentQuestionFragment = new CheckBoxQuestionFragment(this, currentQuestion,
+            QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
       case ORDERED:
-        fragment = new OrderedListQuestionFragment(this, currentQuestion,
-            QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length));
+        currentQuestionFragment = new OrderedListQuestionFragment(this, currentQuestion,
+            QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
       case LOOP:
         break;
     }
 
     FragmentTransaction transaction = fragmentManager.beginTransaction();
-    transaction.replace(R.id.surveyor_frame, fragment);
+    transaction.replace(R.id.surveyor_frame, currentQuestionFragment);
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
     transaction.addToBackStack(null);
     transaction.commit();
@@ -132,6 +133,9 @@ public class QuestionController implements QuestionActionListener {
     // TODO(adchia): implement
   }
 
+  /*
+   * Nav Buttons listener.
+   */
   @Override
   public void onPrevQuestionButtonClicked() {
     if (isAskingTripQuestions) {
@@ -237,10 +241,13 @@ public class QuestionController implements QuestionActionListener {
     return isAskingTripQuestions;
   }
 
+  public boolean isQuestionShowing() {
+    return currentQuestionFragment.isVisible();
+  }
+
   private Chapter getCurrentChapter() {
     return chapterList[chapterPosition];
   }
 
-  public class ReachedEndOfTrackerSurveyEvent {
-  }
+  public class ReachedEndOfTrackerSurveyEvent {}
 }

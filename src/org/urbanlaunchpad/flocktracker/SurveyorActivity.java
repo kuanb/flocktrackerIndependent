@@ -22,6 +22,8 @@ import com.squareup.otto.Subscribe;
 import dagger.ObjectGraph;
 import org.urbanlaunchpad.flocktracker.controllers.*;
 import org.urbanlaunchpad.flocktracker.fragments.HubPageFragment;
+import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment;
+import org.urbanlaunchpad.flocktracker.fragments.StatisticsPageFragment;
 import org.urbanlaunchpad.flocktracker.helpers.GoogleDriveHelper;
 import org.urbanlaunchpad.flocktracker.helpers.ImageHelper;
 import org.urbanlaunchpad.flocktracker.models.Metadata;
@@ -133,44 +135,14 @@ public class SurveyorActivity extends Activity {
     drawerController.onConfigurationChanged(newConfig);
   }
 
-//	@Override
-//	public void onBackPressed() {
-//		if (isTripStarted) {
-//			if (surveyHelper.prevTrackingPositions.empty()
-//					|| surveyHelper.getTrackerQuestionPosition() == 0) {
-//				surveyHelper
-//						.updateTrackerPositionOnBack(SurveyHelper.HUB_PAGE_QUESTION_POSITION);
-//				showHubPage();
-//				return;
-//			}
-//			// Pop last question off
-//			Integer prevPosition = surveyHelper.prevTrackingPositions.pop();
-//			surveyHelper.updateTrackerPositionOnBack(prevPosition);
-//			showCurrentQuestion();
-//			return;
-//		}
-//
-//		if (surveyHelper.prevPositions.isEmpty()) {
-//			finish();
-//			return;
-//		}
-//
-//		Tuple prevPosition = surveyHelper.prevPositions.pop();
-//		// Pop last question off
-//		surveyHelper.updateSurveyPositionOnBack(prevPosition.chapterPosition,
-//				prevPosition.questionPosition);
-//
-//		if (surveyHelper.wasJustAtHubPage(prevPosition)) {
-//			showHubPage();
-//			return;
-//		} else if (surveyHelper.wasJustAtStatsPage(prevPosition)) {
-//			showStatisticsPage();
-//			return;
-//		}
-//
-//		showCurrentQuestion();
-//		return;
-//	}
+  @Override
+  public void onBackPressed() {
+    if (hubPageController.isHubPageShowing()) {
+      finish();
+    } else {
+      super.onBackPressed();
+    }
+  }
 
 
   @Override
@@ -309,10 +281,6 @@ public class SurveyorActivity extends Activity {
     drawerController.showStatisticsPage();
   }
 
-	/*
-	 * Hub Page Event Handlers
-	 */
-
   public void stopTripDialog() {
     Builder dialog;
     dialog = new AlertDialog.Builder(this);
@@ -392,8 +360,26 @@ public class SurveyorActivity extends Activity {
   }
 
   @Subscribe
+  public void onHubPageShown(HubPageFragment.HubPageAttachedEvent event) {
+    showHubPage();
+  }
+
+  @Subscribe
   public void onStatisticsPageRequested(CommonEvents.RequestStatisticsPageEvent event) {
     showStatisticsPage();
+  }
+
+  @Subscribe
+  public void onStatisticsPageShown(StatisticsPageFragment.StatisticsPageAttachedEvent event) {
+    showStatisticsPage();
+  }
+
+  @Subscribe
+  public void onQuestionShown(QuestionFragment.QuestionAttachedEvent event) {
+    Question question = questionController.getCurrentQuestion();
+    questionController.updateSurveyPosition(question.getChapter().getChapterNumber(), question.getQuestionNumber());
+    questionController.showCurrentQuestion();
+    drawerController.selectSurveyChapter(question.getChapter().getChapterNumber());
   }
 
   @Subscribe

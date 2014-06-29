@@ -1,5 +1,6 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -37,6 +38,7 @@ public class HubPageFragment extends Fragment {
   private int femaleCount = 0;
   private RequestToggleTripEvent requestToggleTripEvent = new RequestToggleTripEvent();
   private RequestStartSurveyEvent requestStartSurveyEvent = new RequestStartSurveyEvent();
+  private HubPageAttachedEvent hubPageAttachedEvent = new HubPageAttachedEvent();
 
   public HubPageFragment(HubPageActionListener listener, int maleCount, int femaleCount) {
     this.listener = listener;
@@ -81,6 +83,12 @@ public class HubPageFragment extends Fragment {
     eventBus.register(this);
 
     return rootView;
+  }
+
+  @Override
+  public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    eventBus.post(hubPageAttachedEvent);
   }
 
   private void setupClickListeners() {
@@ -162,4 +170,5 @@ public class HubPageFragment extends Fragment {
 
   public class RequestToggleTripEvent {}
   public class RequestStartSurveyEvent {}
+  public class HubPageAttachedEvent {}
 }
