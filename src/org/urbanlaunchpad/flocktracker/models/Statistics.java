@@ -47,6 +47,8 @@ public class Statistics {
           }
         }
       }).start();
+    } else {
+      addresses = null;
     }
 
     if (addresses != null) {

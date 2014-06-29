@@ -172,7 +172,7 @@ public class SurveyorActivity extends Activity {
 	protected void onDestroy() {
 		cancelTracker();
 		questionController.resetTrip();
-    locationController.disconnect();
+    locationController.stopTrip();
 		super.onDestroy();
 	}
 
@@ -795,7 +795,7 @@ public class SurveyorActivity extends Activity {
 	 */
 
 	public void stopTrip() {
-    locationController.disconnect();
+    locationController.stopTrip();
 		cancelTracker();
 		messageHandler.sendEmptyMessage(EVENT_TYPE.UPDATE_HUB_PAGE.ordinal());
 		questionController.resetTrip();
@@ -823,7 +823,7 @@ public class SurveyorActivity extends Activity {
       questionController.askTripQuestions();
     } else {
       cancelTracker();
-      locationController.disconnect();
+      locationController.stopTrip();
       metadata.setTripID(null);
       metadata.setCurrentLocation(null);
       statisticsPageController.stopTrip();
@@ -835,6 +835,7 @@ public class SurveyorActivity extends Activity {
   public void onReachedEndOfTrackerSurvey(QuestionController.ReachedEndOfTrackerSurveyEvent event) {
     startTracker();
     showHubPage();
+    locationController.startTrip();
     statisticsPageController.startTrip();
   }
 

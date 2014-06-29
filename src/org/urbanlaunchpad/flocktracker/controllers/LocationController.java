@@ -26,6 +26,7 @@ public class LocationController implements
   private Context context;
   private Metadata metadata;
   private SubmissionHelper submissionHelper;
+  private QuestionController questionController;
   private Statistics statistics;
   private LocationClient locationClient;
   private LocationRequest locationRequest;
@@ -37,10 +38,11 @@ public class LocationController implements
   private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
   private static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND
       * FASTEST_INTERVAL_IN_SECONDS;
+  private boolean isTripStarted;
 
   @Inject
   public LocationController(Context context, SubmissionHelper submissionHelper, Metadata metadata,
-      Statistics statistics) {
+      Statistics statistics, QuestionController questionController) {
     this.context = context;
     this.submissionHelper = submissionHelper;
     this.metadata = metadata;
@@ -67,8 +69,12 @@ public class LocationController implements
     }
   }
 
-  public void disconnect() {
+  public void startTrip() {
+    this.isTripStarted = true;
+  }
+  public void stopTrip() {
     locationClient.disconnect();
+    isTripStarted = false;
   }
 
   @Override
@@ -77,8 +83,10 @@ public class LocationController implements
         new LocationListener() {
           @Override
           public void onLocationChanged(final Location location) {
-            statistics.updateLocation(location);
-            metadata.setCurrentLocation(location);
+            if (isTripStarted) {
+              statistics.updateLocation(location);
+              metadata.setCurrentLocation(location);
+            }
           }
         });
 
