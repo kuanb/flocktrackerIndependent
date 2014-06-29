@@ -1,10 +1,14 @@
 package org.urbanlaunchpad.flocktracker.controllers;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -13,6 +17,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
+import org.urbanlaunchpad.flocktracker.TrackerAlarm;
 import org.urbanlaunchpad.flocktracker.helpers.SubmissionHelper;
 import org.urbanlaunchpad.flocktracker.models.Metadata;
 import org.urbanlaunchpad.flocktracker.models.Statistics;
@@ -70,10 +75,34 @@ public class LocationController implements
 
   public void startTrip() {
     this.isTripStarted = true;
+    startTracker();
   }
+
   public void stopTrip() {
+    cancelTracker();
     locationClient.disconnect();
     isTripStarted = false;
+  }
+
+  private void startTracker() {
+    AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+    Intent intentAlarm = new Intent(TrackerAlarm.TAG);
+    PendingIntent pi = PendingIntent.getBroadcast(context, 1, intentAlarm,
+        PendingIntent.FLAG_UPDATE_CURRENT);
+    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+        System.currentTimeMillis(), TrackerAlarm.TRACKER_INTERVAL, pi);
+    Log.d("TrackerAlarm", "TrackerAlarm working.");
+  }
+
+  private void cancelTracker() {
+    Log.d("TrackerAlarm", "Cancelling tracker");
+
+    Intent intentAlarm = new Intent(TrackerAlarm.TAG);
+    PendingIntent sender = PendingIntent.getBroadcast(context, 1, intentAlarm,
+        PendingIntent.FLAG_UPDATE_CURRENT);
+    AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+    alarmManager.cancel(sender);
   }
 
   @Override
