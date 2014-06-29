@@ -147,6 +147,10 @@ public class Statistics {
 
   public void updateLocation(Location location) {
     // update location + distance
+    if (metadata.getCurrentLocation() == null) {
+      return;
+    }
+    
     distanceDelta = metadata.getCurrentLocation().distanceTo(location);
     tripDistance += distanceDelta;
   }
