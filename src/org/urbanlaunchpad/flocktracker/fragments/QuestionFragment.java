@@ -1,6 +1,5 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -50,14 +49,9 @@ public abstract class QuestionFragment extends Fragment {
 
     setupLayout(rootView);
     prepopulateQuestion();
+    eventBus.post(questionAttachedEvent);
 
     return rootView;
-  }
-
-  @Override
-  public void onAttach(Activity activity) {
-    super.onAttach(activity);
-    eventBus.post(questionAttachedEvent);
   }
 
   abstract void setupLayout(View rootView);

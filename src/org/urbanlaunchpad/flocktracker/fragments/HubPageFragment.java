@@ -20,8 +20,7 @@ import javax.inject.Inject;
 
 public class HubPageFragment extends Fragment {
 
-  @Inject
-  Bus eventBus;
+  @Inject Bus eventBus;
   private View rootView;
   private ImageView startTripButton;
   private View startSurveyButton;
@@ -81,16 +80,9 @@ public class HubPageFragment extends Fragment {
 
     setupClickListeners();
     eventBus.register(this);
+    eventBus.post(hubPageAttachedEvent);
 
     return rootView;
-  }
-
-  @Override
-  public void onAttach(Activity activity) {
-    super.onAttach(activity);
-    if (eventBus != null) {
-      eventBus.post(hubPageAttachedEvent);
-    }
   }
 
   private void setupClickListeners() {

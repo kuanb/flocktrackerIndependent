@@ -1,6 +1,5 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -52,16 +51,9 @@ public class StatisticsPageFragment extends Fragment {
     usernameText = (TextView) rootView.findViewById(R.id.user_greeting);
     surveysCompletedText = (TextView) rootView.findViewById(R.id.surveysCompleted);
     ridesCompletedText = (TextView) rootView.findViewById(R.id.ridesCompleted);
+    eventBus.post(statisticsPageAttachedEvent);
 
     return rootView;
-  }
-
-  @Override
-  public void onAttach(Activity activity) {
-    super.onAttach(activity);
-    if (eventBus != null) {
-      eventBus.post(statisticsPageAttachedEvent);
-    }
   }
 
   @Override
