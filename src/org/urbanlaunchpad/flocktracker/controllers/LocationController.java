@@ -42,6 +42,15 @@ public class LocationController implements
   private LocationClient locationClient;
   private LocationRequest locationRequest;
   private boolean isTripStarted;
+  private LocationListener locationListener = new LocationListener() {
+    @Override
+    public void onLocationChanged(final Location location) {
+      if (isTripStarted) {
+        statistics.updateLocation(location);
+        metadata.setCurrentLocation(location);
+      }
+    }
+  };
 
   @Inject
   public LocationController(Context context, SubmissionHelper submissionHelper, Metadata metadata,
@@ -106,18 +115,7 @@ public class LocationController implements
 
   @Override
   public void onConnected(Bundle bundle) {
-    locationClient.requestLocationUpdates(locationRequest,
-        new LocationListener() {
-          @Override
-          public void onLocationChanged(final Location location) {
-            if (isTripStarted) {
-              statistics.updateLocation(location);
-              metadata.setCurrentLocation(location);
-            }
-          }
-        }
-    );
-
+    locationClient.requestLocationUpdates(locationRequest, locationListener);
     metadata.setCurrentLocation(locationClient.getLastLocation());
     statistics.updateLocation(locationClient.getLastLocation());
 
@@ -127,6 +125,7 @@ public class LocationController implements
   @Override
   public void onDisconnected() {
     Toast.makeText(context, R.string.disconnected, Toast.LENGTH_SHORT).show();
+    locationClient.removeLocationUpdates(locationListener);
   }
 
   @Override
