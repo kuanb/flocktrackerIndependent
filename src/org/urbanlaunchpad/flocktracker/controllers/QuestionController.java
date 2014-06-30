@@ -243,6 +243,9 @@ public class QuestionController implements QuestionActionListener {
   }
 
   public boolean isQuestionShowing() {
+    if (currentQuestionFragment == null) {
+      return false;
+    }
     return currentQuestionFragment.isVisible();
   }
 
