@@ -125,7 +125,6 @@ public class LocationController implements
   @Override
   public void onDisconnected() {
     Toast.makeText(context, R.string.disconnected, Toast.LENGTH_SHORT).show();
-    locationClient.removeLocationUpdates(locationListener);
   }
 
   @Override
