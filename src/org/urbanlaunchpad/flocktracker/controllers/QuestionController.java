@@ -83,7 +83,8 @@ public class QuestionController implements QuestionActionListener {
         currentQuestionFragment = new MultipleChoiceQuestionFragment(this, currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
-      case OPEN:
+      case OPEN_NUMBER:
+      case OPEN_TEXT:
         currentQuestionFragment = new OpenQuestionFragment(this, currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
@@ -108,10 +109,6 @@ public class QuestionController implements QuestionActionListener {
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
     transaction.addToBackStack(null);
     transaction.commit();
-  }
-
-  public Question getCurrentDisplayedQuestion() {
-    return currentQuestionFragment.getQuestion();
   }
 
   public Question getCurrentQuestion() {

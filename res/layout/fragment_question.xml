@@ -1,8 +1,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/question_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="20dp"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:layout_marginTop="30dp"
     android:orientation="vertical">
 
     <TextView
@@ -11,7 +12,8 @@
         android:layout_height="wrap_content"
         android:padding="15dp"
         android:textColor="@color/text_color_light"
-        android:textSize="17sp" />
+        android:textSize="17sp"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/question_view"

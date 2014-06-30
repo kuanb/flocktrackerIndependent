@@ -16,8 +16,8 @@ import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
 
 public class OpenQuestionFragment extends QuestionFragment {
-  EditText openET;
-  Boolean askingNumbers;
+  private EditText openET;
+  private boolean askingNumbers;
   private LinearLayout answersContainer;
 
   private OnClickListener onClickListener = new OnClickListener() {
@@ -38,7 +38,7 @@ public class OpenQuestionFragment extends QuestionFragment {
     answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
 
     Question.QuestionType questionType = getQuestion().getType();
-    if (questionType.equals(Question.QuestionType.OPEN) || questionType.equals(Question.QuestionType.LOOP)) {
+    if (questionType.equals(Question.QuestionType.OPEN_NUMBER) || questionType.equals(Question.QuestionType.LOOP)) {
       askingNumbers = true;
     }
 

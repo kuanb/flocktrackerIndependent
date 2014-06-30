@@ -150,5 +150,5 @@ public class Question {
     this.isTracker = isTracker;
   }
 
-  public enum QuestionType {MULTIPLE_CHOICE, OPEN, IMAGE, CHECKBOX, ORDERED, LOOP}
+  public enum QuestionType {MULTIPLE_CHOICE, OPEN_NUMBER, OPEN_TEXT, IMAGE, CHECKBOX, ORDERED, LOOP}
 }

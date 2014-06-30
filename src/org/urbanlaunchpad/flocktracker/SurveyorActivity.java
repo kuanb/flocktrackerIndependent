@@ -139,6 +139,13 @@ public class SurveyorActivity extends Activity {
   public void onBackPressed() {
     if (hubPageController.isHubPageShowing()) {
       finish();
+    } else if (questionController.isQuestionShowing()) {
+      Question question = questionController.getCurrentQuestion();
+      if (question.getChapter().getChapterNumber() == 0 && question.getQuestionNumber() == 0) {
+        showHubPage();
+      } else {
+        questionController.onPrevQuestionButtonClicked();
+      }
     } else {
       super.onBackPressed();
     }
@@ -376,10 +383,7 @@ public class SurveyorActivity extends Activity {
 
   @Subscribe
   public void onQuestionShown(QuestionFragment.QuestionAttachedEvent event) {
-    Question question = questionController.getCurrentDisplayedQuestion();
-    if (question.equals(questionController.getCurrentQuestion())) {
-      return;
-    }
+    Question question = event.question;
     questionController.updateSurveyPosition(question.getChapter().getChapterNumber(), question.getQuestionNumber());
     drawerController.selectSurveyChapter(question.getChapter().getChapterNumber());
   }

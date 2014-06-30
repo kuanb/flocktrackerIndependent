@@ -12,7 +12,11 @@ public class QuestionUtil {
     }
 
     if (type.equals("ON")) {
-      return QuestionType.OPEN;
+      return QuestionType.OPEN_NUMBER;
+    }
+
+    if (type.equals("OT")) {
+      return QuestionType.OPEN_TEXT;
     }
 
     if (type.equals("IM")) {
@@ -27,6 +31,10 @@ public class QuestionUtil {
       return QuestionType.LOOP;
     }
 
+    if (type.equals("OL")) {
+      return QuestionType.ORDERED;
+    }
+
     return null;
   }
 
@@ -34,14 +42,12 @@ public class QuestionUtil {
     switch (type) {
       case MULTIPLE_CHOICE:
         return "STRING";
-      case OPEN:
+      case OPEN_NUMBER:
         return "NUMBER";
+      case OPEN_TEXT:
       case IMAGE:
-        return "STRING";
       case CHECKBOX:
-        return "STRING";
       case ORDERED:
-        return "STRING";
       case LOOP:
         return "STRING";
     }

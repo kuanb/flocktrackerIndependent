@@ -187,9 +187,9 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 
   @Override
   public void prepopulateQuestion() {
-    for (int j = 0; j <= numAnswers; ++j) {
-      if (selectedAnswers.contains(j)) {
-        if (j == numAnswers) {
+//    for (int j = 0; j <= numAnswers; ++j) {
+//      if (selectedAnswers.contains(j)) {
+//        if (j == numAnswers) {
 //					String otheranswerString = jquestion.getString("Answer");
 //					otheranswerString = otheranswerString.substring(1,
 //							otheranswerString.length() - 1);
@@ -203,10 +203,10 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 //									otheranswerString.length());
 //						}
 //					}
-        }
-        toggleCheckBox(answersLayout[j]);
-      }
-    }
+//        }
+//        toggleCheckBox(answersLayout[j]);
+//      }
+//    }
 
   }
 

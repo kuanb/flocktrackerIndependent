@@ -49,6 +49,7 @@ public abstract class QuestionFragment extends Fragment {
 
     setupLayout(rootView);
     prepopulateQuestion();
+    questionAttachedEvent.question = question;
     eventBus.post(questionAttachedEvent);
 
     return rootView;
@@ -94,5 +95,7 @@ public abstract class QuestionFragment extends Fragment {
     void onSubmitButtonClicked();
   }
 
-  public class QuestionAttachedEvent {}
+  public class QuestionAttachedEvent {
+    public Question question;
+  }
 }
