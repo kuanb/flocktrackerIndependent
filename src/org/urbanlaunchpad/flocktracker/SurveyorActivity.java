@@ -138,6 +138,7 @@ public class SurveyorActivity extends Activity {
   @Override
   public void onBackPressed() {
     if (hubPageController.isHubPageShowing()) {
+      locationController.stopTrip();
       finish();
     } else if (questionController.isQuestionShowing()) {
       Question question = questionController.getCurrentQuestion();
