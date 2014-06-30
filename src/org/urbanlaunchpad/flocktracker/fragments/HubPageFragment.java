@@ -80,7 +80,6 @@ public class HubPageFragment extends Fragment {
 
     setupClickListeners();
     eventBus.register(this);
-    eventBus.post(hubPageAttachedEvent);
 
     return rootView;
   }
@@ -155,6 +154,7 @@ public class HubPageFragment extends Fragment {
   @Override
   public void onStart() {
     super.onStart();
+    eventBus.post(hubPageAttachedEvent);
     maleCountView.setText(Integer.toString(maleCount));
     femaleCountView.setText(Integer.toString(femaleCount));
     totalCountView.setText(Integer.toString(maleCount + femaleCount));

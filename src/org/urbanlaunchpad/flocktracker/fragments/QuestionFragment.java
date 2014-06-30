@@ -49,10 +49,15 @@ public abstract class QuestionFragment extends Fragment {
 
     setupLayout(rootView);
     prepopulateQuestion();
-    questionAttachedEvent.question = question;
-    eventBus.post(questionAttachedEvent);
 
     return rootView;
+  }
+
+  @Override
+  public void onStart() {
+    super.onStart();
+    questionAttachedEvent.question = question;
+    eventBus.post(questionAttachedEvent);
   }
 
   abstract void setupLayout(View rootView);

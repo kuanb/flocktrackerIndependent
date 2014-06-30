@@ -51,7 +51,6 @@ public class StatisticsPageFragment extends Fragment {
     usernameText = (TextView) rootView.findViewById(R.id.user_greeting);
     surveysCompletedText = (TextView) rootView.findViewById(R.id.surveysCompleted);
     ridesCompletedText = (TextView) rootView.findViewById(R.id.ridesCompleted);
-    eventBus.post(statisticsPageAttachedEvent);
 
     return rootView;
   }
@@ -59,6 +58,7 @@ public class StatisticsPageFragment extends Fragment {
   @Override
   public void onStart() {
     super.onStart();
+    eventBus.post(statisticsPageAttachedEvent);
     timer = new Timer();
     timer.scheduleAtFixedRate(new TimerTask() {
       public void run() {
