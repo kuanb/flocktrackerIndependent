@@ -68,10 +68,6 @@ public abstract class QuestionFragment extends Fragment {
     return question;
   }
 
-  protected QuestionType getQuestionType() {
-    return questionType;
-  }
-
   protected QuestionActionListener getListener() {
     return listener;
   }

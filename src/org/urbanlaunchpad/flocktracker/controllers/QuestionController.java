@@ -70,6 +70,11 @@ public class QuestionController implements QuestionActionListener {
     showCurrentQuestion();
   }
 
+  public void stopAskingTripQuestions() {
+    isAskingTripQuestions = false;
+    resetTrip();
+  }
+
   public void startSurvey() {
     questionPosition = 0;
     showCurrentQuestion();
@@ -188,6 +193,10 @@ public class QuestionController implements QuestionActionListener {
         submissionHelper.saveSubmission(submission);
       }
     }).start();
+  }
+
+  public void updateTrackerPosition(int questionPosition) {
+    this.trackerQuestionPosition = questionPosition;
   }
 
   public void updateSurveyPosition(int chapterPosition, int questionPosition) {
