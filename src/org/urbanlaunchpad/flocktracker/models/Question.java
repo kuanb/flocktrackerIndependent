@@ -9,7 +9,8 @@ public class Question {
   private QuestionType type;
   private boolean isTracker;
 
-  private Chapter chapter;
+  private int chapterNumber;
+  private int chapterQuestionCount;
   private Question[] loopQuestions;
 
   private int questionNumber;
@@ -38,12 +39,17 @@ public class Question {
     this.type = type;
   }
 
-  public Chapter getChapter() {
-    return chapter;
+  public int getChapterNumber() {
+    return chapterNumber;
   }
 
-  public void setChapter(Chapter chapter) {
-    this.chapter = chapter;
+  public int getChapterQuestionCount() {
+    return chapterQuestionCount;
+  }
+
+  public void setChapterInfo(int chapterNumber, int chapterQuestionCount) {
+    this.chapterNumber = chapterNumber;
+    this.chapterQuestionCount = chapterQuestionCount;
   }
 
   public String getQuestionText() {

@@ -71,8 +71,6 @@ public class NavButtonsView extends LinearLayout implements NavButtonsManager {
       @Override
       public void onClick(View v) {
         if (listener != null) {
-          listener.onSubmitButtonClicked();
-
           // Show submitting dialog.
           AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
           builder.setMessage(getResources().getString(R.string.submit_survey_question))

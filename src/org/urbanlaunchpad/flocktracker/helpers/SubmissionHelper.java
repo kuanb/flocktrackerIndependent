@@ -15,6 +15,7 @@ import java.util.LinkedList;
 public class SubmissionHelper {
   private LinkedList<Submission> surveySubmissionQueue;
   private LinkedList<Submission> trackerSubmissionQueue;
+  private Type submissionQueueType = new TypeToken<LinkedList<Submission>>(){}.getType();
   private boolean savingTrackerSubmission = false;
   private boolean savingSurveySubmission = false;
   private boolean submittingSubmission = false;
@@ -57,14 +58,16 @@ public class SubmissionHelper {
       savingTrackerSubmission = true;
       synchronized (trackerSubmissionQueue) {
         trackerSubmissionQueue.add(submission);
-        prefs.edit().putString("trackerSubmissionQueue", new Gson().toJson(trackerSubmissionQueue)).commit();
+        prefs.edit().putString("trackerSubmissionQueue",
+            new Gson().toJson(trackerSubmissionQueue, submissionQueueType)).commit();
         savingTrackerSubmission = false;
       }
     } else if (submission.getType().equals(Submission.Type.SURVEY)) {
       savingSurveySubmission = true;
       synchronized (surveySubmissionQueue) {
         surveySubmissionQueue.add(submission);
-        prefs.edit().putString("surveySubmissionQueue", new Gson().toJson(surveySubmissionQueue)).commit();
+        prefs.edit().putString("surveySubmissionQueue",
+            new Gson().toJson(surveySubmissionQueue, submissionQueueType)).commit();
         savingSurveySubmission = false;
       }
     }
@@ -104,7 +107,8 @@ public class SubmissionHelper {
           while (!surveySubmissionQueue.isEmpty()) {
             Submission submission = surveySubmissionQueue.pop();
             if (submission.submit()) {
-              prefs.edit().putString("surveySubmissionQueue", new Gson().toJson(surveySubmissionQueue)).commit();
+              prefs.edit().putString("surveySubmissionQueue",
+                  new Gson().toJson(surveySubmissionQueue, submissionQueueType)).commit();
             } else { // Failed. Try again
               try {
                 surveySubmissionQueue.add(submission);
@@ -119,7 +123,8 @@ public class SubmissionHelper {
           while (!trackerSubmissionQueue.isEmpty()) {
             Submission submission = trackerSubmissionQueue.pop();
             if (submission.submit()) {
-              prefs.edit().putString("trackerSubmissionQueue", new Gson().toJson(trackerSubmissionQueue)).commit();
+              prefs.edit().putString("trackerSubmissionQueue",
+                  new Gson().toJson(trackerSubmissionQueue, submissionQueueType)).commit();
             } else { // Failed. Try again
               try {
                 trackerSubmissionQueue.add(submission);

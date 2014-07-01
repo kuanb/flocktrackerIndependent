@@ -116,7 +116,7 @@ public class Submission {
   private String getQueryForSubmission() {
     // Create and submit query
     StringBuilder questionIDString = new StringBuilder();
-    StringBuilder answerString = new StringBuilder();
+    StringBuilder answerString = new StringBuilder("'");
 
     Location currentLocation = metadata.getCurrentLocation();
     String locationString = LocationUtil.getLngLatAlt(currentLocation);
@@ -139,8 +139,17 @@ public class Submission {
           for (Question question : chapter.getQuestions()) {
             // Get question ID's and answers
             questionIDString.append(question.getQuestionID() + ",");
-            answerString.append("'" + question.getSelectedAnswers().toString() + "','");
+            answerString.append(question.getSelectedAnswers().toString() + "','");
           }
+        }
+
+        double latitude, longitude, altitude;
+        if (currentLocation == null) {
+          latitude = longitude = altitude = 0;
+        } else {
+          latitude = currentLocation.getLatitude();
+          longitude = currentLocation.getLongitude();
+          altitude = currentLocation.getAltitude();
         }
 
         query = "INSERT INTO "
@@ -150,14 +159,13 @@ public class Submission {
             + "Location,Lat,Lng,Alt,Date,SurveyID,TripID,Username,TotalCount,FemaleCount,MaleCount,Speed"
             + ") VALUES (" + answerString
             + "<Point><coordinates>" + locationString
-            + "</coordinates></Point>','" + currentLocation.getLatitude() + "','" + currentLocation.getLongitude()
-            + "','" + currentLocation.getAltitude() + "','" + metadata.getTimeStamp() + "','" + metadata.getSurveyID()
+            + "</coordinates></Point>','" + latitude + "','" + longitude
+            + "','" + altitude + "','" + metadata.getTimeStamp() + "','" + metadata.getSurveyID()
             + "','" + metadata.getTripID() + "','" + ProjectConfig.get().getUsername() + "','"
             + (metadata.getMaleCount() + metadata.getFemaleCount()) + "','" + metadata.getFemaleCount()
             + "','" + metadata.getMaleCount() + "','" + metadata.getSpeed() + "');";
         break;
     }
-
     return query;
   }
 

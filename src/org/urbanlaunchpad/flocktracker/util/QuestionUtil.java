@@ -63,8 +63,8 @@ public class QuestionUtil {
         return QuestionFragment.QuestionType.TRIP_NORMAL;
       }
     } else {
-      int chapterQuestionCount = question.getChapter().getQuestionCount();
-      int chapterPosition = question.getChapter().getChapterNumber();
+      int chapterQuestionCount = question.getChapterQuestionCount();
+      int chapterPosition = question.getChapterNumber();
       if (questionPosition == 0 && chapterPosition == 0) {
         return QuestionFragment.QuestionType.FIRST;
       } else if (questionPosition == chapterQuestionCount - 1 && chapterPosition == numChapters - 1) {

@@ -33,7 +33,7 @@ public class JSONUtil {
         for (int j = 0; j < jsonQuestionList.length(); j++) {
           questions[j] = parseQuestion(jsonQuestionList.getJSONObject(j));
           questions[j].setQuestionNumber(j);
-          questions[j].setChapter(chapter);
+          questions[j].setChapterInfo(i, jsonQuestionList.length());
           questions[j].setTracker(false);
         }
 

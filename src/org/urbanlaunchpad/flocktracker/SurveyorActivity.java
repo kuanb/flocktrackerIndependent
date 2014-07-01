@@ -148,7 +148,7 @@ public class SurveyorActivity extends Activity {
           questionController.stopAskingTripQuestions();
           return;
         }
-      } else if (question.getChapter().getChapterNumber() == 0 && question.getQuestionNumber() == 0) {
+      } else if (question.getChapterNumber() == 0 && question.getQuestionNumber() == 0) {
         showHubPage();
         return;
       }
@@ -186,7 +186,7 @@ public class SurveyorActivity extends Activity {
           } else {
             Question question = questionController.getCurrentQuestion();
             ArrayList<Integer> key = new ArrayList<Integer>(
-                Arrays.asList(question.getChapter().getChapterNumber(),
+                Arrays.asList(question.getChapterNumber(),
                     question.getQuestionNumber(), -1, -1)
             );
 //					SurveyHelper.prevImages.put(key, driveHelper.fileUri);
@@ -230,7 +230,7 @@ public class SurveyorActivity extends Activity {
           } else {
             Question question = questionController.getCurrentQuestion();
             ArrayList<Integer> key = new ArrayList<Integer>(
-                Arrays.asList(question.getChapter().getChapterNumber(),
+                Arrays.asList(question.getChapterNumber(),
                     question.getQuestionNumber(), -1, -1)
             );
 //					SurveyHelper.prevImages.put(key, driveHelper.fileUri);
@@ -395,8 +395,8 @@ public class SurveyorActivity extends Activity {
     if (questionController.isAskingTripQuestions()) {
       questionController.updateTrackerPosition(question.getQuestionNumber());
     } else { //TODO: Figure out title and drawer settings for tracker questions.
-      questionController.updateSurveyPosition(question.getChapter().getChapterNumber(), question.getQuestionNumber());
-      drawerController.selectSurveyChapter(question.getChapter().getChapterNumber());
+      questionController.updateSurveyPosition(question.getChapterNumber(), question.getQuestionNumber());
+      drawerController.selectSurveyChapter(question.getChapterNumber());
     }
   }
 
