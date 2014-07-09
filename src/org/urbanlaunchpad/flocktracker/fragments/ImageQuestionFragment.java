@@ -38,7 +38,7 @@ public class ImageQuestionFragment extends QuestionFragment {
   @Override
   public void prepopulateQuestion() {
 
-  }
+  }	
 
   public void addThumbnail() {
 //		SurveyHelper.Tuple key = new SurveyHelper.Tuple(chapterposition, questionposition);

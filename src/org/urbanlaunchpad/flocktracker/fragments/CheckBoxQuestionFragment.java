@@ -50,7 +50,8 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 
   @Override
   public void setupLayout(View rootView) {
-
+	
+	LinearLayout answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
     boolean hasOther = getQuestion().isOtherEnabled();
     String[] answers = getQuestion().getAnswers();
     int numAnswers = hasOther ? answers.length : answers.length + 1;
@@ -89,7 +90,8 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
       answersLayout[i].addView(tvanswer);
       answersLayout[i].setId(ANSWER_TAG);
       answersLayout[i].setOnClickListener(onClickListener);
-      // answerlayout.addView(answersLayout[i]);
+      
+      answersContainer.addView(answersLayout[i]);
 
     }
     if (hasOther) {
