@@ -7,3 +7,4 @@ out/
 Flocksourcingmx.iml
 .gitignore
 proguard_logs/
+/.apt_generated

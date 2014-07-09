@@ -1,0 +1,6 @@
+<factorypath>
+    <factorypathentry kind="WKSPJAR" id="/Flocksourcingmx/libs/dagger-1.2.1.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="WKSPJAR" id="/Flocksourcingmx/libs/javawriter-2.5.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="WKSPJAR" id="/Flocksourcingmx/libs/javax.inject-1.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="WKSPJAR" id="/Flocksourcingmx/compile-libs/dagger-compiler-1.2.1.jar" enabled="true" runInBatchMode="false"/>
+</factorypath>
