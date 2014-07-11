@@ -1,5 +1,6 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,8 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
 import org.urbanlaunchpad.flocktracker.CommonEvents;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
@@ -17,6 +20,7 @@ import org.urbanlaunchpad.flocktracker.fragments.HubPageManager.HubPageActionLis
 
 import javax.inject.Inject;
 
+@SuppressLint("ValidFragment")
 public class HubPageFragment extends Fragment {
 
   @Inject Bus eventBus;

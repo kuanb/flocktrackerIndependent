@@ -1,5 +1,6 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
+import android.annotation.SuppressLint;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
@@ -11,7 +12,7 @@ import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.models.Question;
 
-
+@SuppressLint("ValidFragment")
 public class ImageQuestionFragment extends QuestionFragment {
 
   private OnClickListener cameraButtonOnClickListener = new OnClickListener() {

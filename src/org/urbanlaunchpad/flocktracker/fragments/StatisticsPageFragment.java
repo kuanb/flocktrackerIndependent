@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
 public class StatisticsPageFragment extends Fragment {
 
   @Inject Statistics statistics;
