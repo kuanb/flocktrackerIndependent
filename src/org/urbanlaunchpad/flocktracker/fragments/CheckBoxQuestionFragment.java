@@ -18,7 +18,7 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 	private final int CB_TAG = -2;
 	private final int ANSWER_TAG = -3;
 	private LinearLayout[] answersLayout;
-	private ArrayList<Integer> selectedAnswers;
+	private ArrayList<Integer> selectedAnswers = new ArrayList<Integer>();;
 	private int numAnswers;
 
 	private OnClickListener onClickListener = new OnClickListener() {
@@ -36,8 +36,9 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 	}
 
 	private void toggleCheckBox(LinearLayout v) {
-		CheckBox cb = (CheckBox) v.findViewById(CB_TAG);
-		TextView tv = (TextView) v.findViewById(ANSWER_TAG);
+		int childs = v.getChildCount();
+		CheckBox cb = (CheckBox) v.getChildAt(0);
+		TextView tv = (TextView) v.getChildAt(1);
 		if (cb.isChecked()) {
 			selectedAnswers.remove((Integer) v.getId());
 			cb.setChecked(false);
@@ -70,11 +71,8 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 
 			// Text for the answer
 			TextView tvanswer = new TextView(getActivity());
+			tvanswer.setId(ANSWER_TAG);
 			tvanswer.setText(answers[i]);
-
-			// linearlayout for checkbox and answer.
-			answersLayout[i] = new LinearLayout(getActivity());
-			answersLayout[i].setOrientation(LinearLayout.HORIZONTAL);
 
 			// Text formating.
 			tvanswer.setTextSize(20);
@@ -87,13 +85,16 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 					60, 60);
 			layoutParams.gravity = Gravity.CENTER_VERTICAL;
 			cbanswer.setLayoutParams(layoutParams);
+			
+			// linearlayout for checkbox and answer.
+			answersLayout[i] = new LinearLayout(getActivity());
+			answersLayout[i].setOrientation(LinearLayout.HORIZONTAL);
 
 			// Adding both to LinearLayout.
 			answersLayout[i].addView(cbanswer);
 			answersLayout[i].addView(tvanswer);
-			answersLayout[i].setId(ANSWER_TAG);
 			answersLayout[i].setOnClickListener(onClickListener);
-
+			answersLayout[i].setId(i);
 			answersContainer.addView(answersLayout[i]);
 
 		}
