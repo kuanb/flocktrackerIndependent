@@ -1,24 +1,31 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar.LayoutParams;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ScrollView;
 
 import com.squareup.otto.Bus;
 
 import org.urbanlaunchpad.flocktracker.R;
+import org.urbanlaunchpad.flocktracker.adapters.StableArrayAdapter;
 import org.urbanlaunchpad.flocktracker.menu.DynamicListView;
 import org.urbanlaunchpad.flocktracker.models.Question;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @SuppressLint("ValidFragment")
 public class OrderedListQuestionFragment extends QuestionFragment implements DynamicListView.SwappingEnded {
 
   ArrayList<String> answerList = null;
   Button skipButton;
-
+ 
   private OnClickListener skipButtonOnClickListener = new OnClickListener() {
 
     @Override
@@ -39,14 +46,16 @@ public class OrderedListQuestionFragment extends QuestionFragment implements Dyn
 
     answerList = new ArrayList<String>(Arrays.asList(getQuestion().getAnswers()));
 
-		ViewGroup questionLayoutView = (ViewGroup) getView()
-				.findViewById(R.id.questionlayout);
-		ScrollView answerScroll = (ScrollView) getView()
-				.findViewById(R.id.answerScroll);
-		questionLayoutView.removeView(answerScroll);
+//		ViewGroup questionLayoutView = (ViewGroup) getView()
+//				.findViewById(R.id.questionlayout);
+//		ScrollView answerScroll = (ScrollView) getView()
+//				.findViewById(R.id.answerScroll);
+//		questionLayoutView.removeView(answerScroll);
+		LinearLayout answersContainer = (LinearLayout) rootView
+				.findViewById(R.id.answer_layout);
 		StableArrayAdapter adapter = new StableArrayAdapter(
 				getActivity(), R.layout.ordered_answer, answerList);
-		answerlistView = (DynamicListView) new DynamicListView(getActivity(),
+		DynamicListView answerlistView = (DynamicListView) new DynamicListView(getActivity(),
 				this);
 		answerlistView.setCheeseList(answerList);
 		answerlistView.setAdapter(adapter);
@@ -56,10 +65,9 @@ public class OrderedListQuestionFragment extends QuestionFragment implements Dyn
 		skipButton.setEnabled(false);
 		skipButton.setText(R.string.question_skipped);
 
-		LinearLayout orderanswerlayout = (LinearLayout) getView()
-				.findViewById(R.id.orderanswerlayout);
-		orderanswerlayout.setOrientation(LinearLayout.VERTICAL);
-		orderanswerlayout.setWeightSum(6f);
+		LinearLayout orderAnswerLayout = new LinearLayout(getActivity());
+		orderAnswerLayout.setOrientation(LinearLayout.VERTICAL);
+		orderAnswerLayout.setWeightSum(6f);
 		LinearLayout.LayoutParams lParams1 = (LinearLayout.LayoutParams) new LinearLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, 0);
 		LinearLayout.LayoutParams lParams2 = (LinearLayout.LayoutParams) new LinearLayout.LayoutParams(
@@ -67,15 +75,18 @@ public class OrderedListQuestionFragment extends QuestionFragment implements Dyn
 		lParams1.weight = 5f;
 		lParams2.weight = 1f;
 
-		orderanswerlayout.addView(answerlistView);
-		orderanswerlayout.addView(skipButton);
+		orderAnswerLayout.addView(answerlistView);
+		orderAnswerLayout.addView(skipButton);
 		answerlistView.setLayoutParams(lParams1);
 		skipButton.setLayoutParams(lParams2);
 		skipButton.setOnClickListener(skipButtonOnClickListener);
-//
+		
+		
+		answersContainer.addView(orderAnswerLayout);
+
 //		prepopulateQuestion();
 //		sendAnswer();
-  }
+}
 
   //	@Override
   public void sendAnswer() {
