@@ -42,45 +42,46 @@ public class OrderedListQuestionFragment extends QuestionFragment implements
 	@Override
 	public void setupLayout(View rootView) {
 
-		answerList = new ArrayList<String>(Arrays.asList(getQuestion()
-				.getAnswers()));
 
-		// ViewGroup questionLayoutView = (ViewGroup) getView()
-		// .findViewById(R.id.questionlayout);
-		// ScrollView answerScroll = (ScrollView) getView()
-		// .findViewById(R.id.answerScroll);
-		// questionLayoutView.removeView(answerScroll);
-		LinearLayout answersContainer = (LinearLayout) rootView
-				.findViewById(R.id.answer_layout);
-		StableArrayAdapter adapter = new StableArrayAdapter(getActivity(),
-				R.layout.ordered_answer, answerList);
-		DynamicListView answerlistView = (DynamicListView) new DynamicListView(
-				getActivity(), this);
-		answerlistView.setCheeseList(answerList);
-		answerlistView.setAdapter(adapter);
-		answerlistView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+	    answerList = new ArrayList<String>(Arrays.asList(getQuestion().getAnswers()));
 
-		skipButton = (Button) new Button(getActivity());
-		skipButton.setEnabled(false);
-		skipButton.setText(R.string.question_skipped);
 
-		LinearLayout orderAnswerLayout = new LinearLayout(getActivity());
-		orderAnswerLayout.setOrientation(LinearLayout.VERTICAL);
-		orderAnswerLayout.setWeightSum(6f);
-		LinearLayout.LayoutParams lParams1 = (LinearLayout.LayoutParams) new LinearLayout.LayoutParams(
-				LayoutParams.MATCH_PARENT, 0);
-		LinearLayout.LayoutParams lParams2 = (LinearLayout.LayoutParams) new LinearLayout.LayoutParams(
-				LayoutParams.MATCH_PARENT, 0);
-		lParams1.weight = 5f;
-		lParams2.weight = 1f;
+	    ScrollView answerScroll = (ScrollView) rootView
+	        .findViewById(R.id.answer_scroll_container);
+	    answerScroll.setVisibility(View.GONE);
+	    LinearLayout answersContainer = (LinearLayout) rootView
+	        .findViewById(R.id.ordered_answer_layout);
+	    answersContainer.setVisibility(View.VISIBLE);
+	    StableArrayAdapter adapter = new StableArrayAdapter(
+	        getActivity(), R.layout.ordered_answer, answerList);
+	    DynamicListView answerlistView = (DynamicListView) new DynamicListView(getActivity(),
+	        this);
+	    answerlistView.setCheeseList(answerList);
+	    answerlistView.setAdapter(adapter);
+	    answerlistView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-		orderAnswerLayout.addView(answerlistView);
-		orderAnswerLayout.addView(skipButton);
-		answerlistView.setLayoutParams(lParams1);
-		skipButton.setLayoutParams(lParams2);
-		skipButton.setOnClickListener(skipButtonOnClickListener);
+	    skipButton = (Button) new Button(getActivity());
+	    skipButton.setEnabled(false);
+	    skipButton.setText(R.string.question_skipped);
 
-		answersContainer.addView(orderAnswerLayout);
+	    LinearLayout orderAnswerLayout = new LinearLayout(getActivity());
+	    orderAnswerLayout.setOrientation(LinearLayout.VERTICAL);
+	    orderAnswerLayout.setWeightSum(6f);
+	    LinearLayout.LayoutParams lParams1 = (LinearLayout.LayoutParams) new LinearLayout.LayoutParams(
+	        LayoutParams.MATCH_PARENT, 0);
+	    LinearLayout.LayoutParams lParams2 = (LinearLayout.LayoutParams) new LinearLayout.LayoutParams(
+	        LayoutParams.MATCH_PARENT, 0);
+	    lParams1.weight = 5f;
+	    lParams2.weight = 1f;
+
+	    orderAnswerLayout.addView(answerlistView);
+	    orderAnswerLayout.addView(skipButton);
+	    answerlistView.setLayoutParams(lParams1);
+	    skipButton.setLayoutParams(lParams2);
+	    skipButton.setOnClickListener(skipButtonOnClickListener);
+	    
+	    
+	    answersContainer.addView(orderAnswerLayout);
 
 		// prepopulateQuestion();
 		// sendAnswer();
