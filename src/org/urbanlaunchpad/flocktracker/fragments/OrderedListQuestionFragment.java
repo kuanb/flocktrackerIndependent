@@ -3,15 +3,20 @@ package org.urbanlaunchpad.flocktracker.fragments;
 import android.annotation.SuppressLint;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import com.squareup.otto.Bus;
 
 import org.urbanlaunchpad.flocktracker.R;
+import org.urbanlaunchpad.flocktracker.adapters.StableArrayAdapter;
 import org.urbanlaunchpad.flocktracker.menu.DynamicListView;
 import org.urbanlaunchpad.flocktracker.models.Question;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @SuppressLint("ValidFragment")
 public class OrderedListQuestionFragment extends QuestionFragment implements DynamicListView.SwappingEnded {
