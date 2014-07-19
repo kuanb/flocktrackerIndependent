@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.squareup.otto.Bus;
 
@@ -55,7 +56,10 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
       answersLayout[i].setId(i);
       answersContainer.addView(answersLayout[i]);
     }
-
+    
+    Toast.makeText(getActivity(), "" + hasOther, 
+    		   Toast.LENGTH_LONG).show();
+    
     if (hasOther) {
       answersLayout[numAnswers - 1] = (AnswerView) getInflater().inflate(
           R.layout.question_answer, null);
