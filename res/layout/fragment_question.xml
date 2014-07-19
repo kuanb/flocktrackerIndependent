@@ -45,7 +45,8 @@
     <LinearLayout
         android:id="@+id/ordered_answer_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="vertical"
         android:padding="15dp"
         android:textColor="@color/text_color_light"
