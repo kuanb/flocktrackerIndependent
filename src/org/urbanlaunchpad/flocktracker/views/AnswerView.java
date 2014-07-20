@@ -89,6 +89,7 @@ public class AnswerView extends LinearLayout {
 
     if (isOther) {
       otherAnswer.setTextColor(getResources().getColor(R.color.answer_selected));
+      otherAnswer.requestFocus();
     }
   }
 
@@ -100,6 +101,10 @@ public class AnswerView extends LinearLayout {
       case CHECKBOX:
         image.setImageResource(R.drawable.checkbox_uncheck);
         break;
+    }
+
+    if (isOther) {
+      otherAnswer.setTextColor(getResources().getColor(R.color.text_color_light));
     }
   }
 

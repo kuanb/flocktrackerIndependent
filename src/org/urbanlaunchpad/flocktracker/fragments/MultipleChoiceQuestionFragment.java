@@ -44,7 +44,7 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 
     boolean hasOther = getQuestion().isOtherEnabled();
     String[] answers = getQuestion().getAnswers();
-    int numAnswers = hasOther ? answers.length : answers.length + 1;
+    int numAnswers = hasOther ? answers.length + 1 : answers.length;
     answersLayout = new AnswerView[numAnswers];
 
     // Add listeners for answers
@@ -61,9 +61,9 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
     }
 
     if (hasOther) {
-      otherAnswer = answersLayout[numAnswers - 1];
       answersLayout[numAnswers - 1] = (AnswerView) getInflater().inflate(
           R.layout.question_answer, null);
+      otherAnswer = answersLayout[numAnswers - 1];
       answersLayout[numAnswers - 1].setId(numAnswers - 1);
       if (selectedAnswerIndex == -1 && !selectedAnswers.isEmpty()) {
         answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
