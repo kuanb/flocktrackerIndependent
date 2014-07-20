@@ -8,16 +8,20 @@ import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.squareup.otto.Bus;
+
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
+import org.urbanlaunchpad.flocktracker.views.AnswerView;
+
 import java.util.ArrayList;
 
 @SuppressLint("ValidFragment")
 public class CheckBoxQuestionFragment extends QuestionFragment {
 	private final int CB_TAG = -2;
 	private final int ANSWER_TAG = -3;
-	private LinearLayout[] answersLayout;
+	private AnswerView[] answersLayout;
 	private ArrayList<Integer> selectedAnswers = new ArrayList<Integer>();;
 	private int numAnswers;
 
@@ -36,18 +40,19 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 	}
 
 	private void toggleCheckBox(LinearLayout v) {
-		int childs = v.getChildCount();
-		CheckBox cb = (CheckBox) v.getChildAt(0);
-		TextView tv = (TextView) v.getChildAt(1);
-		if (cb.isChecked()) {
-			selectedAnswers.remove((Integer) v.getId());
-			cb.setChecked(false);
-			tv.setTextColor(getResources().getColor(R.color.text_color_light));
-		} else {
-			cb.setChecked(true);
-			selectedAnswers.add((Integer) v.getId());
-			tv.setTextColor(getResources().getColor(R.color.answer_selected));
-		}
+		((AnswerView) v).toggle();
+//		int childs = v.getChildCount();
+//		CheckBox cb = (CheckBox) v.getChildAt(0);
+//		TextView tv = (TextView) v.getChildAt(1);
+//		if (cb.isChecked()) {
+//			selectedAnswers.remove((Integer) v.getId());
+//			cb.setChecked(false);
+//			tv.setTextColor(getResources().getColor(R.color.text_color_light));
+//		} else {
+//			cb.setChecked(true);
+//			selectedAnswers.add((Integer) v.getId());
+//			tv.setTextColor(getResources().getColor(R.color.answer_selected));
+//		}
 	}
 
 	@Override
@@ -59,48 +64,61 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 		String[] answers = getQuestion().getAnswers();
 
 		int numAnswers = hasOther ? answers.length : answers.length + 1;
-		answersLayout = new LinearLayout[numAnswers];
+		answersLayout = new AnswerView[numAnswers];
 
 		for (int i = 0; i < answers.length; ++i) {
-			// Custom Checkbox.
-			CheckBox cbanswer = new CheckBox(getActivity());
-			cbanswer.setId(CB_TAG);
-			cbanswer.setBackgroundResource(R.drawable.custom_checkbox);
-			cbanswer.setButtonDrawable(new StateListDrawable());
-			cbanswer.setClickable(false);
-
-			// Text for the answer
-			TextView tvanswer = new TextView(getActivity());
-			tvanswer.setId(ANSWER_TAG);
-			tvanswer.setText(answers[i]);
-
-			// Text formating.
-			tvanswer.setTextSize(20);
-			tvanswer.setPadding(20, 20, 0, 20);
-			tvanswer.setTextColor(getResources().getColor(
-					R.color.text_color_light));
-
-			// Checkbox formatting.
-			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-					60, 60);
-			layoutParams.gravity = Gravity.CENTER_VERTICAL;
-			cbanswer.setLayoutParams(layoutParams);
-			
-			// linearlayout for checkbox and answer.
-			answersLayout[i] = new LinearLayout(getActivity());
-			answersLayout[i].setOrientation(LinearLayout.HORIZONTAL);
-
-			// Adding both to LinearLayout.
-			answersLayout[i].addView(cbanswer);
-			answersLayout[i].addView(tvanswer);
+			answersLayout[i] = (AnswerView) getInflater().inflate(
+					R.layout.question_answer, null);
+			answersLayout[i].initialize(getQuestion().getType(), answers[i]);
 			answersLayout[i].setOnClickListener(onClickListener);
 			answersLayout[i].setId(i);
 			answersContainer.addView(answersLayout[i]);
+			// // Custom Checkbox.
+			// CheckBox cbanswer = new CheckBox(getActivity());
+			// cbanswer.setId(CB_TAG);
+			// cbanswer.setBackgroundResource(R.drawable.custom_checkbox);
+			// cbanswer.setButtonDrawable(new StateListDrawable());
+			// cbanswer.setClickable(false);
+			//
+			// // Text for the answer
+			// TextView tvanswer = new TextView(getActivity());
+			// tvanswer.setId(ANSWER_TAG);
+			// tvanswer.setText(answers[i]);
+			//
+			// // Text formating.
+			// tvanswer.setTextSize(20);
+			// tvanswer.setPadding(20, 20, 0, 20);
+			// tvanswer.setTextColor(getResources().getColor(
+			// R.color.text_color_light));
+			//
+			// // Checkbox formatting.
+			// LinearLayout.LayoutParams layoutParams = new
+			// LinearLayout.LayoutParams(
+			// 60, 60);
+			// layoutParams.gravity = Gravity.CENTER_VERTICAL;
+			// cbanswer.setLayoutParams(layoutParams);
+			//
+			// // linearlayout for checkbox and answer.
+			// answersLayout[i] = new LinearLayout(getActivity());
+			// answersLayout[i].setOrientation(LinearLayout.HORIZONTAL);
+			//
+			// // Adding both to LinearLayout.
+			// answersLayout[i].addView(cbanswer);
+			// answersLayout[i].addView(tvanswer);
+			// answersLayout[i].setOnClickListener(onClickListener);
+			// answersLayout[i].setId(i);
+			// answersContainer.addView(answersLayout[i]);
 
 		}
 		if (hasOther) {
-			final int i = numAnswers - 1;
 
+			answersLayout[numAnswers - 1] = (AnswerView) getInflater().inflate(
+					R.layout.question_answer, null);
+			answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
+					null);
+			answersLayout[numAnswers - 1].setOnClickListener(onClickListener);
+			answersContainer.addView(answersLayout[numAnswers - 1]);
+			// final int i = numAnswers - 1;
 			// Custom checkbox
 			// otherCB = new CheckBox(getActivity());
 			// otherCB.setId(CB_TAG);
