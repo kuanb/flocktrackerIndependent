@@ -42,45 +42,15 @@ import java.util.Arrays;
 public class SurveyorActivity extends Activity {
   public static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
   public static GoogleDriveHelper driveHelper;
-  @Inject
-  QuestionController questionController;
-  @Inject
-  HubPageController hubPageController;
-  @Inject
-  StatisticsPageController statisticsPageController;
-  @Inject
-  LocationController locationController;
-  @Inject
-  DrawerController drawerController;
-  @Inject
-  Metadata metadata;
-  @Inject
-  Bus eventBus;
-  @Inject
-  TrackerAlarm trackerAlarm;
+  @Inject QuestionController questionController;
+  @Inject HubPageController hubPageController;
+  @Inject StatisticsPageController statisticsPageController;
+  @Inject LocationController locationController;
+  @Inject DrawerController drawerController;
+  @Inject Metadata metadata;
+  @Inject Bus eventBus;
+  @Inject TrackerAlarm trackerAlarm;
   private ObjectGraph objectGraph;
-  @SuppressLint("HandlerLeak")
-  private Handler messageHandler = new Handler() {
-
-    @SuppressWarnings("deprecation")
-    public void handleMessage(Message msg) {
-//      if (msg.what == EVENT_TYPE.SUBMITTED_SURVEY.ordinal()) {
-//        Toast toast = Toast.makeText(getApplicationContext(),
-//            getResources().getString(R.string.survey_submitted),
-//            Toast.LENGTH_SHORT);
-//        toast.show();
-//				surveyHelper.updateSurveyPosition(
-//						SurveyHelper.HUB_PAGE_CHAPTER_POSITION,
-//						SurveyHelper.HUB_PAGE_QUESTION_POSITION);
-//        showHubPage();
-//      } else if (msg.what == EVENT_TYPE.SUBMIT_FAILED.ordinal()) {
-//        Toast toast = Toast.makeText(getApplicationContext(),
-//            getResources().getString(R.string.submit_failed),
-//            Toast.LENGTH_SHORT);
-//        toast.show();
-//      }
-    }
-  };
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
