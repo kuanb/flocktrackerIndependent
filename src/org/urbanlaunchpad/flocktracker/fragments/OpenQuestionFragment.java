@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import com.squareup.otto.Bus;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
+import org.urbanlaunchpad.flocktracker.views.AnswerView;
 
 import java.util.Collections;
 import java.util.Set;
@@ -44,6 +45,12 @@ public class OpenQuestionFragment extends QuestionFragment {
     openET.setTextSize(20);
     openET.setTextColor(getResources().getColor(R.color.text_color_light));
     openET.setBackgroundResource(R.drawable.edit_text);
+    openET.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        ((AnswerView) view).enable();
+      }
+    });
 
     // Pre-populate
     Set<String> selectedAnswers = getQuestion().getSelectedAnswers();
