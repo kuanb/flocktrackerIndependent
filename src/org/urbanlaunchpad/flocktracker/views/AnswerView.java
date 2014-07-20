@@ -86,6 +86,10 @@ public class AnswerView extends LinearLayout {
         image.setImageResource(R.drawable.checkbox_check);
         break;
     }
+
+    if (isOther) {
+      otherAnswer.setTextColor(getResources().getColor(R.color.answer_selected));
+    }
   }
 
   public void disable() {

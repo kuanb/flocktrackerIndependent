@@ -62,6 +62,7 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
     if (hasOther) {
       answersLayout[numAnswers - 1] = (AnswerView) getInflater().inflate(
           R.layout.question_answer, null);
+      answersLayout[numAnswers - 1].setId(numAnswers - 1);
       if (selectedAnswerIndex == -1 && !selectedAnswers.isEmpty()) {
         answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
             selectedAnswers.iterator().next(), true);
@@ -70,7 +71,6 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
         answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
             null, true);
       }
-      answersLayout[numAnswers - 1].setId(numAnswers - 1);
       answersLayout[numAnswers - 1].setOnClickListener(onClickListener);
       answersContainer.addView(answersLayout[numAnswers - 1]);
     }
