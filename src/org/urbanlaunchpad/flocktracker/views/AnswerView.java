@@ -31,9 +31,9 @@ public class AnswerView extends LinearLayout {
     this.image = (ImageView) findViewById(R.id.answer_image);
   }
 
-  public void initialize(Question.QuestionType questionType, String answerText) {
+  public void initialize(Question.QuestionType questionType, String answerText, boolean isOther) {
     this.questionType = questionType;
-    this.isOther = answerText == null;
+    this.isOther = isOther;
 
     // Check if this is an other
     if (this.isOther) {
@@ -61,6 +61,8 @@ public class AnswerView extends LinearLayout {
           return false;
         }
       });
+
+      otherAnswer.setText(answerText);
     } else {
       answer.setText(answerText);
     }

@@ -87,10 +87,10 @@ public class JSONUtil {
     question.setQuestionID(jsonQuestion.getString("id"));
     question.setType(QuestionUtil.getQuestionTypeFromString(jsonQuestion.getString("Kind")));
     question.setQuestionText(jsonQuestion.getString("Question"));
-    if(!jsonQuestion.isNull("Other")){
-        question.setOtherEnabled(jsonQuestion.getBoolean("Other"));
+    if (!jsonQuestion.isNull("Other")) {
+      question.setOtherEnabled(jsonQuestion.getBoolean("Other"));
     }
-    
+
     if (jsonQuestion.has("Answers")) {
       JSONArray jsonAnswers = jsonQuestion.getJSONArray("Answers");
       String[] answers = new String[jsonAnswers.length()];

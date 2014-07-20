@@ -9,6 +9,7 @@ import org.urbanlaunchpad.flocktracker.fragments.StatisticsPageFragment;
 import org.urbanlaunchpad.flocktracker.helpers.SubmissionHelper;
 import org.urbanlaunchpad.flocktracker.models.Metadata;
 import org.urbanlaunchpad.flocktracker.models.Statistics;
+import org.urbanlaunchpad.flocktracker.views.NavButtonsView;
 
 import javax.inject.Singleton;
 
@@ -16,7 +17,8 @@ import javax.inject.Singleton;
     injects = {
         SurveyorActivity.class,
         HubPageFragment.class,
-        StatisticsPageFragment.class
+        StatisticsPageFragment.class,
+        NavButtonsView.class
     }
 )
 public class FlocktrackerModule {

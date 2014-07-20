@@ -19,8 +19,10 @@ import java.util.TimerTask;
 
 public class StatisticsPageFragment extends Fragment {
 
-  @Inject Statistics statistics;
-  @Inject Bus eventBus;
+  @Inject
+  Statistics statistics;
+  @Inject
+  Bus eventBus;
   private StatisticsPageAttachedEvent statisticsPageAttachedEvent = new StatisticsPageAttachedEvent();
   private Timer timer;
   private TextView tripTimeText;
@@ -90,5 +92,6 @@ public class StatisticsPageFragment extends Fragment {
     });
   }
 
-  public class StatisticsPageAttachedEvent {}
+  public class StatisticsPageAttachedEvent {
+  }
 }

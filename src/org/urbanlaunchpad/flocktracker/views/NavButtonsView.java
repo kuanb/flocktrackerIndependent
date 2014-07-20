@@ -7,18 +7,23 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import com.squareup.otto.Bus;
+import org.urbanlaunchpad.flocktracker.CommonEvents;
 import org.urbanlaunchpad.flocktracker.R;
-import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment.QuestionActionListener;
+import org.urbanlaunchpad.flocktracker.SurveyorActivity;
+import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment;
 import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment.QuestionType;
+
+import javax.inject.Inject;
 
 public class NavButtonsView extends LinearLayout implements NavButtonsManager {
 
+  @Inject
+  Bus eventBus;
   private View previousQuestionButton;
   private View nextQuestionButton;
   private View submitSurveyButton;
-
-  private QuestionActionListener listener;
-
+  private QuestionFragment questionFragment;
   private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
     @Override
     public void onClick(DialogInterface dialog, int which) {
@@ -26,7 +31,7 @@ public class NavButtonsView extends LinearLayout implements NavButtonsManager {
         case DialogInterface.BUTTON_POSITIVE:
           // Yes button clicked
           Toast.makeText(getContext(), getResources().getString(R.string.submitting_survey), Toast.LENGTH_SHORT).show();
-          listener.onSubmitButtonClicked();
+          eventBus.post(new CommonEvents.SubmitSurveyEvent(questionFragment.getSelectedAnswers()));
           break;
         case DialogInterface.BUTTON_NEGATIVE:
           // No button clicked
@@ -42,6 +47,7 @@ public class NavButtonsView extends LinearLayout implements NavButtonsManager {
   @Override
   protected void onFinishInflate() {
     super.onFinishInflate();
+    ((SurveyorActivity) getContext()).getObjectGraph().inject(this);
     this.previousQuestionButton = findViewById(R.id.previous_question_button);
     this.nextQuestionButton = findViewById(R.id.next_question_button);
     this.submitSurveyButton = findViewById(R.id.submit_survey_button);
@@ -54,37 +60,31 @@ public class NavButtonsView extends LinearLayout implements NavButtonsManager {
     previousQuestionButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (listener != null) {
-          listener.onPrevQuestionButtonClicked();
-        }
+        eventBus.post(new CommonEvents.PreviousQuestionPressedEvent(questionFragment.getSelectedAnswers()));
       }
     });
     nextQuestionButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (listener != null) {
-          listener.onNextQuestionButtonClicked();
-        }
+        eventBus.post(new CommonEvents.NextQuestionPressedEvent(questionFragment.getSelectedAnswers()));
       }
     });
     submitSurveyButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (listener != null) {
-          // Show submitting dialog.
-          AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-          builder.setMessage(getResources().getString(R.string.submit_survey_question))
-              .setPositiveButton(getResources().getString(R.string.yes), dialogClickListener)
-              .setNegativeButton(getResources().getString(R.string.no), dialogClickListener)
-              .show();
-        }
+        // Show submitting dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(getResources().getString(R.string.submit_survey_question))
+            .setPositiveButton(getResources().getString(R.string.yes), dialogClickListener)
+            .setNegativeButton(getResources().getString(R.string.no), dialogClickListener)
+            .show();
       }
     });
   }
 
   @Override
-  public void setQuestionType(QuestionActionListener listener, QuestionType type) {
-    this.listener = listener;
+  public void setQuestionType(QuestionFragment questionFragment, QuestionType type) {
+    this.questionFragment = questionFragment;
 
     switch (type) {
       case TRIP_FIRST:
@@ -104,10 +104,5 @@ public class NavButtonsView extends LinearLayout implements NavButtonsManager {
         nextQuestionButton.setVisibility(INVISIBLE);
         break;
     }
-  }
-
-  @Override
-  public void cleanUp() {
-    this.listener = null;
   }
 }

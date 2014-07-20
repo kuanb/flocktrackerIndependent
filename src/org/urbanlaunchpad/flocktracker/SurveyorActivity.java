@@ -1,7 +1,8 @@
 package org.urbanlaunchpad.flocktracker;
 
 import android.annotation.SuppressLint;
-import android.app.*;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,14 +42,22 @@ import java.util.Arrays;
 public class SurveyorActivity extends Activity {
   public static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
   public static GoogleDriveHelper driveHelper;
-  @Inject QuestionController questionController;
-  @Inject HubPageController hubPageController;
-  @Inject StatisticsPageController statisticsPageController;
-  @Inject LocationController locationController;
-  @Inject DrawerController drawerController;
-  @Inject Metadata metadata;
-  @Inject Bus eventBus;
-  @Inject TrackerAlarm trackerAlarm;
+  @Inject
+  QuestionController questionController;
+  @Inject
+  HubPageController hubPageController;
+  @Inject
+  StatisticsPageController statisticsPageController;
+  @Inject
+  LocationController locationController;
+  @Inject
+  DrawerController drawerController;
+  @Inject
+  Metadata metadata;
+  @Inject
+  Bus eventBus;
+  @Inject
+  TrackerAlarm trackerAlarm;
   private ObjectGraph objectGraph;
   @SuppressLint("HandlerLeak")
   private Handler messageHandler = new Handler() {
@@ -153,7 +162,7 @@ public class SurveyorActivity extends Activity {
         return;
       }
 
-      questionController.onPrevQuestionButtonClicked();
+      questionController.onPrevQuestionButtonClicked(new CommonEvents.PreviousQuestionPressedEvent(null));
     } else {
       super.onBackPressed();
     }
@@ -267,7 +276,7 @@ public class SurveyorActivity extends Activity {
   }
 
 	/*
-	 * Drawer Logic
+   * Drawer Logic
 	 */
 
   public boolean onOptionsItemSelected(MenuItem item) {
@@ -324,7 +333,7 @@ public class SurveyorActivity extends Activity {
   }
 
 	/*
-	 * Location tracking helper
+   * Location tracking helper
 	 */
 
   public void stopTrip() {

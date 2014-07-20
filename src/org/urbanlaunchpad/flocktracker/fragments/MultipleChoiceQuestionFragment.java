@@ -5,12 +5,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import com.squareup.otto.Bus;
-
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.views.AnswerView;
+
+import java.util.Collections;
+import java.util.Set;
 
 @SuppressLint("ValidFragment")
 public class MultipleChoiceQuestionFragment extends QuestionFragment {
@@ -28,18 +29,16 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 
       ((AnswerView) v).enable();
       selectedAnswerIndex = v.getId();
-      getListener().onSelectedAnswer(
-          ((AnswerView) v).getAnswer().toString());
     }
   };
 
-  public MultipleChoiceQuestionFragment(QuestionActionListener listener,
-      Question question, QuestionType questionType, Bus eventBus) {
-    super(listener, question, questionType, eventBus);
+  public MultipleChoiceQuestionFragment(Question question, QuestionType questionType, Bus eventBus) {
+    super(question, questionType, eventBus);
   }
 
   @Override
   public void setupLayout(View rootView) {
+    Set<String> selectedAnswers = getQuestion().getSelectedAnswers();
     answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
 
     boolean hasOther = getQuestion().isOtherEnabled();
@@ -51,34 +50,38 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
     for (int i = 0; i < answers.length; i++) {
       answersLayout[i] = (AnswerView) getInflater().inflate(
           R.layout.question_answer, null);
-      answersLayout[i].initialize(getQuestion().getType(), answers[i]);
+      answersLayout[i].initialize(getQuestion().getType(), answers[i], false);
       answersLayout[i].setOnClickListener(onClickListener);
       answersLayout[i].setId(i);
+      if (selectedAnswers != null && selectedAnswers.contains(answers[i])) {
+        onClickListener.onClick(answersLayout[i]);
+      }
       answersContainer.addView(answersLayout[i]);
     }
-    
-    Toast.makeText(getActivity(), "" + hasOther, 
-    		   Toast.LENGTH_LONG).show();
-    
+
     if (hasOther) {
       answersLayout[numAnswers - 1] = (AnswerView) getInflater().inflate(
           R.layout.question_answer, null);
-      answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
-          null);
+      if (selectedAnswerIndex == -1 && !selectedAnswers.isEmpty()) {
+        answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
+            selectedAnswers.iterator().next(), true);
+        onClickListener.onClick(answersLayout[numAnswers - 1]);
+      } else {
+        answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
+            null, true);
+      }
+      answersLayout[numAnswers - 1].setId(numAnswers - 1);
       answersLayout[numAnswers - 1].setOnClickListener(onClickListener);
       answersContainer.addView(answersLayout[numAnswers - 1]);
     }
-    prepopulateQuestion();
   }
 
   @Override
-  public void prepopulateQuestion() {
-    // if (selectedAnswers != null) {
-    // if (selectedAnswers.get(0) == answersLayout.length) {
-    // EditText answerText = (EditText) answersLayout[answersLayout.length]
-    // .findViewById(ANSWER_TAG);
-    // answerText.setText(jquestion.getString("Answer"));
-    // }
-    // }
+  public Set<String> getSelectedAnswers() {
+    if (selectedAnswerIndex == -1) {
+      return null;
+    }
+
+    return Collections.singleton(getQuestion().getAnswers()[selectedAnswerIndex]);
   }
 }
