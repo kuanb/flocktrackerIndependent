@@ -26,11 +26,13 @@
 
   <EditText
       android:id="@+id/other_answer"
-      android:layout_width="wrap_content"
+      android:background="@drawable/edit_text"
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_gravity="center_vertical"
       android:hint="@string/other_hint"
       android:inputType="text"
+      android:padding="5dp"
       android:singleLine="true"
       android:textColor="@color/text_color_light"
       android:textSize="20sp"

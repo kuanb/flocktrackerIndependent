@@ -65,7 +65,7 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
           R.layout.question_answer, null);
       otherAnswer = answersLayout[numAnswers - 1];
       answersLayout[numAnswers - 1].setId(numAnswers - 1);
-      if (selectedAnswerIndex == -1 && !selectedAnswers.isEmpty()) {
+      if (selectedAnswerIndex == -1 && selectedAnswers != null && !selectedAnswers.isEmpty()) {
         answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
             selectedAnswers.iterator().next(), true);
         onClickListener.onClick(answersLayout[numAnswers - 1]);

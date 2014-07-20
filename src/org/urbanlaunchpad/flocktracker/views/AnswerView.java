@@ -1,6 +1,7 @@
 package org.urbanlaunchpad.flocktracker.views;
 
 import android.content.Context;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -42,11 +43,8 @@ public class AnswerView extends LinearLayout {
       otherAnswer.setOnFocusChangeListener(new View.OnFocusChangeListener() {
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
-          InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
           if (hasFocus) {
-            imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
-          } else {
-            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+            callOnClick();
           }
         }
       });
@@ -64,10 +62,24 @@ public class AnswerView extends LinearLayout {
 
       otherAnswer.setText(answerText);
     } else {
+      answer.setHint(getResources().getString(R.string.answer_hint));
       answer.setText(answerText);
     }
 
     switch (questionType) {
+      case OPEN_NUMBER:
+        answer.setInputType(InputType.TYPE_CLASS_NUMBER
+            | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+      case OPEN_TEXT:
+        answer.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+          @Override
+          public void onFocusChange(View v, boolean hasFocus) {
+            if (hasFocus) {
+              callOnClick();
+            }
+          }
+        });
+        break;
       case IMAGE:
         image.setVisibility(GONE);
         break;

@@ -36,7 +36,6 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
   }
 
   private void toggleCheckBox(LinearLayout v) {
-    int childs = v.getChildCount();
     CheckBox cb = (CheckBox) v.getChildAt(0);
     TextView tv = (TextView) v.getChildAt(1);
     if (cb.isChecked()) {
@@ -45,7 +44,7 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
       tv.setTextColor(getResources().getColor(R.color.text_color_light));
     } else {
       cb.setChecked(true);
-      selectedAnswers.add((Integer) v.getId());
+      selectedAnswers.add(v.getId());
       tv.setTextColor(getResources().getColor(R.color.answer_selected));
     }
   }
@@ -60,6 +59,7 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 
     int numAnswers = hasOther ? answers.length : answers.length + 1;
     answersLayout = new LinearLayout[numAnswers];
+    Set<String> selectedAnswers = getQuestion().getSelectedAnswers();
 
     for (int i = 0; i < answers.length; ++i) {
       // Custom Checkbox.
@@ -97,6 +97,10 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
       answersLayout[i].setId(i);
       answersContainer.addView(answersLayout[i]);
 
+      // Pre-populate.
+      if (selectedAnswers.contains(answers[i])) {
+        onClickListener.onClick(answersLayout[i]);
+      }
     }
     if (hasOther) {
       final int i = numAnswers - 1;

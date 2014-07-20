@@ -1,10 +1,6 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
-import android.graphics.Typeface;
-import android.text.InputType;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import com.squareup.otto.Bus;
 import org.urbanlaunchpad.flocktracker.R;
@@ -15,9 +11,14 @@ import java.util.Collections;
 import java.util.Set;
 
 public class OpenQuestionFragment extends QuestionFragment {
-  private EditText openET;
-  private boolean askingNumbers;
   private LinearLayout answersContainer;
+  private AnswerView answerView;
+  private View.OnClickListener onClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      ((AnswerView) view).enable();
+    }
+  };
 
   public OpenQuestionFragment(Question question, QuestionType questionType,
       Bus eventBus) {
@@ -27,43 +28,24 @@ public class OpenQuestionFragment extends QuestionFragment {
   @Override
   public void setupLayout(View rootView) {
     answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
-
-    Question.QuestionType questionType = getQuestion().getType();
-    if (questionType.equals(Question.QuestionType.OPEN_NUMBER) || questionType.equals(Question.QuestionType.LOOP)) {
-      askingNumbers = true;
-    }
-
-    openET = new EditText(getActivity());
-    openET.setHint(getResources().getString(R.string.answer_hint));
-    openET.setImeOptions(EditorInfo.IME_ACTION_DONE);
-    if (askingNumbers) {
-      openET.setInputType(InputType.TYPE_CLASS_NUMBER
-          | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-    }
-    openET.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
-    openET.setSingleLine();
-    openET.setTextSize(20);
-    openET.setTextColor(getResources().getColor(R.color.text_color_light));
-    openET.setBackgroundResource(R.drawable.edit_text);
-    openET.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        ((AnswerView) view).enable();
-      }
-    });
+    answerView = (AnswerView) getInflater().inflate(R.layout.question_answer_open, null);
+    answerView.setOnClickListener(onClickListener);
 
     // Pre-populate
     Set<String> selectedAnswers = getQuestion().getSelectedAnswers();
     if (!selectedAnswers.isEmpty()) {
-      openET.setText(selectedAnswers.iterator().next());
+      answerView.initialize(getQuestion().getType(), selectedAnswers.iterator().next(), false);
+      onClickListener.onClick(answerView);
+    } else {
+      answerView.initialize(getQuestion().getType(), null, false);
     }
 
-    answersContainer.addView(openET);
+    answersContainer.addView(answerView);
   }
 
   @Override
   public Set<String> getSelectedAnswers() {
-    return Collections.singleton(openET.getText().toString());
+    return Collections.singleton(answerView.getAnswer().toString());
   }
 
 }
