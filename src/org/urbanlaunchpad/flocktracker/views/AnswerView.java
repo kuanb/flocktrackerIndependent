@@ -90,6 +90,8 @@ public class AnswerView extends LinearLayout {
     if (isOther) {
       otherAnswer.setTextColor(getResources().getColor(R.color.answer_selected));
       otherAnswer.requestFocus();
+    } else {
+      answer.setTextColor(getResources().getColor(R.color.answer_selected));
     }
   }
 
@@ -105,6 +107,8 @@ public class AnswerView extends LinearLayout {
 
     if (isOther) {
       otherAnswer.setTextColor(getResources().getColor(R.color.text_color_light));
+    } else {
+      answer.setTextColor(getResources().getColor(R.color.text_color_light));
     }
   }
 
