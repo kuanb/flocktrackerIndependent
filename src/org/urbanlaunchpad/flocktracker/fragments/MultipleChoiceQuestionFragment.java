@@ -18,6 +18,7 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
   private AnswerView[] answersLayout;
   private LinearLayout answersContainer;
   private int selectedAnswerIndex = -1;
+  private AnswerView otherAnswer;
 
   private OnClickListener onClickListener = new OnClickListener() {
     @Override
@@ -60,6 +61,7 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
     }
 
     if (hasOther) {
+      otherAnswer = answersLayout[numAnswers - 1];
       answersLayout[numAnswers - 1] = (AnswerView) getInflater().inflate(
           R.layout.question_answer, null);
       answersLayout[numAnswers - 1].setId(numAnswers - 1);
@@ -80,6 +82,11 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
   public Set<String> getSelectedAnswers() {
     if (selectedAnswerIndex == -1) {
       return null;
+    }
+
+    // Other answer.
+    if (getQuestion().isOtherEnabled() && selectedAnswerIndex == getQuestion().getAnswers().length) {
+      return Collections.singleton(otherAnswer.getAnswer().toString());
     }
 
     return Collections.singleton(getQuestion().getAnswers()[selectedAnswerIndex]);
