@@ -1,6 +1,7 @@
 package org.urbanlaunchpad.flocktracker.views;
 
 import android.content.Context;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +20,7 @@ public class AnswerView extends LinearLayout {
 	private boolean isOther;
 	private Question.QuestionType questionType;
 	private boolean enabled = false;
+	
 
 	public AnswerView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -32,9 +34,10 @@ public class AnswerView extends LinearLayout {
 		this.image = (ImageView) findViewById(R.id.answer_image);
 	}
 
-	public void initialize(Question.QuestionType questionType, String answerText) {
+	public void initialize(Question.QuestionType questionType,
+			String answerText, boolean isOther) {
 		this.questionType = questionType;
-		this.isOther = answerText == null;
+		this.isOther = isOther;
 
 		// Check if this is an other
 		if (this.isOther) {
@@ -44,15 +47,8 @@ public class AnswerView extends LinearLayout {
 					.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 						@Override
 						public void onFocusChange(View v, boolean hasFocus) {
-							InputMethodManager imm = (InputMethodManager) getContext()
-									.getSystemService(
-											Context.INPUT_METHOD_SERVICE);
 							if (hasFocus) {
-								imm.showSoftInput(v,
-										InputMethodManager.SHOW_IMPLICIT);
-							} else {
-								imm.hideSoftInputFromWindow(v.getWindowToken(),
-										0);
+								callOnClick();
 							}
 						}
 					});
@@ -67,11 +63,27 @@ public class AnswerView extends LinearLayout {
 					return false;
 				}
 			});
+
+			otherAnswer.setText(answerText);
 		} else {
+			answer.setHint(getResources().getString(R.string.answer_hint));
 			answer.setText(answerText);
 		}
 
 		switch (questionType) {
+		case OPEN_NUMBER:
+			answer.setInputType(InputType.TYPE_CLASS_NUMBER
+					| InputType.TYPE_NUMBER_FLAG_DECIMAL);
+		case OPEN_TEXT:
+			answer.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+				@Override
+				public void onFocusChange(View v, boolean hasFocus) {
+					if (hasFocus) {
+						callOnClick();
+					}
+				}
+			});
+			break;
 		case IMAGE:
 			image.setVisibility(GONE);
 			break;
@@ -90,6 +102,15 @@ public class AnswerView extends LinearLayout {
 			image.setImageResource(R.drawable.checkbox_check);
 			break;
 		}
+
+		if (isOther) {
+			otherAnswer.setTextColor(getResources().getColor(
+					R.color.answer_selected));
+			otherAnswer.requestFocus();
+		} else {
+			answer.setTextColor(getResources()
+					.getColor(R.color.answer_selected));
+		}
 		enabled = true;
 	}
 
@@ -102,13 +123,21 @@ public class AnswerView extends LinearLayout {
 			image.setImageResource(R.drawable.checkbox_uncheck);
 			break;
 		}
+
+		if (isOther) {
+			otherAnswer.setTextColor(getResources().getColor(
+					R.color.text_color_light));
+		} else {
+			answer.setTextColor(getResources().getColor(
+					R.color.text_color_light));
+		}
 		enabled = false;
 	}
 
 	public void toggle() {
-		if(enabled){
+		if (enabled) {
 			disable();
-		} else{
+		} else {
 			enable();
 		}
 	}

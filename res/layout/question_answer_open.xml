@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<org.urbanlaunchpad.flocktracker.views.AnswerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp">
+  <EditText
+      android:id="@+id/answer_text"
+      android:background="@drawable/edit_text"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_vertical"
+      android:hint="@string/other_hint"
+      android:inputType="text"
+      android:singleLine="true"
+      android:textColor="@color/text_color_light"
+      android:textSize="20sp"/>
+</org.urbanlaunchpad.flocktracker.views.AnswerView>

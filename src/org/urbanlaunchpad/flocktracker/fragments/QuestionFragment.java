@@ -12,6 +12,8 @@ import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.views.NavButtonsManager;
 
+import java.util.Set;
+
 public abstract class QuestionFragment extends Fragment {
 
   // Loop stuff
@@ -19,7 +21,6 @@ public abstract class QuestionFragment extends Fragment {
   Integer loopTotalInteger;
   Integer loopIterationInteger;
   Integer loopPositionInteger;
-  private QuestionActionListener listener;
   private NavButtonsManager navButtonsManager;
   private Question question;
   private QuestionType questionType;
@@ -27,9 +28,7 @@ public abstract class QuestionFragment extends Fragment {
   private Bus eventBus;
   private QuestionAttachedEvent questionAttachedEvent = new QuestionAttachedEvent();
 
-  public QuestionFragment(QuestionActionListener listener, Question question,
-      QuestionType questionType, Bus eventBus) {
-    this.listener = listener;
+  public QuestionFragment(Question question, QuestionType questionType, Bus eventBus) {
     this.question = question;
     this.questionType = questionType;
     this.eventBus = eventBus;
@@ -38,18 +37,12 @@ public abstract class QuestionFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
-    View rootView = inflater.inflate(R.layout.fragment_question, container,
-        false);
-
-    navButtonsManager = (NavButtonsManager) rootView
-        .findViewById(R.id.questionButtons);
-    navButtonsManager.setQuestionType(listener, questionType);
+    View rootView = inflater.inflate(R.layout.fragment_question, container, false);
+    navButtonsManager = (NavButtonsManager) rootView.findViewById(R.id.questionButtons);
+    navButtonsManager.setQuestionType(this, questionType);
     questionView = (TextView) rootView.findViewById(R.id.question_view);
     questionView.setText(question.getQuestionText());
-
     setupLayout(rootView);
-    prepopulateQuestion();
-
     return rootView;
   }
 
@@ -62,38 +55,21 @@ public abstract class QuestionFragment extends Fragment {
 
   abstract void setupLayout(View rootView);
 
-  abstract void prepopulateQuestion();
-
   public Question getQuestion() {
     return question;
-  }
-
-  protected QuestionActionListener getListener() {
-    return listener;
   }
 
   protected LayoutInflater getInflater() {
     return (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
   }
 
+  public abstract Set<String> getSelectedAnswers();
+
   /**
    * Enum to specify question type
    */
   public enum QuestionType {
     FIRST, NORMAL, LAST, TRIP_FIRST, TRIP_NORMAL
-  }
-
-  /**
-   * Listener for answer changes
-   */
-  public interface QuestionActionListener {
-    void onSelectedAnswer(String answer);
-
-    void onPrevQuestionButtonClicked();
-
-    void onNextQuestionButtonClicked();
-
-    void onSubmitButtonClicked();
   }
 
   public class QuestionAttachedEvent {

@@ -4,15 +4,15 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.support.v4.app.Fragment;
 import android.widget.Toast;
 import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.urbanlaunchpad.flocktracker.CommonEvents;
 import org.urbanlaunchpad.flocktracker.ProjectConfig;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.fragments.*;
-import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment.QuestionActionListener;
 import org.urbanlaunchpad.flocktracker.helpers.ColumnCheckHelper;
 import org.urbanlaunchpad.flocktracker.helpers.SubmissionHelper;
 import org.urbanlaunchpad.flocktracker.models.Chapter;
@@ -24,7 +24,7 @@ import org.urbanlaunchpad.flocktracker.util.QuestionUtil;
 
 import javax.inject.Inject;
 
-public class QuestionController implements QuestionActionListener {
+public class QuestionController {
   private Context context;
   private Metadata metadata;
   private FragmentManager fragmentManager;
@@ -52,6 +52,7 @@ public class QuestionController implements QuestionActionListener {
     this.submissionHelper = submissionHelper;
     this.metadata = metadata;
     this.eventBus = eventBus;
+    eventBus.register(this);
     resetSurvey();
     resetTrip();
 
@@ -85,24 +86,24 @@ public class QuestionController implements QuestionActionListener {
 
     switch (currentQuestion.getType()) {
       case MULTIPLE_CHOICE:
-        currentQuestionFragment = new MultipleChoiceQuestionFragment(this, currentQuestion,
+        currentQuestionFragment = new MultipleChoiceQuestionFragment(currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
       case OPEN_NUMBER:
       case OPEN_TEXT:
-        currentQuestionFragment = new OpenQuestionFragment(this, currentQuestion,
+        currentQuestionFragment = new OpenQuestionFragment(currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
       case IMAGE:
-        currentQuestionFragment = new ImageQuestionFragment(this, currentQuestion,
+        currentQuestionFragment = new ImageQuestionFragment(currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
       case CHECKBOX:
-        currentQuestionFragment = new CheckBoxQuestionFragment(this, currentQuestion,
+        currentQuestionFragment = new CheckBoxQuestionFragment(currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
       case ORDERED:
-        currentQuestionFragment = new OrderedListQuestionFragment(this, currentQuestion,
+        currentQuestionFragment = new OrderedListQuestionFragment(currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
       case LOOP:
@@ -134,16 +135,12 @@ public class QuestionController implements QuestionActionListener {
     return currentQuestion;
   }
 
-  @Override
-  public void onSelectedAnswer(String answer) {
-    // TODO(adchia): implement
-  }
-
   /*
    * Nav Buttons listener.
    */
-  @Override
-  public void onPrevQuestionButtonClicked() {
+  @Subscribe
+  public void onPrevQuestionButtonClicked(CommonEvents.PreviousQuestionPressedEvent event) {
+    getCurrentQuestion().setSelectedAnswers(event.selectedAnswers);
     if (isAskingTripQuestions) {
       trackerQuestionPosition--;
       showCurrentQuestion();
@@ -159,8 +156,9 @@ public class QuestionController implements QuestionActionListener {
     }
   }
 
-  @Override
-  public void onNextQuestionButtonClicked() {
+  @Subscribe
+  public void onNextQuestionButtonClicked(CommonEvents.NextQuestionPressedEvent event) {
+    getCurrentQuestion().setSelectedAnswers(event.selectedAnswers);
     if (isAskingTripQuestions) {
       if (trackerQuestionPosition == trackingQuestions.length - 1) {
         // show hub page and start tracking
@@ -182,8 +180,9 @@ public class QuestionController implements QuestionActionListener {
     }
   }
 
-  @Override
-  public void onSubmitButtonClicked() {
+  @Subscribe
+  public void onSubmitButtonClicked(CommonEvents.SubmitSurveyEvent event) {
+    getCurrentQuestion().setSelectedAnswers(event.selectedAnswers);
     new Thread(new Runnable() {
       public void run() {
         Submission submission = new Submission();
@@ -262,5 +261,6 @@ public class QuestionController implements QuestionActionListener {
     return chapterList[chapterPosition];
   }
 
-  public class ReachedEndOfTrackerSurveyEvent {}
+  public class ReachedEndOfTrackerSurveyEvent {
+  }
 }

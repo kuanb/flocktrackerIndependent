@@ -1,7 +1,8 @@
 package org.urbanlaunchpad.flocktracker;
 
 import android.annotation.SuppressLint;
-import android.app.*;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -50,28 +51,6 @@ public class SurveyorActivity extends Activity {
   @Inject Bus eventBus;
   @Inject TrackerAlarm trackerAlarm;
   private ObjectGraph objectGraph;
-  @SuppressLint("HandlerLeak")
-  private Handler messageHandler = new Handler() {
-
-    @SuppressWarnings("deprecation")
-    public void handleMessage(Message msg) {
-//      if (msg.what == EVENT_TYPE.SUBMITTED_SURVEY.ordinal()) {
-//        Toast toast = Toast.makeText(getApplicationContext(),
-//            getResources().getString(R.string.survey_submitted),
-//            Toast.LENGTH_SHORT);
-//        toast.show();
-//				surveyHelper.updateSurveyPosition(
-//						SurveyHelper.HUB_PAGE_CHAPTER_POSITION,
-//						SurveyHelper.HUB_PAGE_QUESTION_POSITION);
-//        showHubPage();
-//      } else if (msg.what == EVENT_TYPE.SUBMIT_FAILED.ordinal()) {
-//        Toast toast = Toast.makeText(getApplicationContext(),
-//            getResources().getString(R.string.submit_failed),
-//            Toast.LENGTH_SHORT);
-//        toast.show();
-//      }
-    }
-  };
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +132,7 @@ public class SurveyorActivity extends Activity {
         return;
       }
 
-      questionController.onPrevQuestionButtonClicked();
+      questionController.onPrevQuestionButtonClicked(new CommonEvents.PreviousQuestionPressedEvent(null));
     } else {
       super.onBackPressed();
     }
@@ -267,7 +246,7 @@ public class SurveyorActivity extends Activity {
   }
 
 	/*
-	 * Drawer Logic
+   * Drawer Logic
 	 */
 
   public boolean onOptionsItemSelected(MenuItem item) {
@@ -324,7 +303,7 @@ public class SurveyorActivity extends Activity {
   }
 
 	/*
-	 * Location tracking helper
+   * Location tracking helper
 	 */
 
   public void stopTrip() {

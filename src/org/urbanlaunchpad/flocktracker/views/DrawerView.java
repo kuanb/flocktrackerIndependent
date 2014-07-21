@@ -102,6 +102,7 @@ public class DrawerView extends DrawerLayout {
 
   public class SelectChapterEvent {
     public int chapterNumber;
+
     public SelectChapterEvent(int chapterNumber) {
       this.chapterNumber = chapterNumber;
     }

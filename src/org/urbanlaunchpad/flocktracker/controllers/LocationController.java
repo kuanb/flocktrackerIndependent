@@ -135,7 +135,7 @@ public class LocationController implements
         connectionResult.startResolutionForResult((Activity) context,
             SurveyorActivity.CONNECTION_FAILURE_RESOLUTION_REQUEST);
         /*
-				 * Thrown if Google Play services canceled the original
+         * Thrown if Google Play services canceled the original
 				 * PendingIntent
 				 */
       } catch (IntentSender.SendIntentException e) {
@@ -143,7 +143,7 @@ public class LocationController implements
         e.printStackTrace();
       }
     } else {
-			/*
+      /*
 			 * If no resolution is available, display a dialog to the user with
 			 * the error.
 			 */

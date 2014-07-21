@@ -16,6 +16,8 @@ import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.views.AnswerView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @SuppressLint("ValidFragment")
 public class CheckBoxQuestionFragment extends QuestionFragment {
@@ -23,10 +25,8 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 	private final int ANSWER_TAG = -3;
 	private AnswerView[] answersLayout;
 	private ArrayList<Integer> selectedAnswers = new ArrayList<Integer>();;
-	private int numAnswers;
 
 	private OnClickListener onClickListener = new OnClickListener() {
-
 		@Override
 		public void onClick(View v) {
 			toggleCheckBox((LinearLayout) v);
@@ -34,25 +34,13 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 		}
 	};
 
-	public CheckBoxQuestionFragment(QuestionActionListener listener,
-			Question question, QuestionType questionType, Bus eventBus) {
-		super(listener, question, questionType, eventBus);
+	public CheckBoxQuestionFragment(Question question,
+			QuestionType questionType, Bus eventBus) {
+		super(question, questionType, eventBus);
 	}
 
 	private void toggleCheckBox(LinearLayout v) {
 		((AnswerView) v).toggle();
-//		int childs = v.getChildCount();
-//		CheckBox cb = (CheckBox) v.getChildAt(0);
-//		TextView tv = (TextView) v.getChildAt(1);
-//		if (cb.isChecked()) {
-//			selectedAnswers.remove((Integer) v.getId());
-//			cb.setChecked(false);
-//			tv.setTextColor(getResources().getColor(R.color.text_color_light));
-//		} else {
-//			cb.setChecked(true);
-//			selectedAnswers.add((Integer) v.getId());
-//			tv.setTextColor(getResources().getColor(R.color.answer_selected));
-//		}
 	}
 
 	@Override
@@ -69,7 +57,7 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 		for (int i = 0; i < answers.length; ++i) {
 			answersLayout[i] = (AnswerView) getInflater().inflate(
 					R.layout.question_answer, null);
-			answersLayout[i].initialize(getQuestion().getType(), answers[i]);
+			answersLayout[i].initialize(getQuestion().getType(), answers[i], false);
 			answersLayout[i].setOnClickListener(onClickListener);
 			answersLayout[i].setId(i);
 			answersContainer.addView(answersLayout[i]);
@@ -115,7 +103,7 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 			answersLayout[numAnswers - 1] = (AnswerView) getInflater().inflate(
 					R.layout.question_answer, null);
 			answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
-					null);
+					null, true);
 			answersLayout[numAnswers - 1].setOnClickListener(onClickListener);
 			answersContainer.addView(answersLayout[numAnswers - 1]);
 			// final int i = numAnswers - 1;
@@ -190,29 +178,6 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 		// sendAnswer();
 	}
 
-	// @Override
-	// public void sendAnswer() {
-	// // Sending the answer to the main activity.
-	// if (!selectedAnswers.isEmpty()) {
-	// String answerString = "";
-	// for (int j = 0; j <= numAnswers; ++j) {
-	// if (selectedAnswers.contains(j)) {
-	// View answerView = answersLayout[j].findViewById(ANSWER_TAG);
-	// if (answerView instanceof TextView) {
-	// TextView answerTextView = (TextView) answerView;
-	// answerString += answerTextView.getText() + ",";
-	// } else if (answerView instanceof EditText) {
-	// EditText answerEditText = (EditText) answerView;
-	// answerString += answerEditText.getText() + ",";
-	// }
-	//
-	// }
-	// }
-	// answerString = answerString.substring(0, answerString.length() - 1);
-	// }
-	// }
-
-	@Override
 	public void prepopulateQuestion() {
 		// for (int j = 0; j <= numAnswers; ++j) {
 		// if (selectedAnswers.contains(j)) {
@@ -237,4 +202,12 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 
 	}
 
+	@Override
+	public Set<String> getSelectedAnswers() {
+		Set<String> answers = new HashSet<String>();
+		for (int index : selectedAnswers) {
+			answers.add(getQuestion().getAnswers()[index]);
+		}
+		return answers;
+	}
 }

@@ -5,12 +5,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
 import com.squareup.otto.Bus;
-
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.models.Question;
+
+import java.util.Set;
 
 @SuppressLint("ValidFragment")
 public class ImageQuestionFragment extends QuestionFragment {
@@ -22,9 +22,9 @@ public class ImageQuestionFragment extends QuestionFragment {
     }
   };
 
-  public ImageQuestionFragment(QuestionActionListener listener, Question question, QuestionType questionType,
+  public ImageQuestionFragment(Question question, QuestionType questionType,
       Bus eventBus) {
-    super(listener, question, questionType, eventBus);
+    super(question, questionType, eventBus);
   }
 
   public void setupLayout(View rootView) {
@@ -37,9 +37,9 @@ public class ImageQuestionFragment extends QuestionFragment {
   }
 
   @Override
-  public void prepopulateQuestion() {
-
-  }	
+  public Set<String> getSelectedAnswers() {
+    return null;
+  }
 
   public void addThumbnail() {
 //		SurveyHelper.Tuple key = new SurveyHelper.Tuple(chapterposition, questionposition);

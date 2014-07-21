@@ -1,6 +1,6 @@
 package org.urbanlaunchpad.flocktracker.views;
 
-import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment.QuestionActionListener;
+import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment;
 import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment.QuestionType;
 
 public interface NavButtonsManager {
@@ -11,10 +11,5 @@ public interface NavButtonsManager {
    *
    * @param type
    */
-  void setQuestionType(QuestionActionListener listener, QuestionType type);
-
-  /**
-   * Used to clear up listeners
-   */
-  void cleanUp();
+  void setQuestionType(QuestionFragment questionFragment, QuestionType type);
 }

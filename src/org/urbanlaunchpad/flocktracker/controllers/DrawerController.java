@@ -10,7 +10,7 @@ import android.view.View;
 import com.squareup.otto.Bus;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.menu.RowItem;
-import org.urbanlaunchpad.flocktracker.views .DrawerView;
+import org.urbanlaunchpad.flocktracker.views.DrawerView;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
