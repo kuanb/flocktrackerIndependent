@@ -1,14 +1,9 @@
 package org.urbanlaunchpad.flocktracker.fragments;
 
 import android.annotation.SuppressLint;
-import android.graphics.drawable.StateListDrawable;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-
 import com.squareup.otto.Bus;
 
 import org.urbanlaunchpad.flocktracker.R;
@@ -21,8 +16,6 @@ import java.util.Set;
 
 @SuppressLint("ValidFragment")
 public class CheckBoxQuestionFragment extends QuestionFragment {
-	private final int CB_TAG = -2;
-	private final int ANSWER_TAG = -3;
 	private AnswerView[] answersLayout;
 	private ArrayList<Integer> selectedAnswers = new ArrayList<Integer>();;
 
