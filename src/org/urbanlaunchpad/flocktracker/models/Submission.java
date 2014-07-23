@@ -62,11 +62,13 @@ public class Submission {
                 .setKey(ProjectConfig.get().getApiKey())
                 .execute().getRows().get(0).get(0));
 
+        Thread.sleep(100);
         // Send rest of info one at a time
         sendQuery(getUpdateQueryGivenRow(rowID, "Username", ProjectConfig.get().getUsername()));
 
         for (Chapter chapter : chapters) {
           for (Question question : chapter.getQuestions()) {
+            Thread.sleep(100);
             sendQuery(getUpdateQueryGivenRow(rowID, question.getQuestionID(),
                 question.getSelectedAnswers().toString()));
           }
@@ -246,6 +248,7 @@ public class Submission {
    * @throws IOException
    */
   private void sendQuery(String query) throws IOException {
+
     Fusiontables.Query.Sql sql = IniconfigActivity.fusiontables.query().sql(query);
     sql.setKey(ProjectConfig.get().getApiKey());
     sql.execute();

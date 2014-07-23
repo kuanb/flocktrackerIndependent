@@ -18,8 +18,7 @@ import javax.inject.Inject;
 
 public class NavButtonsView extends LinearLayout implements NavButtonsManager {
 
-  @Inject
-  Bus eventBus;
+  @Inject Bus eventBus;
   private View previousQuestionButton;
   private View nextQuestionButton;
   private View submitSurveyButton;

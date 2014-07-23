@@ -261,6 +261,5 @@ public class QuestionController {
     return chapterList[chapterPosition];
   }
 
-  public class ReachedEndOfTrackerSurveyEvent {
-  }
+  public class ReachedEndOfTrackerSurveyEvent {}
 }
