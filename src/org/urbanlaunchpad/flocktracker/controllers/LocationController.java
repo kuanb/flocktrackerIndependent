@@ -22,6 +22,7 @@ import org.urbanlaunchpad.flocktracker.helpers.SubmissionHelper;
 import org.urbanlaunchpad.flocktracker.models.Metadata;
 import org.urbanlaunchpad.flocktracker.models.Statistics;
 import org.urbanlaunchpad.flocktracker.models.Submission;
+import org.urbanlaunchpad.flocktracker.util.StringUtil;
 
 import javax.inject.Inject;
 
@@ -69,10 +70,6 @@ public class LocationController implements
   }
 
   public void saveLocation() {
-    if (!locationClient.isConnected()) {
-      locationClient.connect();
-    }
-
     if (locationClient.isConnected()) {
       Submission submission = new Submission();
       submission.setType(Submission.Type.TRACKER);
@@ -83,13 +80,20 @@ public class LocationController implements
 
   public void startTrip() {
     this.isTripStarted = true;
+    locationClient.connect();
     startTracker();
+    metadata.setTripID("T" + StringUtil.createID());
   }
 
   public void stopTrip() {
-    cancelTracker();
+    if (locationClient.isConnected()) {
+      locationClient.removeLocationUpdates(locationListener);
+    }
     locationClient.disconnect();
+    cancelTracker();
     isTripStarted = false;
+    metadata.setCurrentLocation(null);
+    metadata.setTripID(null);
   }
 
   private void startTracker() {

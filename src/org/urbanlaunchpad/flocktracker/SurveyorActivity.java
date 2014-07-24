@@ -1,9 +1,6 @@
 package org.urbanlaunchpad.flocktracker;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -78,8 +75,7 @@ public class SurveyorActivity extends Activity {
 
   @Override
   protected void onDestroy() {
-    questionController.resetTrip();
-    locationController.stopTrip();
+    stopTrip();
     super.onDestroy();
   }
 
@@ -115,7 +111,7 @@ public class SurveyorActivity extends Activity {
   @Override
   public void onBackPressed() {
     if (hubPageController.isHubPageShowing()) {
-      locationController.stopTrip();
+      stopTrip();
       finish();
     } else if (questionController.isQuestionShowing()) {
       Question question = questionController.getCurrentQuestion();
@@ -273,38 +269,12 @@ public class SurveyorActivity extends Activity {
     drawerController.showStatisticsPage();
   }
 
-  public void stopTripDialog() {
-    Builder dialog;
-    dialog = new AlertDialog.Builder(this);
-    dialog.setMessage(this.getResources().getString(
-        R.string.stop_tracker_message));
-    dialog.setPositiveButton(this.getResources().getString(R.string.yes),
-        new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface paramDialogInterface,
-              int paramInt) {
-            stopTrip();
-          }
-        }
-    );
-    dialog.setNegativeButton(this.getString(R.string.no),
-        new DialogInterface.OnClickListener() {
-
-          @Override
-          public void onClick(DialogInterface paramDialogInterface,
-              int paramInt) {
-            // Nothing happens.
-          }
-        }
-    );
-    dialog.show();
-  }
-
-	/*
+  /*
    * Location tracking helper
-	 */
+   */
 
   public void stopTrip() {
+    hubPageController.stopTrip();
     locationController.stopTrip();
     questionController.resetTrip();
     statisticsPageController.stopTrip();
@@ -335,14 +305,9 @@ public class SurveyorActivity extends Activity {
   @Subscribe
   public void onToggleTrip(HubPageFragment.RequestToggleTripEvent event) {
     if (metadata.getTripID() == null) {
-      metadata.setTripID("T" + StringUtil.createID());
       questionController.askTripQuestions();
     } else {
-      locationController.stopTrip();
-      metadata.setTripID(null);
-      metadata.setCurrentLocation(null);
-      statisticsPageController.stopTrip();
-      hubPageController.stopTrip();
+      stopTrip();
     }
   }
 

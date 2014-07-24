@@ -125,14 +125,22 @@ public class Submission {
     String locationString = LocationUtil.getLngLatAlt(currentLocation);
     String query = "";
 
+    double latitude, longitude, altitude;
+    if (currentLocation == null) {
+      latitude = longitude = altitude = 0;
+    } else {
+      latitude = currentLocation.getLatitude();
+      longitude = currentLocation.getLongitude();
+      altitude = currentLocation.getAltitude();
+    }
+
     switch (type) {
       case TRACKER:
         query = "INSERT INTO "
             + ProjectConfig.get().getTrackerTableID()
             + " (Location,Lat,Lng,Alt,Date,TripID,Username,TotalCount,FemaleCount,MaleCount,Speed) VALUES ("
-            + "'<Point><coordinates>" + locationString
-            + "</coordinates></Point>','" + currentLocation.getLatitude() + "','" + currentLocation.getLongitude()
-            + "','" + currentLocation.getAltitude() + "','" + metadata.getTimeStamp() + "','" + metadata.getTripID()
+            + "'<Point><coordinates>" + locationString + "</coordinates></Point>','" + latitude + "','" + longitude
+            + "','" + altitude + "','" + metadata.getTimeStamp() + "','" + metadata.getTripID()
             + "','" + ProjectConfig.get().getUsername() + "','"
             + (metadata.getMaleCount() + metadata.getFemaleCount()) + "','"
             + metadata.getFemaleCount() + "','" + metadata.getMaleCount() + "','" + metadata.getSpeed() + "');";
@@ -153,15 +161,6 @@ public class Submission {
               answerString.append("','");
             }
           }
-        }
-
-        double latitude, longitude, altitude;
-        if (currentLocation == null) {
-          latitude = longitude = altitude = 0;
-        } else {
-          latitude = currentLocation.getLatitude();
-          longitude = currentLocation.getLongitude();
-          altitude = currentLocation.getAltitude();
         }
 
         query = "INSERT INTO "
