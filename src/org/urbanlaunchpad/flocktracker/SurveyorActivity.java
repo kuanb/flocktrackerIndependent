@@ -21,7 +21,6 @@ import com.squareup.otto.Subscribe;
 import dagger.ObjectGraph;
 import org.urbanlaunchpad.flocktracker.controllers.*;
 import org.urbanlaunchpad.flocktracker.fragments.HubPageFragment;
-import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment;
 import org.urbanlaunchpad.flocktracker.fragments.StatisticsPageFragment;
 import org.urbanlaunchpad.flocktracker.helpers.GoogleDriveHelper;
 import org.urbanlaunchpad.flocktracker.helpers.ImageHelper;
@@ -131,7 +130,7 @@ public class SurveyorActivity extends Activity {
         return;
       }
 
-      questionController.onPrevQuestionButtonClicked(new CommonEvents.PreviousQuestionPressedEvent(null));
+      switchToPreviousQuestion();
     } else {
       super.onBackPressed();
     }
@@ -315,6 +314,20 @@ public class SurveyorActivity extends Activity {
     return objectGraph;
   }
 
+  /**
+   * Question handling
+   */
+
+  private void switchToNextQuestion() {
+    questionController.switchToNextQuestion();
+    drawerController.selectSurveyChapter(questionController.getCurrentQuestion().getChapterNumber());
+  }
+
+  private void switchToPreviousQuestion() {
+    questionController.switchToPreviousQuestion();
+    drawerController.selectSurveyChapter(questionController.getCurrentQuestion().getChapterNumber());
+  }
+
   /*
    * EventBus event handling
    */
@@ -341,10 +354,16 @@ public class SurveyorActivity extends Activity {
   }
 
   @Subscribe
-  public void startSurvey(HubPageFragment.RequestStartSurveyEvent event) {
+  public void onSurveyStartRequested(HubPageFragment.RequestStartSurveyEvent event) {
     metadata.setSurveyID("S" + StringUtil.createID());
     questionController.startSurvey();
     drawerController.selectSurveyChapter(0);
+  }
+
+  @Subscribe
+  public void onSubmitButtonClicked(CommonEvents.SubmitSurveyEvent event) {
+    showHubPage();
+    questionController.submitSurvey();
   }
 
   @Subscribe
@@ -368,7 +387,17 @@ public class SurveyorActivity extends Activity {
   }
 
   @Subscribe
-  public void onQuestionShown(QuestionFragment.QuestionAttachedEvent event) {
+  public void onNextQuestionButtonClicked(CommonEvents.NextQuestionPressedEvent event) {
+    switchToNextQuestion();
+  }
+
+  @Subscribe
+  public void onPrevQuestionButtonClicked(CommonEvents.PreviousQuestionPressedEvent event) {
+    switchToPreviousQuestion();
+  }
+
+  @Subscribe
+  public void onQuestionShown(CommonEvents.QuestionShownEvent event) {
     Question question = event.question;
     if (questionController.isAskingTripQuestions()) {
       questionController.updateTrackerPosition(question.getQuestionNumber());

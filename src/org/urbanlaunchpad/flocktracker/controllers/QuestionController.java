@@ -6,10 +6,8 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.widget.Toast;
 import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.urbanlaunchpad.flocktracker.CommonEvents;
 import org.urbanlaunchpad.flocktracker.ProjectConfig;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.fragments.*;
@@ -52,7 +50,6 @@ public class QuestionController {
     this.submissionHelper = submissionHelper;
     this.metadata = metadata;
     this.eventBus = eventBus;
-    eventBus.register(this);
     resetSurvey();
     resetTrip();
 
@@ -79,6 +76,18 @@ public class QuestionController {
   public void startSurvey() {
     questionPosition = 0;
     showCurrentQuestion();
+  }
+
+  public void submitSurvey() {
+    new Thread(new Runnable() {
+      public void run() {
+        Submission submission = new Submission();
+        submission.setChapters(chapterList);
+        submission.setType(Submission.Type.SURVEY);
+        submission.setMetadata(metadata);
+        submissionHelper.saveSubmission(submission);
+      }
+    }).start();
   }
 
   public void showCurrentQuestion() {
@@ -135,12 +144,7 @@ public class QuestionController {
     return currentQuestion;
   }
 
-  /*
-   * Nav Buttons listener.
-   */
-  @Subscribe
-  public void onPrevQuestionButtonClicked(CommonEvents.PreviousQuestionPressedEvent event) {
-    getCurrentQuestion().setSelectedAnswers(event.selectedAnswers);
+  public void switchToPreviousQuestion() {
     if (isAskingTripQuestions) {
       trackerQuestionPosition--;
       showCurrentQuestion();
@@ -156,9 +160,7 @@ public class QuestionController {
     }
   }
 
-  @Subscribe
-  public void onNextQuestionButtonClicked(CommonEvents.NextQuestionPressedEvent event) {
-    getCurrentQuestion().setSelectedAnswers(event.selectedAnswers);
+  public void switchToNextQuestion() {
     if (isAskingTripQuestions) {
       if (trackerQuestionPosition == trackingQuestions.length - 1) {
         // show hub page and start tracking
@@ -178,20 +180,6 @@ public class QuestionController {
         showCurrentQuestion();
       }
     }
-  }
-
-  @Subscribe
-  public void onSubmitButtonClicked(CommonEvents.SubmitSurveyEvent event) {
-    getCurrentQuestion().setSelectedAnswers(event.selectedAnswers);
-    new Thread(new Runnable() {
-      public void run() {
-        Submission submission = new Submission();
-        submission.setChapters(chapterList);
-        submission.setType(Submission.Type.SURVEY);
-        submission.setMetadata(metadata);
-        submissionHelper.saveSubmission(submission);
-      }
-    }).start();
   }
 
   public void updateTrackerPosition(int questionPosition) {
