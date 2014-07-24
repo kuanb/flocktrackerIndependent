@@ -8,6 +8,7 @@ import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.util.LocationUtil;
 
 import java.io.IOException;
+import java.util.Set;
 
 public class Submission {
   public static final Integer MAX_QUERY_LENGTH = 2000; // max length allowed by fusion table
@@ -141,7 +142,12 @@ public class Submission {
           for (Question question : chapter.getQuestions()) {
             // Get question ID's and answers
             questionIDString.append(question.getQuestionID() + ",");
-            answerString.append(question.getSelectedAnswers().toString() + "','");
+            Set<String> selectedAnswers = question.getSelectedAnswers();
+            if (selectedAnswers != null && !selectedAnswers.isEmpty()) {
+              answerString.append(question.getSelectedAnswers().toString() + "','");
+            } else {
+              answerString.append("','");
+            }
           }
         }
 
