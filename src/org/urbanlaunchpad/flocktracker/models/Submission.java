@@ -144,7 +144,11 @@ public class Submission {
             questionIDString.append(question.getQuestionID() + ",");
             Set<String> selectedAnswers = question.getSelectedAnswers();
             if (selectedAnswers != null && !selectedAnswers.isEmpty()) {
-              answerString.append(question.getSelectedAnswers().toString() + "','");
+              if (selectedAnswers.size() == 1) {
+                answerString.append(selectedAnswers.iterator().next() + "','");
+              } else {
+                answerString.append(selectedAnswers.toString() + "','");
+              }
             } else {
               answerString.append("','");
             }
