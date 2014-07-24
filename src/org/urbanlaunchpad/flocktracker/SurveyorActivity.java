@@ -408,6 +408,11 @@ public class SurveyorActivity extends Activity {
   }
 
   @Subscribe
+  public void onQuestionHidden(CommonEvents.QuestionHiddenEvent event) {
+    event.question.setSelectedAnswers(event.selectedAnswers);
+  }
+
+  @Subscribe
   public void onChapterRequested(DrawerView.SelectChapterEvent event) {
     if (questionController.isAskingTripQuestions()) {
       questionController.resetTrip();
