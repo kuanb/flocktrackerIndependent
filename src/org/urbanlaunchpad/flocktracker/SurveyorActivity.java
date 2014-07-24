@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class SurveyorActivity extends Activity {
   public static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
@@ -375,7 +376,12 @@ public class SurveyorActivity extends Activity {
 
   @Subscribe
   public void onQuestionHidden(CommonEvents.QuestionHiddenEvent event) {
-    event.question.setSelectedAnswers(event.selectedAnswers);
+    Question question = event.question;
+    if (question.isInLoop()) {
+      question.getLoopQuestionSelectedAnswers()[question.getLoopIteration()] = event.selectedAnswers;
+    } else {
+      event.question.setSelectedAnswers(event.selectedAnswers);
+    }
   }
 
   @Subscribe

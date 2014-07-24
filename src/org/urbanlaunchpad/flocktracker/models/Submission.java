@@ -152,11 +152,8 @@ public class Submission {
             questionIDString.append(question.getQuestionID() + ",");
             Set<String> selectedAnswers = question.getSelectedAnswers();
             if (selectedAnswers != null && !selectedAnswers.isEmpty()) {
-              if (selectedAnswers.size() == 1) {
-                answerString.append(selectedAnswers.iterator().next() + "','");
-              } else {
-                answerString.append(selectedAnswers.toString() + "','");
-              }
+              questionIDString.append(question.getQuestionID() + ",");
+              addQuestionToAnswerString(answerString, question);
             } else {
               answerString.append("','");
             }
@@ -178,6 +175,45 @@ public class Submission {
         break;
     }
     return query;
+  }
+
+  private void addQuestionToAnswerString(StringBuilder answerString, Question question) {
+    // Get question ID's and answers
+    Set<String> selectedAnswers = question.getSelectedAnswers();
+    if (selectedAnswers != null && !selectedAnswers.isEmpty()) {
+      String selectedAnswer = "";
+      // Normal selected answers.
+      if (selectedAnswers.size() == 1) {
+        selectedAnswer = selectedAnswers.iterator().next();
+        answerString.append(selectedAnswer);
+      } else {
+        answerString.append(selectedAnswers.toString());
+      }
+
+      // Loop through and add all the loop question answers in to this question.
+      if (question.getType() == Question.QuestionType.LOOP) {
+        int loopTotal = Integer.parseInt(selectedAnswer);
+
+        answerString.append(" [");
+        for (int i = 0; i < loopTotal; i++) {
+          answerString.append("[");
+          for (Question loopQuestion : question.getLoopQuestions()) {
+            Set<String> loopSelectedAnswers = loopQuestion.getLoopQuestionSelectedAnswers()[i];
+            if (loopSelectedAnswers != null) {
+              answerString.append(loopSelectedAnswers);
+            }
+            answerString.append(",");
+          }
+          answerString.setLength(answerString.length() - 1);
+          answerString.append("]");
+        }
+        answerString.append("]");
+      }
+
+      answerString.append("','");
+    } else {
+      answerString.append("','");
+    }
   }
 
   /**

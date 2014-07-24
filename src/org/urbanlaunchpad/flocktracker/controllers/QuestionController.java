@@ -16,6 +16,7 @@ import org.urbanlaunchpad.flocktracker.helpers.SubmissionHelper;
 import org.urbanlaunchpad.flocktracker.models.Chapter;
 import org.urbanlaunchpad.flocktracker.models.Metadata;
 import org.urbanlaunchpad.flocktracker.models.Question;
+import org.urbanlaunchpad.flocktracker.models.Question.QuestionType;
 import org.urbanlaunchpad.flocktracker.models.Submission;
 import org.urbanlaunchpad.flocktracker.util.JSONUtil;
 import org.urbanlaunchpad.flocktracker.util.QuestionUtil;
@@ -37,7 +38,9 @@ public class QuestionController {
 
   private boolean inLoop = false; // Toggle that turns on if the survey gets into a loop.
   private int loopPosition = -1; // Position in the questions array in the loop the survey is in.
+  private int numLoopQuestions = -1;
   private int loopIteration = -1; // Iteration step where the loop process is.
+  private int loopTotal = -1;
 
   private boolean isAskingTripQuestions = false;
   private ReachedEndOfTrackerSurveyEvent reachedEndOfTrackerSurveyEvent = new ReachedEndOfTrackerSurveyEvent();
@@ -78,6 +81,14 @@ public class QuestionController {
     showCurrentQuestion();
   }
 
+  private void startLoop() {
+    inLoop = true;
+    loopPosition = 0;
+    loopIteration = 0;
+    loopTotal = Integer.parseInt(getCurrentQuestion().getSelectedAnswers().iterator().next());
+    numLoopQuestions = getCurrentQuestion().getLoopQuestions().length;
+  }
+
   public void submitSurvey() {
     new Thread(new Runnable() {
       public void run() {
@@ -95,6 +106,10 @@ public class QuestionController {
     Question currentQuestion = getCurrentQuestion();
 
     switch (currentQuestion.getType()) {
+      case LOOP:
+        if (currentQuestion.getSelectedAnswers() != null) {
+          startLoop();
+        }
       case MULTIPLE_CHOICE:
         currentQuestionFragment = new MultipleChoiceQuestionFragment(currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
@@ -116,8 +131,6 @@ public class QuestionController {
         currentQuestionFragment = new OrderedListQuestionFragment(currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
-      case LOOP:
-        break;
     }
 
     FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -132,20 +145,41 @@ public class QuestionController {
     if (isAskingTripQuestions) {
       if (inLoop) {
         currentQuestion = trackingQuestions[trackerQuestionPosition].getLoopQuestions()[loopPosition];
+        currentQuestion.initializeLoop(loopTotal, loopIteration, loopPosition);
       } else {
         currentQuestion = trackingQuestions[trackerQuestionPosition];
       }
     } else {
       if (inLoop) {
         currentQuestion = getCurrentChapter().getQuestions()[questionPosition].getLoopQuestions()[loopPosition];
+        currentQuestion.initializeLoop(loopTotal, loopIteration, loopPosition);
       } else {
         currentQuestion = getCurrentChapter().getQuestions()[questionPosition];
       }
     }
+
     return currentQuestion;
   }
 
   public void switchToPreviousQuestion() {
+    if (inLoop) {
+      // First question in iteration.
+      if (loopPosition == 0) {
+        // First loop question. Switch out of loop.
+        if (loopIteration == 0) {
+          inLoop = false;
+        } else { // Go back an iteration.
+          loopIteration--;
+          showCurrentQuestion();
+          return;
+        }
+      } else { // Not first question in iteration. Go back.
+        loopPosition--;
+        showCurrentQuestion();
+        return;
+      }
+    }
+
     if (isAskingTripQuestions) {
       trackerQuestionPosition--;
       showCurrentQuestion();
@@ -162,6 +196,33 @@ public class QuestionController {
   }
 
   public void switchToNextQuestion() {
+    Question currentQuestion = getCurrentQuestion();
+
+    // If this is the question that has looped questions, initialize the loop.
+    if (currentQuestion.getType() == QuestionType.LOOP && currentQuestion.getSelectedAnswers() != null) {
+      showCurrentQuestion();
+      return;
+    } else if (inLoop) {
+      // We have reached the last loop question in the iteration.
+      if (loopPosition == numLoopQuestions - 1) {
+        // We have finished all iterations of the loop questions. Continue to next
+        // question.
+        if (loopIteration == loopTotal - 1) {
+          inLoop = false;
+        } else { // Continue into next iteration.
+          loopIteration++;
+          loopPosition = 0;
+          showCurrentQuestion();
+          return;
+        }
+      } else {
+        // Continue onto next question in this iteration.
+        loopPosition++;
+        showCurrentQuestion();
+        return;
+      }
+    }
+
     if (isAskingTripQuestions) {
       if (trackerQuestionPosition == trackingQuestions.length - 1) {
         // show hub page and start tracking
