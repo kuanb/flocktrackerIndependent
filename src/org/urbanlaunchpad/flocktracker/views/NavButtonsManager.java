@@ -1,6 +1,5 @@
 package org.urbanlaunchpad.flocktracker.views;
 
-import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment;
 import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment.QuestionType;
 
 public interface NavButtonsManager {
@@ -11,5 +10,5 @@ public interface NavButtonsManager {
    *
    * @param type
    */
-  void setQuestionType(QuestionFragment questionFragment, QuestionType type);
+  void setQuestionType(QuestionType type);
 }

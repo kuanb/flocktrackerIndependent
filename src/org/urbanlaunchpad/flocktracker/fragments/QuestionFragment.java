@@ -39,7 +39,7 @@ public abstract class QuestionFragment extends Fragment {
       Bundle savedInstanceState) {
     View rootView = inflater.inflate(R.layout.fragment_question, container, false);
     navButtonsManager = (NavButtonsManager) rootView.findViewById(R.id.questionButtons);
-    navButtonsManager.setQuestionType(this, questionType);
+    navButtonsManager.setQuestionType(questionType);
     questionView = (TextView) rootView.findViewById(R.id.question_view);
     questionView.setText(question.getQuestionText());
     setupLayout(rootView);

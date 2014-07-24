@@ -22,7 +22,6 @@ public class NavButtonsView extends LinearLayout implements NavButtonsManager {
   private View previousQuestionButton;
   private View nextQuestionButton;
   private View submitSurveyButton;
-  private QuestionFragment questionFragment;
   private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
     @Override
     public void onClick(DialogInterface dialog, int which) {
@@ -30,7 +29,7 @@ public class NavButtonsView extends LinearLayout implements NavButtonsManager {
         case DialogInterface.BUTTON_POSITIVE:
           // Yes button clicked
           Toast.makeText(getContext(), getResources().getString(R.string.submitting_survey), Toast.LENGTH_SHORT).show();
-          eventBus.post(new CommonEvents.SubmitSurveyEvent(questionFragment.getSelectedAnswers()));
+          eventBus.post(CommonEvents.submitSurveyEvent);
           break;
         case DialogInterface.BUTTON_NEGATIVE:
           // No button clicked
@@ -59,13 +58,13 @@ public class NavButtonsView extends LinearLayout implements NavButtonsManager {
     previousQuestionButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        eventBus.post(new CommonEvents.PreviousQuestionPressedEvent(questionFragment.getSelectedAnswers()));
+        eventBus.post(CommonEvents.previousQuestionPressedEvent);
       }
     });
     nextQuestionButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
-        eventBus.post(new CommonEvents.NextQuestionPressedEvent(questionFragment.getSelectedAnswers()));
+        eventBus.post(CommonEvents.nextQuestionPressedEvent);
       }
     });
     submitSurveyButton.setOnClickListener(new OnClickListener() {
@@ -82,9 +81,7 @@ public class NavButtonsView extends LinearLayout implements NavButtonsManager {
   }
 
   @Override
-  public void setQuestionType(QuestionFragment questionFragment, QuestionType type) {
-    this.questionFragment = questionFragment;
-
+  public void setQuestionType(QuestionType type) {
     switch (type) {
       case TRIP_FIRST:
         submitSurveyButton.setVisibility(INVISIBLE);
