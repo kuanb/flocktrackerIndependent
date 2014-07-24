@@ -257,7 +257,6 @@ public class Submission {
    * @throws IOException
    */
   private void sendQuery(String query) throws IOException {
-
     Fusiontables.Query.Sql sql = IniconfigActivity.fusiontables.query().sql(query);
     sql.setKey(ProjectConfig.get().getApiKey());
     sql.execute();
