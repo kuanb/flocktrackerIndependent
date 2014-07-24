@@ -88,6 +88,7 @@ public class QuestionController {
         submissionHelper.saveSubmission(submission);
       }
     }).start();
+    resetSurvey();
   }
 
   public void showCurrentQuestion() {

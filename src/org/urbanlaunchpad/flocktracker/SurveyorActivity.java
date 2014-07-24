@@ -364,6 +364,7 @@ public class SurveyorActivity extends Activity {
   public void onSubmitButtonClicked(CommonEvents.SubmitSurveyEvent event) {
     showHubPage();
     questionController.submitSurvey();
+    statisticsPageController.submitSurvey();
   }
 
   @Subscribe
