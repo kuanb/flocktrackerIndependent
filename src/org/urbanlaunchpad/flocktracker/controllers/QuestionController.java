@@ -6,10 +6,8 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.widget.Toast;
 import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.urbanlaunchpad.flocktracker.CommonEvents;
 import org.urbanlaunchpad.flocktracker.ProjectConfig;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.fragments.*;
@@ -18,6 +16,7 @@ import org.urbanlaunchpad.flocktracker.helpers.SubmissionHelper;
 import org.urbanlaunchpad.flocktracker.models.Chapter;
 import org.urbanlaunchpad.flocktracker.models.Metadata;
 import org.urbanlaunchpad.flocktracker.models.Question;
+import org.urbanlaunchpad.flocktracker.models.Question.QuestionType;
 import org.urbanlaunchpad.flocktracker.models.Submission;
 import org.urbanlaunchpad.flocktracker.util.JSONUtil;
 import org.urbanlaunchpad.flocktracker.util.QuestionUtil;
@@ -39,7 +38,9 @@ public class QuestionController {
 
   private boolean inLoop = false; // Toggle that turns on if the survey gets into a loop.
   private int loopPosition = -1; // Position in the questions array in the loop the survey is in.
+  private int numLoopQuestions = -1;
   private int loopIteration = -1; // Iteration step where the loop process is.
+  private int loopTotal = -1;
 
   private boolean isAskingTripQuestions = false;
   private ReachedEndOfTrackerSurveyEvent reachedEndOfTrackerSurveyEvent = new ReachedEndOfTrackerSurveyEvent();
@@ -52,7 +53,6 @@ public class QuestionController {
     this.submissionHelper = submissionHelper;
     this.metadata = metadata;
     this.eventBus = eventBus;
-    eventBus.register(this);
     resetSurvey();
     resetTrip();
 
@@ -81,10 +81,35 @@ public class QuestionController {
     showCurrentQuestion();
   }
 
+  private void startLoop() {
+    inLoop = true;
+    loopPosition = 0;
+    loopIteration = 0;
+    loopTotal = Integer.parseInt(getCurrentQuestion().getSelectedAnswers().iterator().next());
+    numLoopQuestions = getCurrentQuestion().getLoopQuestions().length;
+  }
+
+  public void submitSurvey() {
+    new Thread(new Runnable() {
+      public void run() {
+        Submission submission = new Submission();
+        submission.setChapters(chapterList);
+        submission.setType(Submission.Type.SURVEY);
+        submission.setMetadata(metadata);
+        submissionHelper.saveSubmission(submission);
+      }
+    }).start();
+    resetSurvey();
+  }
+
   public void showCurrentQuestion() {
     Question currentQuestion = getCurrentQuestion();
 
     switch (currentQuestion.getType()) {
+      case LOOP:
+        if (currentQuestion.getSelectedAnswers() != null) {
+          startLoop();
+        }
       case MULTIPLE_CHOICE:
         currentQuestionFragment = new MultipleChoiceQuestionFragment(currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
@@ -106,8 +131,6 @@ public class QuestionController {
         currentQuestionFragment = new OrderedListQuestionFragment(currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
-      case LOOP:
-        break;
     }
 
     FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -122,25 +145,41 @@ public class QuestionController {
     if (isAskingTripQuestions) {
       if (inLoop) {
         currentQuestion = trackingQuestions[trackerQuestionPosition].getLoopQuestions()[loopPosition];
+        currentQuestion.initializeLoop(loopTotal, loopIteration, loopPosition);
       } else {
         currentQuestion = trackingQuestions[trackerQuestionPosition];
       }
     } else {
       if (inLoop) {
         currentQuestion = getCurrentChapter().getQuestions()[questionPosition].getLoopQuestions()[loopPosition];
+        currentQuestion.initializeLoop(loopTotal, loopIteration, loopPosition);
       } else {
         currentQuestion = getCurrentChapter().getQuestions()[questionPosition];
       }
     }
+
     return currentQuestion;
   }
 
-  /*
-   * Nav Buttons listener.
-   */
-  @Subscribe
-  public void onPrevQuestionButtonClicked(CommonEvents.PreviousQuestionPressedEvent event) {
-    getCurrentQuestion().setSelectedAnswers(event.selectedAnswers);
+  public void switchToPreviousQuestion() {
+    if (inLoop) {
+      // First question in iteration.
+      if (loopPosition == 0) {
+        // First loop question. Switch out of loop.
+        if (loopIteration == 0) {
+          inLoop = false;
+        } else { // Go back an iteration.
+          loopIteration--;
+          showCurrentQuestion();
+          return;
+        }
+      } else { // Not first question in iteration. Go back.
+        loopPosition--;
+        showCurrentQuestion();
+        return;
+      }
+    }
+
     if (isAskingTripQuestions) {
       trackerQuestionPosition--;
       showCurrentQuestion();
@@ -156,9 +195,34 @@ public class QuestionController {
     }
   }
 
-  @Subscribe
-  public void onNextQuestionButtonClicked(CommonEvents.NextQuestionPressedEvent event) {
-    getCurrentQuestion().setSelectedAnswers(event.selectedAnswers);
+  public void switchToNextQuestion() {
+    Question currentQuestion = getCurrentQuestion();
+
+    // If this is the question that has looped questions, initialize the loop.
+    if (currentQuestion.getType() == QuestionType.LOOP && currentQuestion.getSelectedAnswers() != null) {
+      showCurrentQuestion();
+      return;
+    } else if (inLoop) {
+      // We have reached the last loop question in the iteration.
+      if (loopPosition == numLoopQuestions - 1) {
+        // We have finished all iterations of the loop questions. Continue to next
+        // question.
+        if (loopIteration == loopTotal - 1) {
+          inLoop = false;
+        } else { // Continue into next iteration.
+          loopIteration++;
+          loopPosition = 0;
+          showCurrentQuestion();
+          return;
+        }
+      } else {
+        // Continue onto next question in this iteration.
+        loopPosition++;
+        showCurrentQuestion();
+        return;
+      }
+    }
+
     if (isAskingTripQuestions) {
       if (trackerQuestionPosition == trackingQuestions.length - 1) {
         // show hub page and start tracking
@@ -178,20 +242,6 @@ public class QuestionController {
         showCurrentQuestion();
       }
     }
-  }
-
-  @Subscribe
-  public void onSubmitButtonClicked(CommonEvents.SubmitSurveyEvent event) {
-    getCurrentQuestion().setSelectedAnswers(event.selectedAnswers);
-    new Thread(new Runnable() {
-      public void run() {
-        Submission submission = new Submission();
-        submission.setChapters(chapterList);
-        submission.setType(Submission.Type.SURVEY);
-        submission.setMetadata(metadata);
-        submissionHelper.saveSubmission(submission);
-      }
-    }).start();
   }
 
   public void updateTrackerPosition(int questionPosition) {
@@ -261,6 +311,5 @@ public class QuestionController {
     return chapterList[chapterPosition];
   }
 
-  public class ReachedEndOfTrackerSurveyEvent {
-  }
+  public class ReachedEndOfTrackerSurveyEvent {}
 }

@@ -46,6 +46,10 @@ public class StatisticsPageController {
     return fragment.isVisible();
   }
 
+  public void submitSurvey() {
+    statistics.setSurveysCompleted(statistics.getSurveysCompleted() + 1);
+  }
+
   public void startTrip() {
     statistics.setStartTripTime(Calendar.getInstance());
   }

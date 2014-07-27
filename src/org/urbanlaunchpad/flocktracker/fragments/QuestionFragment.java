@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.squareup.otto.Bus;
+import org.urbanlaunchpad.flocktracker.CommonEvents;
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.views.NavButtonsManager;
@@ -26,7 +27,6 @@ public abstract class QuestionFragment extends Fragment {
   private QuestionType questionType;
   private TextView questionView;
   private Bus eventBus;
-  private QuestionAttachedEvent questionAttachedEvent = new QuestionAttachedEvent();
 
   public QuestionFragment(Question question, QuestionType questionType, Bus eventBus) {
     this.question = question;
@@ -39,7 +39,7 @@ public abstract class QuestionFragment extends Fragment {
       Bundle savedInstanceState) {
     View rootView = inflater.inflate(R.layout.fragment_question, container, false);
     navButtonsManager = (NavButtonsManager) rootView.findViewById(R.id.questionButtons);
-    navButtonsManager.setQuestionType(this, questionType);
+    navButtonsManager.setQuestionType(questionType);
     questionView = (TextView) rootView.findViewById(R.id.question_view);
     questionView.setText(question.getQuestionText());
     setupLayout(rootView);
@@ -49,8 +49,13 @@ public abstract class QuestionFragment extends Fragment {
   @Override
   public void onStart() {
     super.onStart();
-    questionAttachedEvent.question = question;
-    eventBus.post(questionAttachedEvent);
+    eventBus.post(new CommonEvents.QuestionShownEvent(question, question.getSelectedAnswers()));
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    eventBus.post(new CommonEvents.QuestionHiddenEvent(question, getSelectedAnswers()));
   }
 
   abstract void setupLayout(View rootView);
@@ -70,9 +75,5 @@ public abstract class QuestionFragment extends Fragment {
    */
   public enum QuestionType {
     FIRST, NORMAL, LAST, TRIP_FIRST, TRIP_NORMAL
-  }
-
-  public class QuestionAttachedEvent {
-    public Question question;
   }
 }

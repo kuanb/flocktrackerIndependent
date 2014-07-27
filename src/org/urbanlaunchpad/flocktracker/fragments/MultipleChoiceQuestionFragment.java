@@ -17,7 +17,6 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
   private AnswerView[] answersLayout;
   private LinearLayout answersContainer;
   private int selectedAnswerIndex = -1;
-  private AnswerView otherAnswer;
 
   private OnClickListener onClickListener = new OnClickListener() {
     @Override
@@ -49,7 +48,7 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
     // Add listeners for answers
     for (int i = 0; i < answers.length; i++) {
       answersLayout[i] = (AnswerView) getInflater().inflate(
-          R.layout.question_answer, null);
+          R.layout.question_answer_mc, null);
       answersLayout[i].initialize(getQuestion().getType(), answers[i], false);
       answersLayout[i].setOnClickListener(onClickListener);
       answersLayout[i].setId(i);
@@ -61,8 +60,7 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 
     if (hasOther) {
       answersLayout[numAnswers - 1] = (AnswerView) getInflater().inflate(
-          R.layout.question_answer, null);
-      otherAnswer = answersLayout[numAnswers - 1];
+          R.layout.question_answer_mc, null);
       answersLayout[numAnswers - 1].setId(numAnswers - 1);
       if (selectedAnswerIndex == -1 && selectedAnswers != null && !selectedAnswers.isEmpty()) {
         answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
@@ -83,11 +81,11 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
       return null;
     }
 
-    // Other answer.
-    if (getQuestion().isOtherEnabled() && selectedAnswerIndex == getQuestion().getAnswers().length) {
-      return Collections.singleton(otherAnswer.getAnswer().toString());
+    String answer = answersLayout[selectedAnswerIndex].getAnswer().toString();
+    if (answer.isEmpty()) {
+      return null;
     }
 
-    return Collections.singleton(getQuestion().getAnswers()[selectedAnswerIndex]);
+    return Collections.singleton(answersLayout[selectedAnswerIndex].getAnswer().toString());
   }
 }

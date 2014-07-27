@@ -1,11 +1,7 @@
 package org.urbanlaunchpad.flocktracker;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.Fragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
@@ -15,10 +11,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.WindowManager;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -27,7 +22,6 @@ import dagger.ObjectGraph;
 
 import org.urbanlaunchpad.flocktracker.controllers.*;
 import org.urbanlaunchpad.flocktracker.fragments.HubPageFragment;
-import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment;
 import org.urbanlaunchpad.flocktracker.fragments.StatisticsPageFragment;
 import org.urbanlaunchpad.flocktracker.helpers.GoogleDriveHelper;
 import org.urbanlaunchpad.flocktracker.helpers.ImageHelper;
@@ -43,6 +37,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class SurveyorActivity extends Activity {
 	public static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
@@ -69,6 +64,8 @@ public class SurveyorActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_surveyor);
+		getWindow().setSoftInputMode(
+				WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
 		driveHelper = new GoogleDriveHelper(this);
 
@@ -93,8 +90,7 @@ public class SurveyorActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		questionController.resetTrip();
-		locationController.stopTrip();
+		stopTrip();
 		super.onDestroy();
 	}
 
@@ -130,7 +126,7 @@ public class SurveyorActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		if (hubPageController.isHubPageShowing()) {
-			locationController.stopTrip();
+			stopTrip();
 			finish();
 		} else if (questionController.isQuestionShowing()) {
 			Question question = questionController.getCurrentQuestion();
@@ -146,9 +142,7 @@ public class SurveyorActivity extends Activity {
 				return;
 			}
 
-			questionController
-					.onPrevQuestionButtonClicked(new CommonEvents.PreviousQuestionPressedEvent(
-							null));
+			switchToPreviousQuestion();
 		} else {
 			super.onBackPressed();
 		}
@@ -157,7 +151,7 @@ public class SurveyorActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent intent) {
-		super.onActivityResult(requestCode, resultCode, intent);
+
 		// Choose what to do based on the request code
 		switch (requestCode) {
 
@@ -195,44 +189,42 @@ public class SurveyorActivity extends Activity {
 			Fragment imageQuestionFragment = getFragmentManager().findFragmentById(R.id.surveyor_frame);
 	        imageQuestionFragment.onActivityResult(requestCode, resultCode, intent);
 			
-			// try {
-			// Bitmap imageBitmap = BitmapFactory.decodeFile(
-			// driveHelper.fileUri.getPath(), null);
-			// float rotation = ImageHelper.rotationForImage(Uri
-			// .fromFile(new File(driveHelper.fileUri.getPath())));
-			// if (rotation != 0) {
-			// Matrix matrix = new Matrix();
-			// matrix.preRotate(rotation);
-			// imageBitmap = Bitmap.createBitmap(imageBitmap, 0, 0,
-			// imageBitmap.getWidth(), imageBitmap.getHeight(),
-			// matrix, true);
-			// }
-			//
-			// imageBitmap.compress(CompressFormat.JPEG, 25,
-			// new FileOutputStream(driveHelper.fileUri.getPath()));
-			// } catch (Exception e) {
-			// e.printStackTrace();
-			// }
-			//
-			// if (resultCode == Activity.RESULT_OK) {
-			// if (questionController.isAskingTripQuestions()) {
-			// ArrayList<Integer> key = new ArrayList<Integer>(
-			// Arrays.asList(
-			// questionController.getCurrentQuestion().getQuestionNumber(), -1,
-			// -1)
-			// );
-			// // SurveyHelper.prevTrackerImages
-			// // .put(key, driveHelper.fileUri);
-			// } else {
-			// Question question = questionController.getCurrentQuestion();
-			// ArrayList<Integer> key = new ArrayList<Integer>(
-			// Arrays.asList(question.getChapterNumber(),
-			// question.getQuestionNumber(), -1, -1)
-			// );
-			// // SurveyHelper.prevImages.put(key, driveHelper.fileUri);
-			// }
-			// // currentQuestionFragment.ImageLayout();
-			// }
+//			try {
+//				Bitmap imageBitmap = BitmapFactory.decodeFile(
+//						driveHelper.fileUri.getPath(), null);
+//				float rotation = ImageHelper.rotationForImage(Uri
+//						.fromFile(new File(driveHelper.fileUri.getPath())));
+//				if (rotation != 0) {
+//					Matrix matrix = new Matrix();
+//					matrix.preRotate(rotation);
+//					imageBitmap = Bitmap.createBitmap(imageBitmap, 0, 0,
+//							imageBitmap.getWidth(), imageBitmap.getHeight(),
+//							matrix, true);
+//				}
+//
+//				imageBitmap.compress(CompressFormat.JPEG, 25,
+//						new FileOutputStream(driveHelper.fileUri.getPath()));
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//
+//			if (resultCode == Activity.RESULT_OK) {
+//				if (questionController.isAskingTripQuestions()) {
+//					ArrayList<Integer> key = new ArrayList<Integer>(
+//							Arrays.asList(questionController
+//									.getCurrentQuestion().getQuestionNumber(),
+//									-1, -1));
+//					// SurveyHelper.prevTrackerImages
+//					// .put(key, driveHelper.fileUri);
+//				} else {
+//					Question question = questionController.getCurrentQuestion();
+//					ArrayList<Integer> key = new ArrayList<Integer>(
+//							Arrays.asList(question.getChapterNumber(),
+//									question.getQuestionNumber(), -1, -1));
+//					// SurveyHelper.prevImages.put(key, driveHelper.fileUri);
+//				}
+//				// currentQuestionFragment.ImageLayout();
+//			}
 			break;
 
 		// If the request code matches the code sent in onConnectionFailed
@@ -292,36 +284,12 @@ public class SurveyorActivity extends Activity {
 		drawerController.showStatisticsPage();
 	}
 
-	public void stopTripDialog() {
-		Builder dialog;
-		dialog = new AlertDialog.Builder(this);
-		dialog.setMessage(this.getResources().getString(
-				R.string.stop_tracker_message));
-		dialog.setPositiveButton(this.getResources().getString(R.string.yes),
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface paramDialogInterface,
-							int paramInt) {
-						stopTrip();
-					}
-				});
-		dialog.setNegativeButton(this.getString(R.string.no),
-				new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface paramDialogInterface,
-							int paramInt) {
-						// Nothing happens.
-					}
-				});
-		dialog.show();
-	}
-
 	/*
 	 * Location tracking helper
 	 */
 
 	public void stopTrip() {
+		hubPageController.stopTrip();
 		locationController.stopTrip();
 		questionController.resetTrip();
 		statisticsPageController.stopTrip();
@@ -331,6 +299,22 @@ public class SurveyorActivity extends Activity {
 		return objectGraph;
 	}
 
+	/**
+	 * Question handling
+	 */
+
+	private void switchToNextQuestion() {
+		questionController.switchToNextQuestion();
+		drawerController.selectSurveyChapter(questionController
+				.getCurrentQuestion().getChapterNumber());
+	}
+
+	private void switchToPreviousQuestion() {
+		questionController.switchToPreviousQuestion();
+		drawerController.selectSurveyChapter(questionController
+				.getCurrentQuestion().getChapterNumber());
+	}
+
 	/*
 	 * EventBus event handling
 	 */
@@ -338,14 +322,9 @@ public class SurveyorActivity extends Activity {
 	@Subscribe
 	public void onToggleTrip(HubPageFragment.RequestToggleTripEvent event) {
 		if (metadata.getTripID() == null) {
-			metadata.setTripID("T" + StringUtil.createID());
 			questionController.askTripQuestions();
 		} else {
-			locationController.stopTrip();
-			metadata.setTripID(null);
-			metadata.setCurrentLocation(null);
-			statisticsPageController.stopTrip();
-			hubPageController.stopTrip();
+			stopTrip();
 		}
 	}
 
@@ -358,10 +337,18 @@ public class SurveyorActivity extends Activity {
 	}
 
 	@Subscribe
-	public void startSurvey(HubPageFragment.RequestStartSurveyEvent event) {
+	public void onSurveyStartRequested(
+			HubPageFragment.RequestStartSurveyEvent event) {
 		metadata.setSurveyID("S" + StringUtil.createID());
 		questionController.startSurvey();
 		drawerController.selectSurveyChapter(0);
+	}
+
+	@Subscribe
+	public void onSubmitButtonClicked(CommonEvents.SubmitSurveyEvent event) {
+		showHubPage();
+		questionController.submitSurvey();
+		statisticsPageController.submitSurvey();
 	}
 
 	@Subscribe
@@ -387,7 +374,19 @@ public class SurveyorActivity extends Activity {
 	}
 
 	@Subscribe
-	public void onQuestionShown(QuestionFragment.QuestionAttachedEvent event) {
+	public void onNextQuestionButtonClicked(
+			CommonEvents.NextQuestionPressedEvent event) {
+		switchToNextQuestion();
+	}
+
+	@Subscribe
+	public void onPrevQuestionButtonClicked(
+			CommonEvents.PreviousQuestionPressedEvent event) {
+		switchToPreviousQuestion();
+	}
+
+	@Subscribe
+	public void onQuestionShown(CommonEvents.QuestionShownEvent event) {
 		Question question = event.question;
 		if (questionController.isAskingTripQuestions()) {
 			questionController.updateTrackerPosition(question
@@ -397,6 +396,17 @@ public class SurveyorActivity extends Activity {
 			questionController.updateSurveyPosition(
 					question.getChapterNumber(), question.getQuestionNumber());
 			drawerController.selectSurveyChapter(question.getChapterNumber());
+		}
+	}
+
+	@Subscribe
+	public void onQuestionHidden(CommonEvents.QuestionHiddenEvent event) {
+		Question question = event.question;
+		if (question.isInLoop()) {
+			question.getLoopQuestionSelectedAnswers()[question
+					.getLoopIteration()] = event.selectedAnswers;
+		} else {
+			event.question.setSelectedAnswers(event.selectedAnswers);
 		}
 	}
 

@@ -15,8 +15,7 @@ import java.util.LinkedList;
 public class SubmissionHelper {
   private LinkedList<Submission> surveySubmissionQueue;
   private LinkedList<Submission> trackerSubmissionQueue;
-  private Type submissionQueueType = new TypeToken<LinkedList<Submission>>() {
-  }.getType();
+  private Type submissionQueueType = new TypeToken<LinkedList<Submission>>() {}.getType();
   private boolean savingTrackerSubmission = false;
   private boolean savingSurveySubmission = false;
   private boolean submittingSubmission = false;

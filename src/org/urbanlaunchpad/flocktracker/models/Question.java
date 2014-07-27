@@ -21,15 +21,16 @@ public class Question {
 
   // Loop related variables
   private boolean inLoop;
-  private int loopTotal;
-  private int loopIteration;
-  private int loopPosition;
+  private int loopTotal; // total number of loops
+  private int loopIteration; // current number of loop
+  private int loopPosition; // within the loop, which question
 
   // Image
   private Uri image;
 
   // Selected Answers
   private Set<String> selectedAnswers = new HashSet<String>();
+  private Set<String>[] loopQuestionSelectedAnswers;
 
   public QuestionType getType() {
     return type;
@@ -50,6 +51,12 @@ public class Question {
   public void setChapterInfo(int chapterNumber, int chapterQuestionCount) {
     this.chapterNumber = chapterNumber;
     this.chapterQuestionCount = chapterQuestionCount;
+
+    if (loopQuestions != null) {
+      for (Question template : loopQuestions) {
+        template.setChapterInfo(chapterNumber, chapterQuestionCount);
+      }
+    }
   }
 
   public String getQuestionText() {
@@ -92,28 +99,27 @@ public class Question {
     this.inLoop = inLoop;
   }
 
-  public int getLoopTotal() {
-    return loopTotal;
+  public void initializeLoop(int loopTotal, int loopIteration, int loopPosition) {
+    this.loopTotal = loopTotal;
+    this.loopIteration = loopIteration;
+    this.loopPosition = loopPosition;
+    this.loopQuestionSelectedAnswers = new Set[loopTotal];
   }
 
-  public void setLoopTotal(int loopTotal) {
-    this.loopTotal = loopTotal;
+  public int getLoopTotal() {
+    return loopTotal;
   }
 
   public int getLoopIteration() {
     return loopIteration;
   }
 
-  public void setLoopIteration(int loopIteration) {
-    this.loopIteration = loopIteration;
-  }
-
   public int getLoopPosition() {
     return loopPosition;
   }
 
-  public void setLoopPosition(int loopPosition) {
-    this.loopPosition = loopPosition;
+  public Set<String>[] getLoopQuestionSelectedAnswers() {
+    return loopQuestionSelectedAnswers;
   }
 
   public Set<String> getSelectedAnswers() {
@@ -138,6 +144,11 @@ public class Question {
 
   public void setQuestionNumber(int questionNumber) {
     this.questionNumber = questionNumber;
+    if (loopQuestions != null) {
+      for (Question template : loopQuestions) {
+        template.setQuestionNumber(questionNumber);
+      }
+    }
   }
 
   public Question[] getLoopQuestions() {

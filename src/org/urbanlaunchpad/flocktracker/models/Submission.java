@@ -8,6 +8,7 @@ import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.util.LocationUtil;
 
 import java.io.IOException;
+import java.util.Set;
 
 public class Submission {
   public static final Integer MAX_QUERY_LENGTH = 2000; // max length allowed by fusion table
@@ -62,11 +63,13 @@ public class Submission {
                 .setKey(ProjectConfig.get().getApiKey())
                 .execute().getRows().get(0).get(0));
 
+        Thread.sleep(100);
         // Send rest of info one at a time
         sendQuery(getUpdateQueryGivenRow(rowID, "Username", ProjectConfig.get().getUsername()));
 
         for (Chapter chapter : chapters) {
           for (Question question : chapter.getQuestions()) {
+            Thread.sleep(100);
             sendQuery(getUpdateQueryGivenRow(rowID, question.getQuestionID(),
                 question.getSelectedAnswers().toString()));
           }
@@ -122,14 +125,22 @@ public class Submission {
     String locationString = LocationUtil.getLngLatAlt(currentLocation);
     String query = "";
 
+    double latitude, longitude, altitude;
+    if (currentLocation == null) {
+      latitude = longitude = altitude = 0;
+    } else {
+      latitude = currentLocation.getLatitude();
+      longitude = currentLocation.getLongitude();
+      altitude = currentLocation.getAltitude();
+    }
+
     switch (type) {
       case TRACKER:
         query = "INSERT INTO "
             + ProjectConfig.get().getTrackerTableID()
             + " (Location,Lat,Lng,Alt,Date,TripID,Username,TotalCount,FemaleCount,MaleCount,Speed) VALUES ("
-            + "'<Point><coordinates>" + locationString
-            + "</coordinates></Point>','" + currentLocation.getLatitude() + "','" + currentLocation.getLongitude()
-            + "','" + currentLocation.getAltitude() + "','" + metadata.getTimeStamp() + "','" + metadata.getTripID()
+            + "'<Point><coordinates>" + locationString + "</coordinates></Point>','" + latitude + "','" + longitude
+            + "','" + altitude + "','" + metadata.getTimeStamp() + "','" + metadata.getTripID()
             + "','" + ProjectConfig.get().getUsername() + "','"
             + (metadata.getMaleCount() + metadata.getFemaleCount()) + "','"
             + metadata.getFemaleCount() + "','" + metadata.getMaleCount() + "','" + metadata.getSpeed() + "');";
@@ -139,17 +150,14 @@ public class Submission {
           for (Question question : chapter.getQuestions()) {
             // Get question ID's and answers
             questionIDString.append(question.getQuestionID() + ",");
-            answerString.append(question.getSelectedAnswers().toString() + "','");
+            Set<String> selectedAnswers = question.getSelectedAnswers();
+            if (selectedAnswers != null && !selectedAnswers.isEmpty()) {
+              questionIDString.append(question.getQuestionID() + ",");
+              addQuestionToAnswerString(answerString, question);
+            } else {
+              answerString.append("','");
+            }
           }
-        }
-
-        double latitude, longitude, altitude;
-        if (currentLocation == null) {
-          latitude = longitude = altitude = 0;
-        } else {
-          latitude = currentLocation.getLatitude();
-          longitude = currentLocation.getLongitude();
-          altitude = currentLocation.getAltitude();
         }
 
         query = "INSERT INTO "
@@ -167,6 +175,45 @@ public class Submission {
         break;
     }
     return query;
+  }
+
+  private void addQuestionToAnswerString(StringBuilder answerString, Question question) {
+    // Get question ID's and answers
+    Set<String> selectedAnswers = question.getSelectedAnswers();
+    if (selectedAnswers != null && !selectedAnswers.isEmpty()) {
+      String selectedAnswer = "";
+      // Normal selected answers.
+      if (selectedAnswers.size() == 1) {
+        selectedAnswer = selectedAnswers.iterator().next();
+        answerString.append(selectedAnswer);
+      } else {
+        answerString.append(selectedAnswers.toString());
+      }
+
+      // Loop through and add all the loop question answers in to this question.
+      if (question.getType() == Question.QuestionType.LOOP) {
+        int loopTotal = Integer.parseInt(selectedAnswer);
+
+        answerString.append(" [");
+        for (int i = 0; i < loopTotal; i++) {
+          answerString.append("[");
+          for (Question loopQuestion : question.getLoopQuestions()) {
+            Set<String> loopSelectedAnswers = loopQuestion.getLoopQuestionSelectedAnswers()[i];
+            if (loopSelectedAnswers != null) {
+              answerString.append(loopSelectedAnswers);
+            }
+            answerString.append(",");
+          }
+          answerString.setLength(answerString.length() - 1);
+          answerString.append("]");
+        }
+        answerString.append("]");
+      }
+
+      answerString.append("','");
+    } else {
+      answerString.append("','");
+    }
   }
 
   /**
