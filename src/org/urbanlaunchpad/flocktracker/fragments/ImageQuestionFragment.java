@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import com.squareup.otto.Bus;
 
 import org.urbanlaunchpad.flocktracker.R;
+import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.helpers.GoogleDriveHelper;
 import org.urbanlaunchpad.flocktracker.helpers.ImageHelper;
 import org.urbanlaunchpad.flocktracker.models.Question;
@@ -44,7 +45,9 @@ public class ImageQuestionFragment extends QuestionFragment {
 	private OnClickListener cameraButtonOnClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			startCameraIntent();
+			String fileName = createImageFilename();
+			cameraIntentUri = createImageUri(fileName);
+			SurveyorActivity.driveHelper.startCameraIntent(fileName);
 		}
 	};
 
@@ -78,14 +81,14 @@ public class ImageQuestionFragment extends QuestionFragment {
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == GoogleDriveHelper.CAPTURE_IMAGE) {
-			if (resultCode == Activity.RESULT_OK){
+			if (resultCode == Activity.RESULT_OK) {
 				imagePath = cameraIntentUri;
-				Bitmap photo = (Bitmap) data.getExtras().get("data");
-	            saveBitmap(photo, imagePath.toString());
+				//imagePath = (Uri) data.getExtras().get(MediaStore.EXTRA_OUTPUT);
+				// Bitmap photo = (Bitmap) data.getExtras().get("data");
+				// saveBitmap(photo, imagePath.toString());
 				getQuestion().setImage(imagePath);
 				new addThumbnail().execute("");
 			}
-			
 
 			// try {
 			// SurveyorActivity.driveHelper.saveFileToDrive(imagePath
@@ -99,38 +102,44 @@ public class ImageQuestionFragment extends QuestionFragment {
 	}
 
 	public void startCameraIntent() {
-		
-	    String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
-	            Environment.DIRECTORY_PICTURES).getPath();
-	        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
-	            .format(new Date());
-	        cameraIntentUri = Uri.fromFile(new File(mediaStorageDir
-	            + File.separator + "IMG_" + timeStamp + ".jpg"));
 
-	        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	        //cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraIntentUri);
+		String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
+				Environment.DIRECTORY_PICTURES).getPath();
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+				.format(new Date());
+		cameraIntentUri = Uri.fromFile(new File(mediaStorageDir
+				+ File.separator + "IMG_" + timeStamp + ".jpg"));
 
-	        getActivity().startActivityForResult(cameraIntent, CAPTURE_IMAGE);
-		
-//		// Container Activity must handle the onActivityResult and send it to this fragment for it to work properly.
-//		String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
-//				Environment.DIRECTORY_PICTURES).getPath();
-//
-//		File folder = new File(mediaStorageDir + File.sepa	rator + "FlockTracker");
-//		if (!folder.exists()) {
-//			folder.mkdir();
-//		}
-//
-//		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
-//				.format(new Date());
-//		cameraIntentUri = Uri.fromFile(new File(folder.getAbsolutePath(), "IMG_" + timeStamp + ".jpg"));
-////		cameraIntentUri = Uri.fromFile(new File(mediaStorageDir + File.separator + "IMG_" + timeStamp + ".jpg"));
-//		Log.v("file Uri", cameraIntentUri.toString());
-//
-//		Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-//		cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraIntentUri);
-//
-//		getActivity().startActivityForResult(cameraIntent, CAPTURE_IMAGE);
+		Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		// cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraIntentUri);
+
+		getActivity().startActivityForResult(cameraIntent, CAPTURE_IMAGE);
+
+		// // Container Activity must handle the onActivityResult and send it to
+		// this fragment for it to work properly.
+		// String mediaStorageDir =
+		// Environment.getExternalStoragePublicDirectory(
+		// Environment.DIRECTORY_PICTURES).getPath();
+		//
+		// File folder = new File(mediaStorageDir + File.sepa rator +
+		// "FlockTracker");
+		// if (!folder.exists()) {
+		// folder.mkdir();
+		// }
+		//
+		// String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+		// .format(new Date());
+		// cameraIntentUri = Uri.fromFile(new File(folder.getAbsolutePath(),
+		// "IMG_" + timeStamp + ".jpg"));
+		// // cameraIntentUri = Uri.fromFile(new File(mediaStorageDir +
+		// File.separator + "IMG_" + timeStamp + ".jpg"));
+		// Log.v("file Uri", cameraIntentUri.toString());
+		//
+		// Intent cameraIntent = new
+		// Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+		// cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraIntentUri);
+		//
+		// getActivity().startActivityForResult(cameraIntent, CAPTURE_IMAGE);
 	}
 
 	private class addThumbnail extends AsyncTask<String, Void, String> {
@@ -191,27 +200,45 @@ public class ImageQuestionFragment extends QuestionFragment {
 		}
 		return imageBitmap;
 	}
-	
+
 	public void saveBitmap(Bitmap photo, String path) {
 		Log.v("SAVE", path);
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        //photo.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
-        Log.v("file Uri to save", path);
-        // you can create a new file name "test.jpg" in sdcard folder.
-        File f = new File(path);
-        try {
-            f.createNewFile();
-            FileOutputStream fo = new FileOutputStream(f);
-            fo.write(bytes.toByteArray());
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		// photo.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
+		Log.v("file Uri to save", path);
+		// you can create a new file name "test.jpg" in sdcard folder.
+		File f = new File(path);
+		try {
+			f.createNewFile();
+			FileOutputStream fo = new FileOutputStream(f);
+			fo.write(bytes.toByteArray());
 
-            // remember close de FileOutput
-            fo.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        // write the bytes in file
+			// remember close de FileOutput
+			fo.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// write the bytes in file
 
-    }
+	}
+
 	
+	
+	public Uri createImageUri(String fileName) {
+		String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
+				Environment.DIRECTORY_PICTURES).getPath();
+		Uri fileUri = Uri.fromFile(new java.io.File(mediaStorageDir
+				+ java.io.File.separator + fileName));
+		return fileUri;
+
+	}
+	
+	private String createImageFilename() {
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+		.format(new Date());		
+		String fileName = "IMG_" + timeStamp + ".jpg";
+		return fileName;
+	}
+
 }

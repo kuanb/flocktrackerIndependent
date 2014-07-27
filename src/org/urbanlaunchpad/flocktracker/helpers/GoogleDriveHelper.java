@@ -38,28 +38,28 @@ public class GoogleDriveHelper {
     service = getDriveService(IniconfigActivity.credential);
   }
 
-  public void startCameraIntent(String jumpString) {
-    String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
-        Environment.DIRECTORY_PICTURES).getPath();
-    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
-        .format(new Date());
-    fileUri = Uri.fromFile(new java.io.File(mediaStorageDir
-        + java.io.File.separator + "IMG_" + timeStamp + ".jpg"));
-
-    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-
-    activity.startActivityForResult(cameraIntent, CAPTURE_IMAGE);
-  }
+//  public void startCameraIntent(String jumpString) {
+//    String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
+//        Environment.DIRECTORY_PICTURES).getPath();
+//    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+//        .format(new Date());
+//    fileUri = Uri.fromFile(new java.io.File(mediaStorageDir
+//        + java.io.File.separator + "IMG_" + timeStamp + ".jpg"));
+//
+//    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+//
+//    activity.startActivityForResult(cameraIntent, CAPTURE_IMAGE);
+//  }
 
   // If we just wish to start the intent without changing jump string
-  public static void startCameraIntent() {
+  public void startCameraIntent(String fileName) {
     String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
         Environment.DIRECTORY_PICTURES).getPath();
     String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
         .format(new Date());
     Uri fileUri = Uri.fromFile(new java.io.File(mediaStorageDir
-        + java.io.File.separator + "IMG_" + timeStamp + ".jpg"));
+        + java.io.File.separator + fileName));
 
     Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
     cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
@@ -104,7 +104,7 @@ public class GoogleDriveHelper {
     });
   }
 
-  public Drive getDriveService(GoogleAccountCredential credential) {
+  public Drive getDriveService(GoogleAccountCredential credential) {	
     return new Drive.Builder(AndroidHttp.newCompatibleTransport(),
         new GsonFactory(), credential).build();
   }
@@ -115,7 +115,7 @@ public class GoogleDriveHelper {
     if (accountName != null) {
       IniconfigActivity.credential.setSelectedAccountName(accountName);
       service = getDriveService(IniconfigActivity.credential);
-      startCameraIntent();
+      //startCameraIntent(fileUri);
     }
   }
 
