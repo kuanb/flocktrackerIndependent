@@ -31,7 +31,7 @@ public class GoogleDriveHelper {
   public static final String PHOTO_FOLDER_ID = "0BzQnDGTR4fYbQUdLeUUwcXFVOUE";
   public static Drive service;
   public Uri fileUri;
-  private SurveyorActivity activity;
+  private static SurveyorActivity activity;
 
   public GoogleDriveHelper(SurveyorActivity mainActivity) {
     this.activity = mainActivity;
@@ -53,12 +53,12 @@ public class GoogleDriveHelper {
   }
 
   // If we just wish to start the intent without changing jump string
-  public void startCameraIntent() {
+  public static void startCameraIntent() {
     String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
         Environment.DIRECTORY_PICTURES).getPath();
     String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
         .format(new Date());
-    fileUri = Uri.fromFile(new java.io.File(mediaStorageDir
+    Uri fileUri = Uri.fromFile(new java.io.File(mediaStorageDir
         + java.io.File.separator + "IMG_" + timeStamp + ".jpg"));
 
     Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
