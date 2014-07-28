@@ -82,11 +82,11 @@ public class QuestionController {
   }
 
   private void startLoop() {
-    inLoop = true;
     loopPosition = 0;
     loopIteration = 0;
-    loopTotal = Integer.parseInt(getCurrentQuestion().getSelectedAnswers().iterator().next());
+    loopTotal = Integer.parseInt(getCurrentQuestionFragment().getSelectedAnswers().iterator().next());
     numLoopQuestions = getCurrentQuestion().getLoopQuestions().length;
+    inLoop = true;
   }
 
   public void submitSurvey() {
@@ -106,14 +106,14 @@ public class QuestionController {
     Question currentQuestion = getCurrentQuestion();
 
     switch (currentQuestion.getType()) {
-      case LOOP:
-        if (currentQuestion.getSelectedAnswers() != null) {
-          startLoop();
-        }
       case MULTIPLE_CHOICE:
         currentQuestionFragment = new MultipleChoiceQuestionFragment(currentQuestion,
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
+      case LOOP:
+        if (currentQuestion.getSelectedAnswers().size() > 0) {
+          startLoop();
+        }
       case OPEN_NUMBER:
       case OPEN_TEXT:
         currentQuestionFragment = new OpenQuestionFragment(currentQuestion,
@@ -203,7 +203,9 @@ public class QuestionController {
     Question currentQuestion = getCurrentQuestion();
 
     // If this is the question that has looped questions, initialize the loop.
-    if (currentQuestion.getType() == QuestionType.LOOP && currentQuestion.getSelectedAnswers() != null) {
+    if (!inLoop && currentQuestion.getType() == QuestionType.LOOP
+        && currentQuestionFragment.getSelectedAnswers().size() > 0) {
+      startLoop();
       showCurrentQuestion();
       return;
     } else if (inLoop) {
@@ -253,9 +255,11 @@ public class QuestionController {
   }
 
   public void updateSurveyPosition(int chapterPosition, int questionPosition) {
-    this.chapterPosition = chapterPosition;
-    this.questionPosition = questionPosition;
-    this.inLoop = false;
+    if (this.chapterPosition != chapterPosition || this.questionPosition != questionPosition) {
+      this.chapterPosition = chapterPosition;
+      this.questionPosition = questionPosition;
+      this.inLoop = false;
+    }
   }
 
   // TODO(adchia): move into a view

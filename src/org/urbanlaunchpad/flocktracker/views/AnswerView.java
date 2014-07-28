@@ -75,6 +75,7 @@ public class AnswerView extends LinearLayout {
           }
         });
         break;
+      case LOOP:
       case OPEN_NUMBER:
         answer.setInputType(InputType.TYPE_CLASS_NUMBER
             | InputType.TYPE_NUMBER_FLAG_DECIMAL);

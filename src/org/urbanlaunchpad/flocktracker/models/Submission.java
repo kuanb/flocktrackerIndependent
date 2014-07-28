@@ -207,8 +207,9 @@ public class Submission {
             answerString.append(",");
           }
           answerString.setLength(answerString.length() - 1);
-          answerString.append("]");
+          answerString.append("],");
         }
+        answerString.setLength(answerString.length() - 1);
         answerString.append("]");
       }
 

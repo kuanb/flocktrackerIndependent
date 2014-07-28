@@ -81,27 +81,6 @@ public class ImageQuestionFragment extends QuestionFragment {
     super.onActivityResult(requestCode, resultCode, data);
     if (requestCode == GoogleDriveHelper.CAPTURE_IMAGE) {
       if (resultCode == Activity.RESULT_OK) {
-        try {
-          String path = driveHelper.getFileUri().getPath();
-          Bitmap imageBitmap = BitmapFactory.decodeFile(path, null);
-          float rotation = ImageHelper.rotationForImage(Uri
-              .fromFile(new File(path)));
-          if (rotation != 0) {
-            Matrix matrix = new Matrix();
-            matrix.preRotate(rotation);
-            imageBitmap = Bitmap.createBitmap(imageBitmap, 0, 0,
-                imageBitmap.getWidth(), imageBitmap.getHeight(),
-                matrix, true);
-          }
-
-          FileOutputStream outputStream = new FileOutputStream(path);
-          imageBitmap.compress(Bitmap.CompressFormat.JPEG, 25,
-              outputStream);
-          outputStream.close();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-
         new ImageProcessTask().execute(driveHelper.getFileUri());
       }
     }
@@ -111,7 +90,28 @@ public class ImageQuestionFragment extends QuestionFragment {
     @Override
     protected Bitmap doInBackground(Uri... params) {
       Uri imageUri = params[0];
-      getQuestion().setImage(imageUri);
+      if (!imageUri.equals(getQuestion().getImage())) {
+        try {
+          Bitmap imageBitmap = BitmapFactory.decodeFile(imageUri.getPath(), null);
+          float rotation = ImageHelper.rotationForImage(Uri
+              .fromFile(new File(imageUri.getPath())));
+          if (rotation != 0) {
+            Matrix matrix = new Matrix();
+            matrix.preRotate(rotation);
+            imageBitmap = Bitmap.createBitmap(imageBitmap, 0, 0,
+                imageBitmap.getWidth(), imageBitmap.getHeight(),
+                matrix, true);
+          }
+
+          FileOutputStream outputStream = new FileOutputStream(imageUri.getPath());
+          imageBitmap.compress(Bitmap.CompressFormat.JPEG, 25,
+              outputStream);
+          outputStream.close();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        getQuestion().setImage(imageUri);
+      }
       return ImageHelper.decodeSampledBitmapFromPath(imageUri.getPath(), 512, 512);
     }
 
