@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.squareup.otto.Bus;
 import org.urbanlaunchpad.flocktracker.CommonEvents;
 import org.urbanlaunchpad.flocktracker.R;
+import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.models.Question;
 import org.urbanlaunchpad.flocktracker.views.NavButtonsManager;
 
@@ -17,11 +18,6 @@ import java.util.Set;
 
 public abstract class QuestionFragment extends Fragment {
 
-  // Loop stuff
-  Boolean inLoopBoolean;
-  Integer loopTotalInteger;
-  Integer loopIterationInteger;
-  Integer loopPositionInteger;
   private NavButtonsManager navButtonsManager;
   private Question question;
   private QuestionType questionType;

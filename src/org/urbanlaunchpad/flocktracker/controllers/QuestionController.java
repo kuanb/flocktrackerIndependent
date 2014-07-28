@@ -161,6 +161,10 @@ public class QuestionController {
     return currentQuestion;
   }
 
+  public QuestionFragment getCurrentQuestionFragment() {
+    return currentQuestionFragment;
+  }
+
   public void switchToPreviousQuestion() {
     if (inLoop) {
       // First question in iteration.

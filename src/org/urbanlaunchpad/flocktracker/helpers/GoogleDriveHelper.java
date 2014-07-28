@@ -33,6 +33,7 @@ public class GoogleDriveHelper {
   public static final String PHOTO_FOLDER_ID = "0BzQnDGTR4fYbQUdLeUUwcXFVOUE";
   private Drive service;
   private SurveyorActivity activity;
+  private Uri fileUri;
 
   @Inject
   public GoogleDriveHelper(Context context) {
@@ -55,7 +56,7 @@ public class GoogleDriveHelper {
         Environment.DIRECTORY_PICTURES).getPath();
     String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
         .format(new Date());
-    Uri fileUri = Uri.fromFile(new java.io.File(mediaStorageDir
+    fileUri = Uri.fromFile(new java.io.File(mediaStorageDir
         + java.io.File.separator + "IMG_" + timeStamp + ".jpg"));
 
     Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -89,6 +90,10 @@ public class GoogleDriveHelper {
           REQUEST_AUTHORIZATION);
     }
     return null;
+  }
+
+  public Uri getFileUri() {
+    return fileUri;
   }
 
   private void showToast(final String toast) {

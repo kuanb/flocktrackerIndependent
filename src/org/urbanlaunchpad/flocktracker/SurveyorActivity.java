@@ -25,7 +25,7 @@ import javax.inject.Inject;
 public class SurveyorActivity extends Activity {
 
   public static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-  @Inject GoogleDriveHelper driveHelper;
+  @Inject public static GoogleDriveHelper driveHelper;
   @Inject QuestionController questionController;
   @Inject HubPageController hubPageController;
   @Inject StatisticsPageController statisticsPageController;
@@ -44,6 +44,7 @@ public class SurveyorActivity extends Activity {
 
     objectGraph = ObjectGraph.create(new FlocktrackerModule(this));
     objectGraph.inject(this);
+    objectGraph.injectStatics();
     eventBus.register(this);
 
     // Check for location services.
@@ -124,6 +125,7 @@ public class SurveyorActivity extends Activity {
   @Override
   protected void onActivityResult(int requestCode, int resultCode,
     Intent intent) {
+    super.onActivityResult(requestCode, resultCode, intent);
     // Choose what to do based on the request code
     switch (requestCode) {
       case GoogleDriveHelper.REQUEST_ACCOUNT_PICKER:
@@ -139,8 +141,8 @@ public class SurveyorActivity extends Activity {
             GoogleDriveHelper.REQUEST_ACCOUNT_PICKER);
         }
         break;
-      default:
-        super.onActivityResult(requestCode, resultCode, intent);
+      case GoogleDriveHelper.CAPTURE_IMAGE:
+        questionController.getCurrentQuestionFragment().onActivityResult(requestCode, resultCode, intent);
     }
   }
 
@@ -309,5 +311,4 @@ public class SurveyorActivity extends Activity {
     questionController.showCurrentQuestion();
     drawerController.selectSurveyChapter(event.chapterNumber);
   }
-
 }
