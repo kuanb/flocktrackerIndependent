@@ -86,4 +86,6 @@
 	<string name="select_user_first">Select user first please.</string> <!-- Prompts the user to select a user befor a project -->
 	<string name="invalid_user_project">Invalid user/project!</string> <!-- Informs that the project/user combination does not work -->
 
+	<string name="camera_button_desc">Camera button</string> <!-- Descriptor for the button on image questions to access the camera -->
+
 </resources>
