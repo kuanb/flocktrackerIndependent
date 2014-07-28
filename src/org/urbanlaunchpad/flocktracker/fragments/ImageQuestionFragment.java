@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +21,8 @@ import org.urbanlaunchpad.flocktracker.helpers.ImageHelper;
 import org.urbanlaunchpad.flocktracker.models.Question;
 
 import javax.inject.Inject;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Collections;
 import java.util.Set;
 
@@ -34,6 +38,12 @@ public class ImageQuestionFragment extends QuestionFragment {
       driveHelper.startCameraIntent();
     }
   };
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    ((SurveyorActivity) getActivity()).getObjectGraph().inject(this);
+  }
 
   public ImageQuestionFragment(Question question, QuestionType questionType,
     Bus eventBus) {
@@ -71,6 +81,27 @@ public class ImageQuestionFragment extends QuestionFragment {
     super.onActivityResult(requestCode, resultCode, data);
     if (requestCode == GoogleDriveHelper.CAPTURE_IMAGE) {
       if (resultCode == Activity.RESULT_OK) {
+        try {
+          String path = driveHelper.getFileUri().getPath();
+          Bitmap imageBitmap = BitmapFactory.decodeFile(path, null);
+          float rotation = ImageHelper.rotationForImage(Uri
+              .fromFile(new File(path)));
+          if (rotation != 0) {
+            Matrix matrix = new Matrix();
+            matrix.preRotate(rotation);
+            imageBitmap = Bitmap.createBitmap(imageBitmap, 0, 0,
+                imageBitmap.getWidth(), imageBitmap.getHeight(),
+                matrix, true);
+          }
+
+          FileOutputStream outputStream = new FileOutputStream(path);
+          imageBitmap.compress(Bitmap.CompressFormat.JPEG, 25,
+              outputStream);
+          outputStream.close();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+
         new ImageProcessTask().execute(driveHelper.getFileUri());
       }
     }

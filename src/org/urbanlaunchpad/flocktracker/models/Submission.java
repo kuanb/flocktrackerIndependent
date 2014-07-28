@@ -101,7 +101,7 @@ public class Submission {
         for (Question question : chapter.getQuestions()) {
           // Upload images
           if (question.getImage() != null) {
-            String fileLink = question.getImage().toString();
+            String fileLink = question.getImage().getPath();
             SurveyorActivity.driveHelper.saveFileToDrive(fileLink);
           }
         }
@@ -151,12 +151,12 @@ public class Submission {
         for (Chapter chapter : chapters) {
           for (Question question : chapter.getQuestions()) {
             // Get question ID's and answers
-            questionIDString.append(question.getQuestionID() + ",");
             Set<String> selectedAnswers = question.getSelectedAnswers();
             if (selectedAnswers != null && !selectedAnswers.isEmpty()) {
               questionIDString.append(question.getQuestionID() + ",");
               addQuestionToAnswerString(answerString, question);
             } else {
+              questionIDString.append(question.getQuestionID() + ",");
               answerString.append("','");
             }
           }

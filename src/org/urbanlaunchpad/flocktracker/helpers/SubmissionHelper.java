@@ -1,8 +1,9 @@
 package org.urbanlaunchpad.flocktracker.helpers;
 
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.Log;
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import org.urbanlaunchpad.flocktracker.ProjectConfig;
 import org.urbanlaunchpad.flocktracker.models.Submission;
@@ -19,6 +20,8 @@ public class SubmissionHelper {
   private boolean savingTrackerSubmission = false;
   private boolean savingSurveySubmission = false;
   private boolean submittingSubmission = false;
+  private Gson gsonSerializer = new GsonBuilder().registerTypeAdapter(Uri.class, new UriSerializer()).create();
+  private Gson gsonDeserializer = new GsonBuilder().registerTypeAdapter(Uri.class, new UriDeserializer()).create();
 
   private SharedPreferences prefs;
 
@@ -32,7 +35,7 @@ public class SubmissionHelper {
     } else {
       Type listType = new TypeToken<LinkedList<Submission>>() {
       }.getType();
-      surveySubmissionQueue = new Gson().fromJson(surveySubmissionQueueGson, listType);
+      surveySubmissionQueue = gsonDeserializer.fromJson(surveySubmissionQueueGson, listType);
     }
 
     String trackerSubmissionQueueGson = prefs.getString("trackerSubmissionQueue", null);
@@ -41,7 +44,7 @@ public class SubmissionHelper {
     } else {
       Type listType = new TypeToken<LinkedList<Submission>>() {
       }.getType();
-      trackerSubmissionQueue = new Gson().fromJson(trackerSubmissionQueueGson, listType);
+      trackerSubmissionQueue = gsonDeserializer.fromJson(trackerSubmissionQueueGson, listType);
     }
 
     if (!surveySubmissionQueue.isEmpty() || !trackerSubmissionQueue.isEmpty()) {
@@ -59,7 +62,7 @@ public class SubmissionHelper {
       synchronized (trackerSubmissionQueue) {
         trackerSubmissionQueue.add(submission);
         prefs.edit().putString("trackerSubmissionQueue",
-            new Gson().toJson(trackerSubmissionQueue, submissionQueueType)).commit();
+            gsonSerializer.toJson(trackerSubmissionQueue, submissionQueueType)).commit();
         savingTrackerSubmission = false;
       }
     } else if (submission.getType().equals(Submission.Type.SURVEY)) {
@@ -67,7 +70,7 @@ public class SubmissionHelper {
       synchronized (surveySubmissionQueue) {
         surveySubmissionQueue.add(submission);
         prefs.edit().putString("surveySubmissionQueue",
-            new Gson().toJson(surveySubmissionQueue, submissionQueueType)).commit();
+            gsonSerializer.toJson(surveySubmissionQueue, submissionQueueType)).commit();
         savingSurveySubmission = false;
       }
     }
@@ -108,7 +111,7 @@ public class SubmissionHelper {
             Submission submission = surveySubmissionQueue.pop();
             if (submission.submit()) {
               prefs.edit().putString("surveySubmissionQueue",
-                  new Gson().toJson(surveySubmissionQueue, submissionQueueType)).commit();
+                  gsonSerializer.toJson(surveySubmissionQueue, submissionQueueType)).commit();
             } else { // Failed. Try again
               try {
                 surveySubmissionQueue.add(submission);
@@ -124,7 +127,7 @@ public class SubmissionHelper {
             Submission submission = trackerSubmissionQueue.pop();
             if (submission.submit()) {
               prefs.edit().putString("trackerSubmissionQueue",
-                  new Gson().toJson(trackerSubmissionQueue, submissionQueueType)).commit();
+                  gsonSerializer.toJson(trackerSubmissionQueue, submissionQueueType)).commit();
             } else { // Failed. Try again
               try {
                 trackerSubmissionQueue.add(submission);
@@ -138,5 +141,19 @@ public class SubmissionHelper {
         submittingSubmission = false;
       }
     }).start();
+  }
+
+  public class UriSerializer implements JsonSerializer<Uri> {
+    public JsonElement serialize(Uri src, Type typeOfSrc, JsonSerializationContext context) {
+      return new JsonPrimitive(src.toString());
+    }
+  }
+
+  public class UriDeserializer implements JsonDeserializer<Uri> {
+    @Override
+    public Uri deserialize(final JsonElement src, final Type srcType,
+        final JsonDeserializationContext context) throws JsonParseException {
+      return Uri.parse(src.getAsString());
+    }
   }
 }

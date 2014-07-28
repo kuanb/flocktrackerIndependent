@@ -53,7 +53,8 @@ public class GoogleDriveHelper {
 
   public void startCameraIntent() {
     String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
-        Environment.DIRECTORY_PICTURES).getPath();
+        Environment.DIRECTORY_DCIM).getPath() + "/flocktracker";
+    new java.io.File(mediaStorageDir).mkdirs();
     String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
         .format(new Date());
     fileUri = Uri.fromFile(new java.io.File(mediaStorageDir
