@@ -1,7 +1,12 @@
 package org.urbanlaunchpad.flocktracker.helpers;
 
 import android.accounts.AccountManager;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -17,6 +22,9 @@ import com.google.api.services.drive.model.ParentReference;
 import org.urbanlaunchpad.flocktracker.IniconfigActivity;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -29,31 +37,26 @@ public class GoogleDriveHelper {
   public static final int REQUEST_AUTHORIZATION = 2;
   public static final int CAPTURE_IMAGE = 3;
   public static final String PHOTO_FOLDER_ID = "0BzQnDGTR4fYbQUdLeUUwcXFVOUE";
-  public static Drive service;
-  public Uri fileUri;
-  private static SurveyorActivity activity;
+  private Drive service;
+  private SurveyorActivity activity;
 
-  public GoogleDriveHelper(SurveyorActivity mainActivity) {
-    this.activity = mainActivity;
+  @Inject
+  public GoogleDriveHelper(Context context) {
+    this.activity = (SurveyorActivity) context;
     service = getDriveService(IniconfigActivity.credential);
   }
 
-  public void startCameraIntent(String jumpString) {
-    String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
-        Environment.DIRECTORY_PICTURES).getPath();
-    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
-        .format(new Date());
-    fileUri = Uri.fromFile(new java.io.File(mediaStorageDir
-        + java.io.File.separator + "IMG_" + timeStamp + ".jpg"));
-
-    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-
-    activity.startActivityForResult(cameraIntent, CAPTURE_IMAGE);
+  public void requestAccountPicker(Intent intent) {
+    String accountName = intent
+      .getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+    if (accountName != null) {
+      IniconfigActivity.credential.setSelectedAccountName(accountName);
+      service = getDriveService(IniconfigActivity.credential);
+      startCameraIntent();
+    }
   }
 
-  // If we just wish to start the intent without changing jump string
-  public static void startCameraIntent() {
+  public void startCameraIntent() {
     String mediaStorageDir = Environment.getExternalStoragePublicDirectory(
         Environment.DIRECTORY_PICTURES).getPath();
     String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
@@ -94,7 +97,7 @@ public class GoogleDriveHelper {
     return null;
   }
 
-  public void showToast(final String toast) {
+  private void showToast(final String toast) {
     activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
@@ -104,19 +107,8 @@ public class GoogleDriveHelper {
     });
   }
 
-  public Drive getDriveService(GoogleAccountCredential credential) {
+  private Drive getDriveService(GoogleAccountCredential credential) {
     return new Drive.Builder(AndroidHttp.newCompatibleTransport(),
         new GsonFactory(), credential).build();
   }
-
-  public void requestAccountPicker(Intent intent) {
-    String accountName = intent
-        .getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-    if (accountName != null) {
-      IniconfigActivity.credential.setSelectedAccountName(accountName);
-      service = getDriveService(IniconfigActivity.credential);
-      startCameraIntent();
-    }
-  }
-
 }

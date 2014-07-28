@@ -2,12 +2,40 @@ package org.urbanlaunchpad.flocktracker.helpers;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class ImageHelper {
+
+  @Nullable
+  public static Bitmap getBitmapFromUri(Uri fileUri) {
+    Bitmap imageBitmap = null;
+    try {
+      imageBitmap = BitmapFactory.decodeFile(
+        fileUri.getPath(), null);
+      float rotation = ImageHelper.rotationForImage(Uri
+        .fromFile(new java.io.File(fileUri.getPath())));
+      if (rotation != 0) {
+        Matrix matrix = new Matrix();
+        matrix.preRotate(rotation);
+        imageBitmap = Bitmap.createBitmap(imageBitmap, 0, 0,
+          imageBitmap.getWidth(), imageBitmap.getHeight(),
+          matrix, true);
+      }
+
+      imageBitmap.compress(Bitmap.CompressFormat.JPEG, 25,
+        new FileOutputStream(fileUri.getPath()));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return imageBitmap;
+  }
 
   public static int calculateInSampleSize(BitmapFactory.Options options,
       int reqWidth, int reqHeight) {
