@@ -58,17 +58,11 @@ public class ImageQuestionFragment extends QuestionFragment {
 	RelativeLayout cameraLayout = (RelativeLayout) getInflater().inflate(
 			R.layout.fragment_image_question, null);
 	
-    //ImageView cameraButton = new ImageView(getActivity());
-    // cameraButton.setImageResource(R.drawable.camera);
-    //cameraButton.setOnClickListener(cameraButtonOnClickListener);
     answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
     ImageView cameraButton = (ImageView) cameraLayout.findViewById(R.id.camera_button);
     cameraButton.setOnClickListener(cameraButtonOnClickListener);
-//    answersContainer.addView(cameraButton);
     answersContainer.addView(cameraLayout);
     thumbnailView = (ImageView) cameraLayout.findViewById(R.id.picture_thumbnail);
-//    thumbnailView.setPadding(10, 30, 10, 10);
-//    answersContainer.addView(thumbnailView);
     Uri imageUri = getQuestion().getImage();
     if (imageUri != null) {
       new ImageProcessTask().execute(imageUri);
