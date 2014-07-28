@@ -13,7 +13,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+
 import com.squareup.otto.Bus;
+
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 import org.urbanlaunchpad.flocktracker.helpers.GoogleDriveHelper;
@@ -21,6 +24,7 @@ import org.urbanlaunchpad.flocktracker.helpers.ImageHelper;
 import org.urbanlaunchpad.flocktracker.models.Question;
 
 import javax.inject.Inject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collections;
@@ -51,14 +55,20 @@ public class ImageQuestionFragment extends QuestionFragment {
   }
 
   public void setupLayout(View rootView) {
-    ImageView cameraButton = new ImageView(getActivity());
-    cameraButton.setImageResource(R.drawable.camera);
-    cameraButton.setOnClickListener(cameraButtonOnClickListener);
+	RelativeLayout cameraLayout = (RelativeLayout) getInflater().inflate(
+			R.layout.fragment_image_question, null);
+	
+    //ImageView cameraButton = new ImageView(getActivity());
+    // cameraButton.setImageResource(R.drawable.camera);
+    //cameraButton.setOnClickListener(cameraButtonOnClickListener);
     answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
-    answersContainer.addView(cameraButton);
-    thumbnailView = new ImageView(getActivity());
-    thumbnailView.setPadding(10, 30, 10, 10);
-    answersContainer.addView(thumbnailView);
+    ImageView cameraButton = (ImageView) cameraLayout.findViewById(R.id.camera_button);
+    cameraButton.setOnClickListener(cameraButtonOnClickListener);
+//    answersContainer.addView(cameraButton);
+    answersContainer.addView(cameraLayout);
+    thumbnailView = (ImageView) cameraLayout.findViewById(R.id.picture_thumbnail);
+//    thumbnailView.setPadding(10, 30, 10, 10);
+//    answersContainer.addView(thumbnailView);
     Uri imageUri = getQuestion().getImage();
     if (imageUri != null) {
       new ImageProcessTask().execute(imageUri);

@@ -87,5 +87,7 @@
 	<string name="invalid_user_project">Invalid user/project!</string> <!-- Informs that the project/user combination does not work -->
 
 	<string name="camera_button_desc">Camera button</string> <!-- Descriptor for the button on image questions to access the camera -->
+	<string name="picture_thumbnail_desc">Picture thumbnail</string> <!-- Descriptor for the thumbnail that will appear on the image questions -->
+	
 
 </resources>
