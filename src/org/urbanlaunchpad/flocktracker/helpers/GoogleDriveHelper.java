@@ -1,12 +1,8 @@
 package org.urbanlaunchpad.flocktracker.helpers;
 
 import android.accounts.AccountManager;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -22,9 +18,7 @@ import com.google.api.services.drive.model.ParentReference;
 import org.urbanlaunchpad.flocktracker.IniconfigActivity;
 import org.urbanlaunchpad.flocktracker.SurveyorActivity;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
