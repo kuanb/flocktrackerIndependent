@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Bus;
@@ -39,7 +40,8 @@ public class OrderedListQuestionFragment extends QuestionFragment implements
 	private OnClickListener skipButtonOnClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			resetAnswers();
+			orderAnswerLayout.removeAllViews();
+			resetLayout(originalAnswerList);
 			skipButton.setEnabled(false);
 			skipButton.setText(R.string.question_skipped);
 		}
@@ -50,24 +52,14 @@ public class OrderedListQuestionFragment extends QuestionFragment implements
 		super(question, questionType, eventBus);
 	}
 
-	protected void resetAnswers() {
-		orderAnswerLayout.removeAllViews();
-		setupLayout(iniRootView);
-	}
-
-	@Override
-	public void setupLayout(View rootView) {
-		iniRootView = rootView;
-		answerList = new ArrayList<String>(Arrays.asList(getQuestion()
-				.getAnswers()));
-		originalAnswerList = answerList;
-		ScrollView answerScroll = (ScrollView) rootView
+	protected void resetLayout(ArrayList<String> answerList) {	
+		ScrollView answerScroll = (ScrollView) iniRootView
 				.findViewById(R.id.answer_scroll_container);
 		answerScroll.setVisibility(View.GONE);
-		LinearLayout answersContainer = (LinearLayout) rootView
+		LinearLayout answersContainer = (LinearLayout) iniRootView
 				.findViewById(R.id.ordered_answer_layout);
 		answersContainer.setVisibility(View.VISIBLE);
-		
+
 		StableArrayAdapter adapter = new StableArrayAdapter(getActivity(),
 				R.layout.ordered_answer, answerList);
 		answerlistView = (DynamicListView) new DynamicListView(getActivity(),
@@ -101,6 +93,25 @@ public class OrderedListQuestionFragment extends QuestionFragment implements
 		// sendAnswer();
 	}
 
+	@Override
+	public void setupLayout(View rootView) {
+		iniRootView = rootView;
+		TreeSet<String> selectedAnswers = (TreeSet<String>) getQuestion()
+				.getSelectedAnswers();
+		answerList = new ArrayList<String>(Arrays.asList(getQuestion()
+				.getAnswers()));
+		originalAnswerList = answerList;
+		if (!(selectedAnswers == null)) {
+			answerList = new ArrayList<String>();
+			for (int i = 0; i < selectedAnswers.size(); ++i) {
+				answerList.add(selectedAnswers.first());
+				selectedAnswers.remove(selectedAnswers.first());
+			}
+		}
+		resetLayout(answerList);
+
+	}
+
 	// @Override
 	public void setAnswer() {
 		if (skipButton != null) {
@@ -130,20 +141,14 @@ public class OrderedListQuestionFragment extends QuestionFragment implements
 	@Override
 	public Set<String> getSelectedAnswers() {
 		TreeSet<String> selectedAnswers = new TreeSet<String>();
-		// for (int i = 0; i < answerList.size(); ++i) {
-		// for (int j = 0; j < originalAnswerList.size(); ++j) {
-		// if (originalAnswerList.get(i).equals(answerList.get(j))) {
-		// selectedAnswers.add(originalAnswerList.get(i));
-		// break;
-		// }
-		// }
-		// }
+		StableArrayAdapter adapter = (StableArrayAdapter) answerlistView.getAdapter();
 		if (!skipButton.isActivated()) {
 			return null;
 		} else {
-			for (int i = 0; i < answerList.size(); ++i) {
-				selectedAnswers.add(answerList.get(i));
-				Toast.makeText(getActivity(), answerList.get(i), Toast.LENGTH_SHORT).show();
+			for (int i = 0; i < adapter.getCount(); ++i) {
+				selectedAnswers.add(adapter.getItem(i));
+//				Toast.makeText(getActivity(), answerList.get(i),
+//						Toast.LENGTH_SHORT).show();
 			}
 			return selectedAnswers;
 		}
