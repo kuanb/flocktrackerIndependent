@@ -512,7 +512,7 @@ public class DynamicListView extends ListView {
     } else {
       touchEventsCancelled();
     }
-    swappingEnded.sendAnswer();
+    swappingEnded.setAnswer();
   }
 
   /**
@@ -576,6 +576,6 @@ public class DynamicListView extends ListView {
      * Called when the swapping is over.
      */
     // TODO call this from the OrderedList Question fragment
-    public void sendAnswer();
+    public void setAnswer();
   }
 }

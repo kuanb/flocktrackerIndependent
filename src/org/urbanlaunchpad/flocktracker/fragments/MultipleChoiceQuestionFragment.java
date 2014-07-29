@@ -37,9 +37,9 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 
   @Override
   public void setupLayout(View rootView) {
+	  
     Set<String> selectedAnswers = getQuestion().getSelectedAnswers();
     answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
-
     boolean hasOther = getQuestion().isOtherEnabled();
     String[] answers = getQuestion().getAnswers();
     int numAnswers = hasOther ? answers.length + 1 : answers.length;
