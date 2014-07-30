@@ -305,6 +305,7 @@ public class QuestionController {
     // Tracking information.
     trackingQuestions = JSONUtil.parseTrackingQuestions(context, surveyJSONObject);
     trackerQuestionPosition = 0;
+    isAskingTripQuestions = false;
   }
 
   public boolean isAskingTripQuestions() {
