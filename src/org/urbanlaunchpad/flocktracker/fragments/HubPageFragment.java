@@ -49,11 +49,11 @@ public class HubPageFragment extends Fragment {
 
   @Subscribe
   public void startTrip(QuestionController.ReachedEndOfTrackerSurveyEvent event) {
-    startTripButton.setImageResource(R.drawable.ft_grn_st1);
+    startTripButton.setImageResource(R.drawable.stop_trip);
   }
 
   public void stopTrip() {
-    startTripButton.setImageResource(R.drawable.ft_red_st);
+    startTripButton.setImageResource(R.drawable.start_trip);
   }
 
   @Override

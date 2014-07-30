@@ -26,7 +26,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:contentDescription="@string/start_trip_bus_desc"
-            android:src="@drawable/ft_red_st" />
+            android:src="@drawable/start_trip" />
     </FrameLayout>
 
     <LinearLayout
