@@ -24,6 +24,7 @@ public class Question {
   private int loopTotal; // total number of loops
   private int loopIteration; // current number of loop
   private int loopPosition; // within the loop, which question
+  private int loopQuestionCount;
 
   // Image
   private Uri image;
@@ -100,16 +101,29 @@ public class Question {
   }
 
   public void initializeLoop(int loopTotal, int loopIteration, int loopPosition) {
+    if (this.loopQuestionSelectedAnswers == null) {
+      this.loopQuestionSelectedAnswers = new Set[loopTotal];
+      for (int i = 0; i < loopTotal; i++) {
+        loopQuestionSelectedAnswers[i] = new HashSet<String>();
+      }
+    }
     this.loopTotal = loopTotal;
     this.loopIteration = loopIteration;
     this.loopPosition = loopPosition;
-    this.loopQuestionSelectedAnswers = new Set[loopTotal];
     this.inLoop = true;
   }
 
   public void updateLoopInfo(int loopIteration, int loopPosition) {
     this.loopIteration = loopIteration;
     this.loopPosition = loopPosition;
+  }
+
+  public int getLoopPosition() {
+    return loopPosition;
+  }
+
+  public int getLoopTotal() {
+    return loopTotal;
   }
 
   public int getLoopIteration() {
@@ -159,6 +173,14 @@ public class Question {
 
   public void setLoopQuestions(Question[] loopQuestions) {
     this.loopQuestions = loopQuestions;
+  }
+
+  public int getLoopQuestionCount() {
+    return loopQuestionCount;
+  }
+
+  public void setLoopQuestionCount(int loopQuestionCount) {
+    this.loopQuestionCount = loopQuestionCount;
   }
 
   public boolean isTracker() {

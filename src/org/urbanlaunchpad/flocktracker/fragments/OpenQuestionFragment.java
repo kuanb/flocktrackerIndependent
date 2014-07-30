@@ -30,14 +30,17 @@ public class OpenQuestionFragment extends QuestionFragment {
     answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
     answerView = (AnswerView) getInflater().inflate(R.layout.question_answer_open, null);
     answerView.setOnClickListener(onClickListener);
+    Question currentQuestion = getQuestion();
 
     // Pre-populate
-    Set<String> selectedAnswers = getQuestion().getSelectedAnswers();
+    Set<String> selectedAnswers = currentQuestion.isInLoop()
+        ? currentQuestion.getLoopQuestionSelectedAnswers()[currentQuestion.getLoopIteration()]
+        : currentQuestion.getSelectedAnswers();
     if (!selectedAnswers.isEmpty()) {
-      answerView.initialize(getQuestion().getType(), selectedAnswers.iterator().next(), false);
+      answerView.initialize(currentQuestion.getType(), selectedAnswers.iterator().next(), false);
       onClickListener.onClick(answerView);
     } else {
-      answerView.initialize(getQuestion().getType(), null, false);
+      answerView.initialize(currentQuestion.getType(), null, false);
     }
 
     answersContainer.addView(answerView);

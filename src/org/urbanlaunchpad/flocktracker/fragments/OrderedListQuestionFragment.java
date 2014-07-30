@@ -42,12 +42,15 @@ public class OrderedListQuestionFragment extends QuestionFragment {
   public void setupLayout(View rootView) {
     skipButton = new Button(getActivity());
     disableSkipButton();
-    Set<String> selectedAnswers = getQuestion().getSelectedAnswers();
+    Question currentQuestion = getQuestion();
+    Set<String> selectedAnswers = currentQuestion.isInLoop()
+        ? currentQuestion.getLoopQuestionSelectedAnswers()[currentQuestion.getLoopIteration()]
+        : currentQuestion.getSelectedAnswers();
     if (selectedAnswers.size() > 0) {
       answerList = new ArrayList<String>(selectedAnswers);
       enableSkipButton();
     } else {
-      answerList = Arrays.asList(getQuestion().getAnswers().clone());
+      answerList = Arrays.asList(currentQuestion.getAnswers().clone());
     }
 
     answerLayout = (LinearLayout) rootView.findViewById(R.id.answer_layout);
