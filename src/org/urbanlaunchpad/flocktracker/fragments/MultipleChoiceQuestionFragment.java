@@ -38,9 +38,7 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
   @Override
   public void setupLayout(View rootView) {
 	  Question currentQuestion = getQuestion();
-    Set<String> selectedAnswers = currentQuestion.isInLoop()
-        ? currentQuestion.getLoopQuestionSelectedAnswers()[currentQuestion.getLoopIteration()]
-        : currentQuestion.getSelectedAnswers();
+    Set<String> selectedAnswers = currentQuestion.getSelectedAnswers();
     answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
     boolean hasOther = currentQuestion.isOtherEnabled();
     String[] answers = currentQuestion.getAnswers();

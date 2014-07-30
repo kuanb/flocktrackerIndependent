@@ -294,12 +294,7 @@ public class SurveyorActivity extends Activity {
   @Subscribe
   public void onQuestionHidden(CommonEvents.QuestionHiddenEvent event) {
     Question question = event.question;
-    if (question.isInLoop()) {
-      question.getLoopQuestionSelectedAnswers()[question
-        .getLoopIteration()] = event.selectedAnswers;
-    } else {
-      event.question.setSelectedAnswers(event.selectedAnswers);
-    }
+    event.question.setSelectedAnswers(event.selectedAnswers);
   }
 
   @Subscribe

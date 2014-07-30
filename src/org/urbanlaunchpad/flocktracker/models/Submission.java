@@ -1,6 +1,7 @@
 package org.urbanlaunchpad.flocktracker.models;
 
 import android.location.Location;
+import android.net.Uri;
 import com.google.api.services.fusiontables.Fusiontables;
 import org.urbanlaunchpad.flocktracker.IniconfigActivity;
 import org.urbanlaunchpad.flocktracker.ProjectConfig;
@@ -10,6 +11,7 @@ import org.urbanlaunchpad.flocktracker.util.LocationUtil;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Set;
 
 public class Submission {
@@ -101,8 +103,21 @@ public class Submission {
         for (Question question : chapter.getQuestions()) {
           // Upload images
           if (question.getImage() != null) {
-            String fileLink = question.getImage().getPath();
-            SurveyorActivity.driveHelper.saveFileToDrive(fileLink);
+            question.setSelectedAnswers(Collections.singleton(uploadImage(question.getImage())));
+          }
+
+          // Loop questions
+          if (question.getType() == Question.QuestionType.LOOP
+              && question.getSelectedAnswers().size() > 0
+              && !((String) question.getSelectedAnswers().toArray()[0]).isEmpty()) {
+            for (int i = 0; i < question.getLoopTotal(); i++) {
+              for (Question loopQuestion : question.getLoopQuestions()) {
+                loopQuestion.updateLoopInfo(i, loopQuestion.getLoopPosition());
+                if (loopQuestion.getImage() != null) {
+                  loopQuestion.setSelectedAnswers(Collections.singleton(uploadImage(question.getImage())));
+                }
+              }
+            }
           }
         }
       }
@@ -111,6 +126,15 @@ public class Submission {
       return false;
     }
     return true;
+  }
+
+  /**
+   * Helper method to upload a single image.
+   * @throws IOException
+   */
+  private String uploadImage(Uri imageUri) throws IOException {
+      String fileLink = imageUri.getPath();
+      return SurveyorActivity.driveHelper.saveFileToDrive(fileLink);
   }
 
   /**
@@ -200,7 +224,8 @@ public class Submission {
         for (int i = 0; i < loopTotal; i++) {
           answerString.append("[");
           for (Question loopQuestion : question.getLoopQuestions()) {
-            Set<String> loopSelectedAnswers = loopQuestion.getLoopQuestionSelectedAnswers()[i];
+            question.updateLoopInfo(i, question.getLoopPosition());
+            Set<String> loopSelectedAnswers = loopQuestion.getSelectedAnswers();
             if (loopSelectedAnswers != null) {
               answerString.append(loopSelectedAnswers);
             }

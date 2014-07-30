@@ -43,9 +43,7 @@ public class OrderedListQuestionFragment extends QuestionFragment {
     skipButton = new Button(getActivity());
     disableSkipButton();
     Question currentQuestion = getQuestion();
-    Set<String> selectedAnswers = currentQuestion.isInLoop()
-        ? currentQuestion.getLoopQuestionSelectedAnswers()[currentQuestion.getLoopIteration()]
-        : currentQuestion.getSelectedAnswers();
+    Set<String> selectedAnswers = currentQuestion.getSelectedAnswers();
     if (selectedAnswers.size() > 0) {
       answerList = new ArrayList<String>(selectedAnswers);
       enableSkipButton();

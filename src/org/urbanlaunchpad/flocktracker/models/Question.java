@@ -28,6 +28,7 @@ public class Question {
 
   // Image
   private Uri image;
+  private Uri[] loopQuestionImages;
 
   // Selected Answers
   private Set<String> selectedAnswers = new HashSet<String>();
@@ -103,9 +104,13 @@ public class Question {
   public void initializeLoop(int loopTotal, int loopIteration, int loopPosition) {
     if (this.loopQuestionSelectedAnswers == null) {
       this.loopQuestionSelectedAnswers = new Set[loopTotal];
+
       for (int i = 0; i < loopTotal; i++) {
         loopQuestionSelectedAnswers[i] = new HashSet<String>();
       }
+    }
+    if (this.loopQuestionImages == null) {
+      this.loopQuestionImages = new Uri[loopTotal];
     }
     this.loopTotal = loopTotal;
     this.loopIteration = loopIteration;
@@ -130,10 +135,6 @@ public class Question {
     return loopIteration;
   }
 
-  public Set<String>[] getLoopQuestionSelectedAnswers() {
-    return loopQuestionSelectedAnswers;
-  }
-
   public Set<String> getSelectedAnswers() {
     if (inLoop) {
       return loopQuestionSelectedAnswers[loopIteration];
@@ -143,15 +144,27 @@ public class Question {
   }
 
   public void setSelectedAnswers(Set<String> selectedAnswers) {
-    this.selectedAnswers = selectedAnswers;
+    if (inLoop) {
+      loopQuestionSelectedAnswers[loopIteration] = selectedAnswers;
+    } else {
+      this.selectedAnswers = selectedAnswers;
+    }
   }
 
   public Uri getImage() {
-    return image;
+    if (inLoop) {
+      return loopQuestionImages[loopIteration];
+    } else {
+      return image;
+    }
   }
 
   public void setImage(Uri image) {
-    this.image = image;
+    if (inLoop) {
+      this.loopQuestionImages[loopIteration] = image;
+    } else {
+      this.image = image;
+    }
   }
 
   public int getQuestionNumber() {
