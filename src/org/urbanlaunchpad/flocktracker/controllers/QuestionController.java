@@ -218,12 +218,14 @@ public class QuestionController {
         } else { // Continue into next iteration.
           loopIteration++;
           loopPosition = 0;
+          getCurrentQuestion().updateLoopInfo(loopIteration, loopPosition);
           showCurrentQuestion();
           return;
         }
       } else {
         // Continue onto next question in this iteration.
         loopPosition++;
+        getCurrentQuestion().updateLoopInfo(loopIteration, loopPosition);
         showCurrentQuestion();
         return;
       }

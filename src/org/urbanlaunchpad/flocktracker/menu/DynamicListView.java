@@ -32,7 +32,7 @@ import android.widget.ListView;
 import org.urbanlaunchpad.flocktracker.adapters.StableArrayAdapter;
 import org.urbanlaunchpad.flocktracker.fragments.QuestionFragment;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The dynamic listview is an extension of listview that supports cell dragging and swapping.
@@ -78,8 +78,7 @@ public class DynamicListView extends ListView {
   private long mBelowItemId = INVALID_ID;
   private final int INVALID_POINTER_ID = -1;
   private int mActivePointerId = INVALID_POINTER_ID;
-  public ArrayList<String> mCheeseList;
-  SwappingEnded swappingEnded;
+  public List<String> mCheeseList;
   private int mLastEventY = -1;
   private int mDownY = -1;
   private int mDownX = -1;
@@ -88,30 +87,6 @@ public class DynamicListView extends ListView {
   private boolean mIsMobileScrolling = false;
   private int mSmoothScrollAmountAtEdge = 0;
   private BitmapDrawable mHoverCell;
-  /**
-   * Listens for long clicks on any items in the listview. When a cell has been selected, the hover cell is created
-   * and set up.
-   */
-  private AdapterView.OnItemLongClickListener mOnItemLongClickListener =
-      new AdapterView.OnItemLongClickListener() {
-        public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
-          mTotalOffset = 0;
-
-          int position = pointToPosition(mDownX, mDownY);
-          int itemNum = position - getFirstVisiblePosition();
-
-          View selectedView = getChildAt(itemNum);
-          mMobileItemId = getAdapter().getItemId(position);
-          mHoverCell = getAndAddHoverView(selectedView);
-          selectedView.setVisibility(INVISIBLE);
-
-          mCellIsMobile = true;
-
-          updateNeighborViewsForID(mMobileItemId);
-
-          return true;
-        }
-      };
   private Rect mHoverCellCurrentBounds;
   private Rect mHoverCellOriginalBounds;
   private boolean mIsWaitingForScrollFinish = false;
@@ -204,7 +179,6 @@ public class DynamicListView extends ListView {
   public DynamicListView(Context context, QuestionFragment fragment) {
     super(context);
     init(context);
-    swappingEnded = (SwappingEnded) fragment;
   }
 
   public DynamicListView(Context context, AttributeSet attrs, int defStyle) {
@@ -218,7 +192,6 @@ public class DynamicListView extends ListView {
   }
 
   public void init(Context context) {
-    setOnItemLongClickListener(mOnItemLongClickListener);
     setOnScrollListener(mScrollListener);
     DisplayMetrics metrics = context.getResources().getDisplayMetrics();
     mSmoothScrollAmountAtEdge = (int) (SMOOTH_SCROLL_AMOUNT_AT_EDGE / metrics.density);
@@ -338,6 +311,19 @@ public class DynamicListView extends ListView {
         mDownX = (int) event.getX();
         mDownY = (int) event.getY();
         mActivePointerId = event.getPointerId(0);
+        mTotalOffset = 0;
+
+        int position = pointToPosition(mDownX, mDownY);
+        int itemNum = position - getFirstVisiblePosition();
+
+        View selectedView = getChildAt(itemNum);
+        mMobileItemId = getAdapter().getItemId(position);
+        mHoverCell = getAndAddHoverView(selectedView);
+        selectedView.setVisibility(INVISIBLE);
+
+        mCellIsMobile = true;
+
+        updateNeighborViewsForID(mMobileItemId);
         break;
       case MotionEvent.ACTION_MOVE:
         if (mActivePointerId == INVALID_POINTER_ID) {
@@ -455,8 +441,8 @@ public class DynamicListView extends ListView {
     }
   }
 
-  private void swapElements(ArrayList arrayList, int indexOne, int indexTwo) {
-    Object temp = arrayList.get(indexOne);
+  private void swapElements(List<String> arrayList, int indexOne, int indexTwo) {
+    String temp = arrayList.get(indexOne);
     arrayList.set(indexOne, arrayList.get(indexTwo));
     arrayList.set(indexTwo, temp);
   }
@@ -512,7 +498,6 @@ public class DynamicListView extends ListView {
     } else {
       touchEventsCancelled();
     }
-    swappingEnded.setAnswer();
   }
 
   /**
@@ -566,16 +551,8 @@ public class DynamicListView extends ListView {
     return false;
   }
 
-  public void setCheeseList(ArrayList<String> cheeseList) {
+  public void setCheeseList(List<String> cheeseList) {
     mCheeseList = cheeseList;
   }
 
-  public interface SwappingEnded {
-
-    /**
-     * Called when the swapping is over.
-     */
-    // TODO call this from the OrderedList Question fragment
-    public void setAnswer();
-  }
 }

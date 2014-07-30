@@ -104,18 +104,16 @@ public class Question {
     this.loopIteration = loopIteration;
     this.loopPosition = loopPosition;
     this.loopQuestionSelectedAnswers = new Set[loopTotal];
+    this.inLoop = true;
   }
 
-  public int getLoopTotal() {
-    return loopTotal;
+  public void updateLoopInfo(int loopIteration, int loopPosition) {
+    this.loopIteration = loopIteration;
+    this.loopPosition = loopPosition;
   }
 
   public int getLoopIteration() {
     return loopIteration;
-  }
-
-  public int getLoopPosition() {
-    return loopPosition;
   }
 
   public Set<String>[] getLoopQuestionSelectedAnswers() {
@@ -123,7 +121,11 @@ public class Question {
   }
 
   public Set<String> getSelectedAnswers() {
-    return selectedAnswers;
+    if (inLoop) {
+      return loopQuestionSelectedAnswers[loopIteration];
+    } else {
+      return selectedAnswers;
+    }
   }
 
   public void setSelectedAnswers(Set<String> selectedAnswers) {
