@@ -289,6 +289,10 @@ public class QuestionController {
     chapterList = JSONUtil.parseChapters(context, surveyJSONObject);
     chapterPosition = 0;
     questionPosition = 0;
+    inLoop = false;
+    loopPosition = -1;
+    loopTotal = -1;
+    loopIteration = -1;
   }
 
   public void resetTrip() {

@@ -110,11 +110,14 @@ public class Submission {
           if (question.getType() == Question.QuestionType.LOOP
               && question.getSelectedAnswers().size() > 0
               && !((String) question.getSelectedAnswers().toArray()[0]).isEmpty()) {
-            for (int i = 0; i < question.getLoopTotal(); i++) {
-              for (Question loopQuestion : question.getLoopQuestions()) {
+            for (Question loopQuestion : question.getLoopQuestions()) {
+              if (loopQuestion.getType() != Question.QuestionType.IMAGE) {
+                continue;
+              }
+              for (int i = 0; i < loopQuestion.getLoopTotal(); i++) {
                 loopQuestion.updateLoopInfo(i, loopQuestion.getLoopPosition());
                 if (loopQuestion.getImage() != null) {
-                  loopQuestion.setSelectedAnswers(Collections.singleton(uploadImage(question.getImage())));
+                  loopQuestion.setSelectedAnswers(Collections.singleton(uploadImage(loopQuestion.getImage())));
                 }
               }
             }
@@ -217,7 +220,10 @@ public class Submission {
       }
 
       // Loop through and add all the loop question answers in to this question.
-      if (question.getType() == Question.QuestionType.LOOP) {
+      // Loop questions
+      if (question.getType() == Question.QuestionType.LOOP
+          && question.getSelectedAnswers().size() > 0
+          && !((String) question.getSelectedAnswers().toArray()[0]).isEmpty()) {
         int loopTotal = Integer.parseInt(selectedAnswer);
 
         answerString.append(" [");
