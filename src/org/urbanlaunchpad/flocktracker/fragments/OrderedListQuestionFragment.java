@@ -2,155 +2,113 @@ package org.urbanlaunchpad.flocktracker.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar.LayoutParams;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.squareup.otto.Bus;
-
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.adapters.StableArrayAdapter;
 import org.urbanlaunchpad.flocktracker.menu.DynamicListView;
 import org.urbanlaunchpad.flocktracker.models.Question;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.xml.datatype.Duration;
+import java.util.*;
 
 @SuppressLint("ValidFragment")
-public class OrderedListQuestionFragment extends QuestionFragment implements
-		DynamicListView.SwappingEnded {
+public class OrderedListQuestionFragment extends QuestionFragment {
 
-	ArrayList<String> answerList = null;
-	ArrayList<String> originalAnswerList = null;
-	Button skipButton;
-	DynamicListView answerlistView = null;
-	ArrayList<Integer> selectedAnswersArrayList = null;
-	LinearLayout orderAnswerLayout;
-	View iniRootView;
+  private List<String> answerList;
+  private DynamicListView answerListView;
+  private LinearLayout answerLayout;
+  private Button skipButton;
 
-	private OnClickListener skipButtonOnClickListener = new OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			orderAnswerLayout.removeAllViews();
-			resetLayout(originalAnswerList);
-			skipButton.setEnabled(false);
-			skipButton.setText(R.string.question_skipped);
-		}
-	};
+  private OnClickListener skipButtonOnClickListener = new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      resetLayout(Arrays.asList(getQuestion().getAnswers().clone()));
+      disableSkipButton();
+    }
+  };
 
-	public OrderedListQuestionFragment(Question question,
-			QuestionType questionType, Bus eventBus) {
-		super(question, questionType, eventBus);
-	}
+  public OrderedListQuestionFragment(Question question,
+      QuestionType questionType, Bus eventBus) {
+    super(question, questionType, eventBus);
+  }
 
-	protected void resetLayout(ArrayList<String> answerList) {	
-		ScrollView answerScroll = (ScrollView) iniRootView
-				.findViewById(R.id.answer_scroll_container);
-		answerScroll.setVisibility(View.GONE);
-		LinearLayout answersContainer = (LinearLayout) iniRootView
-				.findViewById(R.id.ordered_answer_layout);
-		answersContainer.setVisibility(View.VISIBLE);
+  @Override
+  public void setupLayout(View rootView) {
+    skipButton = new Button(getActivity());
+    disableSkipButton();
+    Question currentQuestion = getQuestion();
+    Set<String> selectedAnswers = currentQuestion.isInLoop()
+        ? currentQuestion.getLoopQuestionSelectedAnswers()[currentQuestion.getLoopIteration()]
+        : currentQuestion.getSelectedAnswers();
+    if (selectedAnswers.size() > 0) {
+      answerList = new ArrayList<String>(selectedAnswers);
+      enableSkipButton();
+    } else {
+      answerList = Arrays.asList(currentQuestion.getAnswers().clone());
+    }
 
-		StableArrayAdapter adapter = new StableArrayAdapter(getActivity(),
-				R.layout.ordered_answer, answerList);
-		answerlistView = (DynamicListView) new DynamicListView(getActivity(),
-				this);
-		answerlistView.setCheeseList(answerList);
-		answerlistView.setAdapter(adapter);
-		answerlistView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+    answerLayout = (LinearLayout) rootView.findViewById(R.id.answer_layout);
+    answerLayout.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
+    answerLayout.setWeightSum(6f);
 
-		skipButton = (Button) new Button(getActivity());
-		skipButton.setEnabled(false);
-		skipButton.setText(R.string.question_skipped);
+    answerListView = new DynamicListView(getActivity(), this);
+    answerListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+    answerListView.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View view, MotionEvent motionEvent) {
+        enableSkipButton();
+        return false;
+      }
+    });
 
-		orderAnswerLayout = new LinearLayout(getActivity());
-		orderAnswerLayout.setOrientation(LinearLayout.VERTICAL);
-		orderAnswerLayout.setWeightSum(6f);
-		LinearLayout.LayoutParams lParams1 = (LinearLayout.LayoutParams) new LinearLayout.LayoutParams(
-				LayoutParams.MATCH_PARENT, 0);
-		LinearLayout.LayoutParams lParams2 = (LinearLayout.LayoutParams) new LinearLayout.LayoutParams(
-				LayoutParams.MATCH_PARENT, 0);
-		lParams1.weight = 5f;
-		lParams2.weight = 1f;
+    LinearLayout.LayoutParams lParams1 = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
+    LinearLayout.LayoutParams lParams2 = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
+    lParams1.weight = 5f;
+    lParams2.weight = 1f;
 
-		orderAnswerLayout.addView(answerlistView);
-		orderAnswerLayout.addView(skipButton);
-		answerlistView.setLayoutParams(lParams1);
-		skipButton.setLayoutParams(lParams2);
-		skipButton.setOnClickListener(skipButtonOnClickListener);
+    answerLayout.addView(answerListView);
+    answerLayout.addView(skipButton);
+    answerListView.setLayoutParams(lParams1);
+    skipButton.setLayoutParams(lParams2);
+    skipButton.setOnClickListener(skipButtonOnClickListener);
 
-		answersContainer.addView(orderAnswerLayout);
+    resetLayout(answerList);
+  }
 
-		// sendAnswer();
-	}
+  private void resetLayout(List<String> answerList) {
+    StableArrayAdapter adapter = new StableArrayAdapter(getActivity(),
+        R.layout.ordered_answer, answerList);
+    answerListView.setCheeseList(answerList);
+    answerListView.setAdapter(adapter);
+    answerListView.invalidateViews();
+  }
 
-	@Override
-	public void setupLayout(View rootView) {
-		iniRootView = rootView;
-		TreeSet<String> selectedAnswers = (TreeSet<String>) getQuestion()
-				.getSelectedAnswers();
-		answerList = new ArrayList<String>(Arrays.asList(getQuestion()
-				.getAnswers()));
-		originalAnswerList = answerList;
-		if (!(selectedAnswers == null)) {
-			answerList = new ArrayList<String>();
-			for (int i = 0; i < selectedAnswers.size(); ++i) {
-				answerList.add(selectedAnswers.first());
-				selectedAnswers.remove(selectedAnswers.first());
-			}
-		}
-		resetLayout(answerList);
+  private void enableSkipButton() {
+    skipButton.setEnabled(true);
+    skipButton.setText(R.string.skip_question);
+  }
 
-	}
+  private void disableSkipButton() {
+    skipButton.setEnabled(false);
+    skipButton.setText(R.string.question_skipped);
+  }
 
-	// @Override
-	public void setAnswer() {
-		if (skipButton != null) {
-			skipButton.setEnabled(true);
-			skipButton.setText(R.string.skip_question);
-		}
-	}
-
-	// private String getOrderedAnswers() {
-	// String answer = null;
-	// StableArrayAdapter List = (StableArrayAdapter) answerlistView
-	// .getAdapter();
-	// for (int i = 0; i < answerList.size(); ++i) {
-	// if (i == 0) {
-	// answer = "(";
-	// } else {
-	// answer = answer + ",";
-	// }
-	// answer = answer + List.getItem(i);
-	// if (i == (answerList.size() - 1)) {
-	// answer = answer + ")";
-	// }
-	// }
-	// return answer;
-	// }
-
-	@Override
-	public Set<String> getSelectedAnswers() {
-		TreeSet<String> selectedAnswers = new TreeSet<String>();
-		StableArrayAdapter adapter = (StableArrayAdapter) answerlistView.getAdapter();
-		if (!skipButton.isActivated()) {
-			return null;
-		} else {
-			for (int i = 0; i < adapter.getCount(); ++i) {
-				selectedAnswers.add(adapter.getItem(i));
-//				Toast.makeText(getActivity(), answerList.get(i),
-//						Toast.LENGTH_SHORT).show();
-			}
-			return selectedAnswers;
-		}
-	}
+  @Override
+  public Set<String> getSelectedAnswers() {
+    if (skipButton.isEnabled()) {
+      LinkedHashSet<String> selectedAnswers = new LinkedHashSet<String>();
+      StableArrayAdapter adapter = (StableArrayAdapter) answerListView.getAdapter();
+      for (int i = 0; i < adapter.getCount(); ++i) {
+        selectedAnswers.add(adapter.getItem(i));
+      }
+      return selectedAnswers;
+    }
+    return new LinkedHashSet<String>();
+  }
 }

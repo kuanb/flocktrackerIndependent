@@ -105,6 +105,7 @@ public class JSONUtil {
       Question[] loopQuestions = new Question[jsonLoopQuestions.length()];
       for (int k = 0; k < loopQuestions.length; k++) {
         loopQuestions[k] = parseQuestion(jsonLoopQuestions.getJSONObject(k));
+        loopQuestions[k].setLoopQuestionCount(loopQuestions.length);
       }
       question.setLoopQuestions(loopQuestions);
     }

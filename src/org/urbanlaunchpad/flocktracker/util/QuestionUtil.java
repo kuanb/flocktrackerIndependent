@@ -57,15 +57,15 @@ public class QuestionUtil {
   public static QuestionFragment.QuestionType getQuestionPositionType(Question question, int numChapters) {
     int questionPosition = question.getQuestionNumber();
     if (question.isTracker()) {
-      if (questionPosition == 0) {
+      if (!question.isInLoop() && questionPosition == 0) {
         return QuestionFragment.QuestionType.TRIP_FIRST;
       } else {
         return QuestionFragment.QuestionType.TRIP_NORMAL;
       }
     } else {
       int chapterQuestionCount = question.getChapterQuestionCount();
-      int chapterPosition = question.getChapterNumber();
-      if (questionPosition == 0 && chapterPosition == 0) {
+      int chapterPosition = question.isInLoop() ? question.getLoopIteration() : question.getChapterNumber();
+      if (!question.isInLoop() && questionPosition == 0 && chapterPosition == 0) {
         return QuestionFragment.QuestionType.FIRST;
       } else if (questionPosition == chapterQuestionCount - 1 && chapterPosition == numChapters - 1) {
         return QuestionFragment.QuestionType.LAST;

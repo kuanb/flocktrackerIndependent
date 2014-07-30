@@ -111,9 +111,6 @@ public class QuestionController {
             QuestionUtil.getQuestionPositionType(currentQuestion, chapterList.length), eventBus);
         break;
       case LOOP:
-        if (currentQuestion.getSelectedAnswers().size() > 0) {
-          startLoop();
-        }
       case OPEN_NUMBER:
       case OPEN_TEXT:
         currentQuestionFragment = new OpenQuestionFragment(currentQuestion,
@@ -157,7 +154,6 @@ public class QuestionController {
         currentQuestion = getCurrentChapter().getQuestions()[questionPosition];
       }
     }
-
     return currentQuestion;
   }
 
@@ -172,8 +168,11 @@ public class QuestionController {
         // First loop question. Switch out of loop.
         if (loopIteration == 0) {
           inLoop = false;
+          showCurrentQuestion();
+          return;
         } else { // Go back an iteration.
           loopIteration--;
+          loopPosition = numLoopQuestions - 1;
           showCurrentQuestion();
           return;
         }
@@ -202,9 +201,11 @@ public class QuestionController {
   public void switchToNextQuestion() {
     Question currentQuestion = getCurrentQuestion();
 
-    // If this is the question that has looped questions, initialize the loop.
     if (!inLoop && currentQuestion.getType() == QuestionType.LOOP
-        && currentQuestionFragment.getSelectedAnswers().size() > 0) {
+        && currentQuestionFragment.getSelectedAnswers().size() > 0
+        && !((String) currentQuestionFragment.getSelectedAnswers().toArray()[0]).isEmpty()) {
+      // If this is the question that has looped questions, initialize the loop.
+      // Else go to next normal question.
       startLoop();
       showCurrentQuestion();
       return;
@@ -218,12 +219,14 @@ public class QuestionController {
         } else { // Continue into next iteration.
           loopIteration++;
           loopPosition = 0;
+          getCurrentQuestion().updateLoopInfo(loopIteration, loopPosition);
           showCurrentQuestion();
           return;
         }
       } else {
         // Continue onto next question in this iteration.
         loopPosition++;
+        getCurrentQuestion().updateLoopInfo(loopIteration, loopPosition);
         showCurrentQuestion();
         return;
       }

@@ -37,11 +37,13 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 
   @Override
   public void setupLayout(View rootView) {
-	  
-    Set<String> selectedAnswers = getQuestion().getSelectedAnswers();
+	  Question currentQuestion = getQuestion();
+    Set<String> selectedAnswers = currentQuestion.isInLoop()
+        ? currentQuestion.getLoopQuestionSelectedAnswers()[currentQuestion.getLoopIteration()]
+        : currentQuestion.getSelectedAnswers();
     answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
-    boolean hasOther = getQuestion().isOtherEnabled();
-    String[] answers = getQuestion().getAnswers();
+    boolean hasOther = currentQuestion.isOtherEnabled();
+    String[] answers = currentQuestion.getAnswers();
     int numAnswers = hasOther ? answers.length + 1 : answers.length;
     answersLayout = new AnswerView[numAnswers];
 
@@ -49,7 +51,7 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
     for (int i = 0; i < answers.length; i++) {
       answersLayout[i] = (AnswerView) getInflater().inflate(
           R.layout.question_answer_mc, null);
-      answersLayout[i].initialize(getQuestion().getType(), answers[i], false);
+      answersLayout[i].initialize(currentQuestion.getType(), answers[i], false);
       answersLayout[i].setOnClickListener(onClickListener);
       answersLayout[i].setId(i);
       if (selectedAnswers != null && selectedAnswers.contains(answers[i])) {
@@ -63,11 +65,11 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
           R.layout.question_answer_mc, null);
       answersLayout[numAnswers - 1].setId(numAnswers - 1);
       if (selectedAnswerIndex == -1 && selectedAnswers != null && !selectedAnswers.isEmpty()) {
-        answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
+        answersLayout[numAnswers - 1].initialize(currentQuestion.getType(),
             selectedAnswers.iterator().next(), true);
         onClickListener.onClick(answersLayout[numAnswers - 1]);
       } else {
-        answersLayout[numAnswers - 1].initialize(getQuestion().getType(),
+        answersLayout[numAnswers - 1].initialize(currentQuestion.getType(),
             null, true);
       }
       answersLayout[numAnswers - 1].setOnClickListener(onClickListener);
