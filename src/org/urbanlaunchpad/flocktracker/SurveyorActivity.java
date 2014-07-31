@@ -156,6 +156,7 @@ public class SurveyorActivity extends Activity {
   }
 
   private void showHubPage() {
+    questionController.resetLoop();
     if (questionController.isAskingTripQuestions()) {
       questionController.resetTrip();
     }
@@ -299,6 +300,7 @@ public class SurveyorActivity extends Activity {
 
   @Subscribe
   public void onChapterRequested(DrawerView.SelectChapterEvent event) {
+    questionController.resetLoop();
     if (questionController.isAskingTripQuestions()) {
       questionController.resetTrip();
     }

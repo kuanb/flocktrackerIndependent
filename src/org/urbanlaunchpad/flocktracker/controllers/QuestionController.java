@@ -274,6 +274,13 @@ public class QuestionController {
     return chapterTitles;
   }
 
+  public void resetLoop() {
+    inLoop = false;
+    loopPosition = -1;
+    loopTotal = -1;
+    loopIteration = -1;
+  }
+
   private void resetSurvey() {
     JSONObject surveyJSONObject = null;
 
@@ -289,10 +296,7 @@ public class QuestionController {
     chapterList = JSONUtil.parseChapters(context, surveyJSONObject);
     chapterPosition = 0;
     questionPosition = 0;
-    inLoop = false;
-    loopPosition = -1;
-    loopTotal = -1;
-    loopIteration = -1;
+    resetLoop();
   }
 
   public void resetTrip() {
