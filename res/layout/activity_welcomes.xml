@@ -17,7 +17,7 @@
         android:scaleType="centerCrop"
         android:src="@drawable/welcome_logo" />
 
-    <LinearLayout
+<!--     <LinearLayout
         style="@style/No_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -98,6 +98,6 @@
                     android:src="@drawable/urban_launchpad_mx" />
             </FrameLayout>
         </LinearLayout>
-    </LinearLayout>
+    </LinearLayout> -->
 
 </RelativeLayout>

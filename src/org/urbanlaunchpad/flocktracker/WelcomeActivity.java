@@ -2,18 +2,15 @@ package org.urbanlaunchpad.flocktracker;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class WelcomeActivity extends Activity implements OnClickListener {
+public class WelcomeActivity extends Activity {
 
   // private long splashDelay = 1000; // 1 second for debugging.
   private long splashDelay = 3000; // 3 seconds.
@@ -30,10 +27,10 @@ public class WelcomeActivity extends Activity implements OnClickListener {
 
     setContentView(R.layout.activity_welcomes);
 
-    findViewById(R.id.mobility_futures_colaborative_button)
-        .setOnClickListener(this);
-    findViewById(R.id.mit_button).setOnClickListener(this);
-    findViewById(R.id.urban_launchpad_button).setOnClickListener(this);
+//    findViewById(R.id.mobility_futures_colaborative_button)
+//        .setOnClickListener(this);
+//    findViewById(R.id.mit_button).setOnClickListener(this);
+//    findViewById(R.id.urban_launchpad_button).setOnClickListener(this);
 
   }
 
@@ -63,23 +60,23 @@ public class WelcomeActivity extends Activity implements OnClickListener {
     return true;
   }
 
-  @Override
-  public void onClick(View v) {
-    Integer ID = v.getId();
-    Intent intent = new Intent();
-    intent.setAction(Intent.ACTION_VIEW);
-    intent.addCategory(Intent.CATEGORY_BROWSABLE);
-    if (ID == R.id.mobility_futures_colaborative_button) {
-      intent.setData(Uri
-          .parse("http://dusp.mit.edu/transportation/project/mobility-futures-collaborative"));
-      startActivity(intent);
-    } else if (ID == R.id.mit_button) {
-      intent.setData(Uri.parse("http://web.mit.edu/"));
-      startActivity(intent);
-    } else if (ID == R.id.urban_launchpad_button) {
-      intent.setData(Uri.parse("http://www.urbanlaunchpad.org/"));
-      startActivity(intent);
-    }
-  }
+//  @Override
+//  public void onClick(View v) {
+//    Integer ID = v.getId();
+//    Intent intent = new Intent();
+//    intent.setAction(Intent.ACTION_VIEW);
+//    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+//    if (ID == R.id.mobility_futures_colaborative_button) {
+//      intent.setData(Uri
+//          .parse("http://dusp.mit.edu/transportation/project/mobility-futures-collaborative"));
+//      startActivity(intent);
+//    } else if (ID == R.id.mit_button) {
+//      intent.setData(Uri.parse("http://web.mit.edu/"));
+//      startActivity(intent);
+//    } else if (ID == R.id.urban_launchpad_button) {
+//      intent.setData(Uri.parse("http://www.urbanlaunchpad.org/"));
+//      startActivity(intent);
+//    }
+//  }
 
 }
