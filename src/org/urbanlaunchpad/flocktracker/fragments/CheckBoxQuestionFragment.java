@@ -39,9 +39,7 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
   public void setupLayout(View rootView) {
     answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
     Question currentQuestion = getQuestion();
-    Set<String> selectedAnswers = currentQuestion.isInLoop()
-        ? currentQuestion.getLoopQuestionSelectedAnswers()[currentQuestion.getLoopIteration()]
-        : currentQuestion.getSelectedAnswers();
+    Set<String> selectedAnswers = currentQuestion.getSelectedAnswers();
     selectedAnswers = (Set<String>) ((HashSet<String>) selectedAnswers).clone();
 
     boolean hasOther = currentQuestion.isOtherEnabled();

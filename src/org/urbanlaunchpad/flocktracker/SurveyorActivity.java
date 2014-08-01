@@ -156,6 +156,7 @@ public class SurveyorActivity extends Activity {
   }
 
   private void showHubPage() {
+    questionController.resetLoop();
     if (questionController.isAskingTripQuestions()) {
       questionController.resetTrip();
     }
@@ -294,16 +295,12 @@ public class SurveyorActivity extends Activity {
   @Subscribe
   public void onQuestionHidden(CommonEvents.QuestionHiddenEvent event) {
     Question question = event.question;
-    if (question.isInLoop()) {
-      question.getLoopQuestionSelectedAnswers()[question
-        .getLoopIteration()] = event.selectedAnswers;
-    } else {
-      event.question.setSelectedAnswers(event.selectedAnswers);
-    }
+    event.question.setSelectedAnswers(event.selectedAnswers);
   }
 
   @Subscribe
   public void onChapterRequested(DrawerView.SelectChapterEvent event) {
+    questionController.resetLoop();
     if (questionController.isAskingTripQuestions()) {
       questionController.resetTrip();
     }

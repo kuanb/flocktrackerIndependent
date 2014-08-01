@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 @SuppressLint("ValidFragment")
@@ -73,13 +74,7 @@ public class ImageQuestionFragment extends QuestionFragment {
 
   @Override
   public Set<String> getSelectedAnswers() {
-    Uri answerURI = getQuestion().getImage();
-    if (!(answerURI == null)) {
-      Set<String> answer = Collections.singleton(answerURI.toString());
-      return answer;
-    } else {
-      return Collections.singleton("");
-    }
+    return new HashSet<String>();
   }
 
   @Override

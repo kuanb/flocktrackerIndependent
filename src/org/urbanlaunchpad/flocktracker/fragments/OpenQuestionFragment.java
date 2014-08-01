@@ -33,9 +33,7 @@ public class OpenQuestionFragment extends QuestionFragment {
     Question currentQuestion = getQuestion();
 
     // Pre-populate
-    Set<String> selectedAnswers = currentQuestion.isInLoop()
-        ? currentQuestion.getLoopQuestionSelectedAnswers()[currentQuestion.getLoopIteration()]
-        : currentQuestion.getSelectedAnswers();
+    Set<String> selectedAnswers = currentQuestion.getSelectedAnswers();
     if (!selectedAnswers.isEmpty()) {
       answerView.initialize(currentQuestion.getType(), selectedAnswers.iterator().next(), false);
       onClickListener.onClick(answerView);

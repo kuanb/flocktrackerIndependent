@@ -308,6 +308,9 @@ public class DynamicListView extends ListView {
 
     switch (event.getAction() & MotionEvent.ACTION_MASK) {
       case MotionEvent.ACTION_DOWN:
+        if (mHoverCell != null) {
+          return true;
+        }
         mDownX = (int) event.getX();
         mDownY = (int) event.getY();
         mActivePointerId = event.getPointerId(0);
