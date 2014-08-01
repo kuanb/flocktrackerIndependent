@@ -4,7 +4,8 @@
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
     android:layout_marginTop="30dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/question_layout" >
 
     <TextView
         android:id="@+id/loop_elements"
@@ -13,14 +14,14 @@
         android:padding="15dp"
         android:textColor="@color/text_color_light"
         android:textSize="17sp"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/question_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="15dp"
         android:fontFamily="sans-serif"
+        android:padding="15dp"
         android:textColor="@color/text_color_light"
         android:textSize="22sp" />
 
@@ -43,5 +44,16 @@
         </LinearLayout>
     </ScrollView>
 
+    <LinearLayout
+        android:id="@+id/answer_linear_container"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:orientation="vertical" >
+    </LinearLayout>
+
     <include layout="@layout/question_nav_buttons" />
+
 </LinearLayout>

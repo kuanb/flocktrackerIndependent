@@ -57,8 +57,10 @@ public class ImageQuestionFragment extends QuestionFragment {
   public void setupLayout(View rootView) {
 	RelativeLayout cameraLayout = (RelativeLayout) getInflater().inflate(
 			R.layout.fragment_image_question, null);
-	
-    answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_layout);
+	LinearLayout questionView = (LinearLayout) rootView.findViewById(R.id.question_layout);
+	questionView.removeView(rootView.findViewById(R.id.answer_scroll_container));
+    answersContainer = (LinearLayout) rootView.findViewById(R.id.answer_linear_container);
+    answersContainer.setVisibility(View.VISIBLE);
     ImageView cameraButton = (ImageView) cameraLayout.findViewById(R.id.camera_button);
     cameraButton.setOnClickListener(cameraButtonOnClickListener);
     answersContainer.addView(cameraLayout);
