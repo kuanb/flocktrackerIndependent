@@ -58,7 +58,8 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 					answers[i].getAnswerText(), false);
 			answersLayout[i].setOnClickListener(onClickListener);
 			answersLayout[i].setId(i);
-			if (selectedAnswers != null && selectedAnswers.contains(answers[i])) {
+			if (selectedAnswers != null
+					&& selectedAnswers.contains(answers[i].getAnswerText())) {
 				onClickListener.onClick(answersLayout[i]);
 			}
 			answersContainer.addView(answersLayout[i]);
