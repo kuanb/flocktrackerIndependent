@@ -6,203 +6,214 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Question {
-  private QuestionType type;
-  private boolean isTracker;
+	private QuestionType type;
+	private boolean isTracker;
 
-  private int chapterNumber;
-  private int chapterQuestionCount;
-  private Question[] loopQuestions;
+	private int chapterNumber;
+	private int chapterQuestionCount;
+	private Question[] loopQuestions;
 
-  private int questionNumber;
-  private String questionText;
-  private String[] answers;
-  private String questionID;
-  private boolean otherEnabled;
+	private int questionNumber;
+	private String questionText;
+	private String[] answers;
+	private String questionID;
+	private boolean otherEnabled;
 
-  // Loop related variables
-  private boolean inLoop;
-  private int loopTotal; // total number of loops
-  private int loopIteration; // current number of loop
-  private int loopPosition; // within the loop, which question
-  private int loopQuestionCount;
+	// Loop related variables
+	private boolean inLoop;
+	private int loopTotal; // total number of loops
+	private int loopIteration; // current number of loop
+	private int loopPosition; // within the loop, which question
+	private int loopQuestionCount;
 
-  // Image
-  private Uri image;
-  private Uri[] loopQuestionImages;
+	// Image
+	private Uri image;
+	private Uri[] loopQuestionImages;
 
-  // Selected Answers
-  private Set<String> selectedAnswers = new HashSet<String>();
-  private Set<String>[] loopQuestionSelectedAnswers;
+	// Selected Answers
+	private Set<String> selectedAnswers = new HashSet<String>();
+	private Set<String>[] loopQuestionSelectedAnswers;
 
-  public QuestionType getType() {
-    return type;
-  }
+	public QuestionType getType() {
+		return type;
+	}
 
-  public void setType(QuestionType type) {
-    this.type = type;
-  }
+	public void setType(QuestionType type) {
+		this.type = type;
+	}
 
-  public int getChapterNumber() {
-    return chapterNumber;
-  }
+	public int getChapterNumber() {
+		return chapterNumber;
+	}
 
-  public int getChapterQuestionCount() {
-    return chapterQuestionCount;
-  }
+	public int getChapterQuestionCount() {
+		return chapterQuestionCount;
+	}
 
-  public void setChapterInfo(int chapterNumber, int chapterQuestionCount) {
-    this.chapterNumber = chapterNumber;
-    this.chapterQuestionCount = chapterQuestionCount;
+	public void setChapterInfo(int chapterNumber, int chapterQuestionCount) {
+		this.chapterNumber = chapterNumber;
+		this.chapterQuestionCount = chapterQuestionCount;
 
-    if (loopQuestions != null) {
-      for (Question template : loopQuestions) {
-        template.setChapterInfo(chapterNumber, chapterQuestionCount);
-      }
-    }
-  }
+		if (loopQuestions != null) {
+			for (Question template : loopQuestions) {
+				template.setChapterInfo(chapterNumber, chapterQuestionCount);
+			}
+		}
+	}
 
-  public String getQuestionText() {
-    return questionText;
-  }
+	public String getQuestionText() {
+		return questionText;
+	}
 
-  public void setQuestionText(String questionText) {
-    this.questionText = questionText;
-  }
+	public void setQuestionText(String questionText) {
+		this.questionText = questionText;
+	}
 
-  public String[] getAnswers() {
-    return answers;
-  }
+	public String[] getAnswers() {
+		return answers;
+	}
 
-  public void setAnswers(String[] answers) {
-    this.answers = answers;
-  }
+	public void setAnswers(String[] answers) {
+		this.answers = answers;
+	}
 
-  public String getQuestionID() {
-    return questionID;
-  }
+	public String getJumpID() {
+		return jumpID;
+	}
 
-  public void setQuestionID(String questionID) {
-    this.questionID = questionID;
-  }
+	public void setjumpID(String jumpID) {
+		this.answerText = jumpID;
+	}
 
-  public boolean isOtherEnabled() {
-    return otherEnabled;
-  }
+	public String getQuestionID() {
+		return questionID;
+	}
 
-  public void setOtherEnabled(boolean otherEnabled) {
-    this.otherEnabled = otherEnabled;
-  }
+	public void setQuestionID(String questionID) {
+		this.questionID = questionID;
+	}
 
-  public boolean isInLoop() {
-    return inLoop;
-  }
+	public boolean isOtherEnabled() {
+		return otherEnabled;
+	}
 
-  public void setInLoop(boolean inLoop) {
-    this.inLoop = inLoop;
-  }
+	public void setOtherEnabled(boolean otherEnabled) {
+		this.otherEnabled = otherEnabled;
+	}
 
-  public void initializeLoop(int loopTotal, int loopIteration, int loopPosition) {
-    if (this.loopQuestionSelectedAnswers == null) {
-      this.loopQuestionSelectedAnswers = new Set[loopTotal];
+	public boolean isInLoop() {
+		return inLoop;
+	}
 
-      for (int i = 0; i < loopTotal; i++) {
-        loopQuestionSelectedAnswers[i] = new HashSet<String>();
-      }
-    }
-    if (this.loopQuestionImages == null) {
-      this.loopQuestionImages = new Uri[loopTotal];
-    }
-    this.loopTotal = loopTotal;
-    this.loopIteration = loopIteration;
-    this.loopPosition = loopPosition;
-    this.inLoop = true;
-  }
+	public void setInLoop(boolean inLoop) {
+		this.inLoop = inLoop;
+	}
 
-  public void updateLoopInfo(int loopIteration, int loopPosition) {
-    this.loopIteration = loopIteration;
-    this.loopPosition = loopPosition;
-  }
+	public void initializeLoop(int loopTotal, int loopIteration,
+			int loopPosition) {
+		if (this.loopQuestionSelectedAnswers == null) {
+			this.loopQuestionSelectedAnswers = new Set[loopTotal];
 
-  public int getLoopPosition() {
-    return loopPosition;
-  }
+			for (int i = 0; i < loopTotal; i++) {
+				loopQuestionSelectedAnswers[i] = new HashSet<String>();
+			}
+		}
+		if (this.loopQuestionImages == null) {
+			this.loopQuestionImages = new Uri[loopTotal];
+		}
+		this.loopTotal = loopTotal;
+		this.loopIteration = loopIteration;
+		this.loopPosition = loopPosition;
+		this.inLoop = true;
+	}
 
-  public int getLoopTotal() {
-    return loopTotal;
-  }
+	public void updateLoopInfo(int loopIteration, int loopPosition) {
+		this.loopIteration = loopIteration;
+		this.loopPosition = loopPosition;
+	}
 
-  public int getLoopIteration() {
-    return loopIteration;
-  }
+	public int getLoopPosition() {
+		return loopPosition;
+	}
 
-  public Set<String> getSelectedAnswers() {
-    if (inLoop) {
-      return loopQuestionSelectedAnswers[loopIteration];
-    } else {
-      return selectedAnswers;
-    }
-  }
+	public int getLoopTotal() {
+		return loopTotal;
+	}
 
-  public void setSelectedAnswers(Set<String> selectedAnswers) {
-    if (inLoop) {
-      loopQuestionSelectedAnswers[loopIteration] = selectedAnswers;
-    } else {
-      this.selectedAnswers = selectedAnswers;
-    }
-  }
+	public int getLoopIteration() {
+		return loopIteration;
+	}
 
-  public Uri getImage() {
-    if (inLoop) {
-      return loopQuestionImages[loopIteration];
-    } else {
-      return image;
-    }
-  }
+	public Set<String> getSelectedAnswers() {
+		if (inLoop) {
+			return loopQuestionSelectedAnswers[loopIteration];
+		} else {
+			return selectedAnswers;
+		}
+	}
 
-  public void setImage(Uri image) {
-    if (inLoop) {
-      this.loopQuestionImages[loopIteration] = image;
-    } else {
-      this.image = image;
-    }
-  }
+	public void setSelectedAnswers(Set<String> selectedAnswers) {
+		if (inLoop) {
+			loopQuestionSelectedAnswers[loopIteration] = selectedAnswers;
+		} else {
+			this.selectedAnswers = selectedAnswers;
+		}
+	}
 
-  public int getQuestionNumber() {
-    return questionNumber;
-  }
+	public Uri getImage() {
+		if (inLoop) {
+			return loopQuestionImages[loopIteration];
+		} else {
+			return image;
+		}
+	}
 
-  public void setQuestionNumber(int questionNumber) {
-    this.questionNumber = questionNumber;
-    if (loopQuestions != null) {
-      for (Question template : loopQuestions) {
-        template.setQuestionNumber(questionNumber);
-      }
-    }
-  }
+	public void setImage(Uri image) {
+		if (inLoop) {
+			this.loopQuestionImages[loopIteration] = image;
+		} else {
+			this.image = image;
+		}
+	}
 
-  public Question[] getLoopQuestions() {
-    return loopQuestions;
-  }
+	public int getQuestionNumber() {
+		return questionNumber;
+	}
 
-  public void setLoopQuestions(Question[] loopQuestions) {
-    this.loopQuestions = loopQuestions;
-  }
+	public void setQuestionNumber(int questionNumber) {
+		this.questionNumber = questionNumber;
+		if (loopQuestions != null) {
+			for (Question template : loopQuestions) {
+				template.setQuestionNumber(questionNumber);
+			}
+		}
+	}
 
-  public int getLoopQuestionCount() {
-    return loopQuestionCount;
-  }
+	public Question[] getLoopQuestions() {
+		return loopQuestions;
+	}
 
-  public void setLoopQuestionCount(int loopQuestionCount) {
-    this.loopQuestionCount = loopQuestionCount;
-  }
+	public void setLoopQuestions(Question[] loopQuestions) {
+		this.loopQuestions = loopQuestions;
+	}
 
-  public boolean isTracker() {
-    return isTracker;
-  }
+	public int getLoopQuestionCount() {
+		return loopQuestionCount;
+	}
 
-  public void setTracker(boolean isTracker) {
-    this.isTracker = isTracker;
-  }
+	public void setLoopQuestionCount(int loopQuestionCount) {
+		this.loopQuestionCount = loopQuestionCount;
+	}
 
-  public enum QuestionType {MULTIPLE_CHOICE, OPEN_NUMBER, OPEN_TEXT, IMAGE, CHECKBOX, ORDERED, LOOP}
+	public boolean isTracker() {
+		return isTracker;
+	}
+
+	public void setTracker(boolean isTracker) {
+		this.isTracker = isTracker;
+	}
+
+	public enum QuestionType {
+		MULTIPLE_CHOICE, OPEN_NUMBER, OPEN_TEXT, IMAGE, CHECKBOX, ORDERED, LOOP
+	}
 }
