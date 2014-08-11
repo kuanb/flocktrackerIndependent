@@ -11,13 +11,13 @@ public class Answer {
 	public void setAnswerText(String answerText) {
 		this.answerText = answerText;
 	}
-	
+
 	public String getJumpID() {
 		return jumpID;
 	}
 
 	public void setjumpID(String jumpID) {
-		this.answerText = jumpID;
+		this.jumpID = jumpID;
 	}
 
 }

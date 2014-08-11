@@ -15,9 +15,10 @@ public class Question {
 
 	private int questionNumber;
 	private String questionText;
-	private String[] answers;
+	private Answer[] answers;
 	private String questionID;
 	private boolean otherEnabled;
+	private String jumpID;
 
 	// Loop related variables
 	private boolean inLoop;
@@ -69,11 +70,11 @@ public class Question {
 		this.questionText = questionText;
 	}
 
-	public String[] getAnswers() {
+	public Answer[] getAnswers() {
 		return answers;
 	}
 
-	public void setAnswers(String[] answers) {
+	public void setAnswers(Answer[] answers) {
 		this.answers = answers;
 	}
 
@@ -82,7 +83,7 @@ public class Question {
 	}
 
 	public void setjumpID(String jumpID) {
-		this.answerText = jumpID;
+		this.jumpID = jumpID;
 	}
 
 	public String getQuestionID() {

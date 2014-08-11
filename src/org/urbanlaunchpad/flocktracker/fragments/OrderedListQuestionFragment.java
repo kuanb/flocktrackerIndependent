@@ -9,10 +9,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+
 import com.squareup.otto.Bus;
+
 import org.urbanlaunchpad.flocktracker.R;
 import org.urbanlaunchpad.flocktracker.adapters.StableArrayAdapter;
 import org.urbanlaunchpad.flocktracker.menu.DynamicListView;
+import org.urbanlaunchpad.flocktracker.models.Answer;
 import org.urbanlaunchpad.flocktracker.models.Question;
 
 import java.util.*;
@@ -21,6 +24,7 @@ import java.util.*;
 public class OrderedListQuestionFragment extends QuestionFragment {
 
   private List<String> answerList;
+  private List<String> originalAnswerList;
   private DynamicListView answerListView;
   private LinearLayout answerLayout;
   private Button skipButton;
@@ -28,7 +32,7 @@ public class OrderedListQuestionFragment extends QuestionFragment {
   private OnClickListener skipButtonOnClickListener = new OnClickListener() {
     @Override
     public void onClick(View v) {
-      resetLayout(Arrays.asList(getQuestion().getAnswers().clone()));
+      resetLayout(answerList = originalAnswerList);
       disableSkipButton();
     }
   };
@@ -48,7 +52,12 @@ public class OrderedListQuestionFragment extends QuestionFragment {
       answerList = new ArrayList<String>(selectedAnswers);
       enableSkipButton();
     } else {
-      answerList = Arrays.asList(currentQuestion.getAnswers().clone());
+    	Answer answers[] = currentQuestion.getAnswers();
+    	originalAnswerList = new ArrayList<String>(answers.length);
+    	for (int i = 0; i < answers.length; ++i){
+    		originalAnswerList.add(answers[i].getAnswerText());
+    	}
+      answerList = originalAnswerList;
     }
 
     answerLayout = (LinearLayout) rootView.findViewById(R.id.answer_layout);
