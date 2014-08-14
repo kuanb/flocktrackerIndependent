@@ -20,6 +20,8 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 	private AnswerView[] answersLayout;
 	private LinearLayout answersContainer;
 	private int selectedAnswerIndex = -1;
+	private String generalJumpID;
+	private String[] answerjumpid;
 
 	private OnClickListener onClickListener = new OnClickListener() {
 		@Override
@@ -47,8 +49,15 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 				.findViewById(R.id.answer_layout);
 		boolean hasOther = currentQuestion.isOtherEnabled();
 		Answer[] answers = currentQuestion.getAnswers();
+		generalJumpID = currentQuestion.getJumpID();
 		int numAnswers = hasOther ? answers.length + 1 : answers.length;
 		answersLayout = new AnswerView[numAnswers];
+		
+		// getting jumps
+		
+		for (int i = 0; i < answers.length; i++) {
+			answerjumpid[i] = answers[i].getJumpID();	
+		}
 
 		// Add listeners for answers
 		for (int i = 0; i < answers.length; i++) {

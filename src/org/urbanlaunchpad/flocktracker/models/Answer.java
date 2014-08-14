@@ -1,8 +1,8 @@
 package org.urbanlaunchpad.flocktracker.models;
 
 public class Answer {
-	private String answerText;
-	private String jumpID;
+	private String answerText = null;
+	private String jumpID = null;
 
 	public String getAnswerText() {
 		return answerText;
