@@ -20,6 +20,7 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 	private AnswerView[] answersLayout;
 	private LinearLayout answersContainer;
 	private Set<Integer> selectedAnswers = new HashSet<Integer>();
+	private String generalJumpID;
 
 	private OnClickListener onClickListener = new OnClickListener() {
 		@Override
@@ -44,6 +45,7 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 		answersContainer = (LinearLayout) rootView
 				.findViewById(R.id.answer_layout);
 		Question currentQuestion = getQuestion();
+		generalJumpID = currentQuestion.getJumpID();
 		Set<String> selectedAnswers = currentQuestion.getSelectedAnswers();
 		selectedAnswers = (Set<String>) ((HashSet<String>) selectedAnswers)
 				.clone();

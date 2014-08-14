@@ -23,99 +23,104 @@ import java.util.*;
 @SuppressLint("ValidFragment")
 public class OrderedListQuestionFragment extends QuestionFragment {
 
-  private List<String> answerList;
-  private List<String> originalAnswerList;
-  private DynamicListView answerListView;
-  private LinearLayout answerLayout;
-  private Button skipButton;
+	private List<String> answerList;
+	private List<String> originalAnswerList;
+	private DynamicListView answerListView;
+	private LinearLayout answerLayout;
+	private Button skipButton;
+	private String generalJumpID;
 
-  private OnClickListener skipButtonOnClickListener = new OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      resetLayout(answerList = originalAnswerList);
-      disableSkipButton();
-    }
-  };
+	private OnClickListener skipButtonOnClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			resetLayout(answerList = originalAnswerList);
+			disableSkipButton();
+		}
+	};
 
-  public OrderedListQuestionFragment(Question question,
-      QuestionType questionType, Bus eventBus) {
-    super(question, questionType, eventBus);
-  }
+	public OrderedListQuestionFragment(Question question,
+			QuestionType questionType, Bus eventBus) {
+		super(question, questionType, eventBus);
+	}
 
-  @Override
-  public void setupLayout(View rootView) {
-    skipButton = new Button(getActivity());
-    disableSkipButton();
-    Question currentQuestion = getQuestion();
-    Set<String> selectedAnswers = currentQuestion.getSelectedAnswers();
-    if (selectedAnswers.size() > 0) {
-      answerList = new ArrayList<String>(selectedAnswers);
-      enableSkipButton();
-    } else {
-    	Answer answers[] = currentQuestion.getAnswers();
-    	originalAnswerList = new ArrayList<String>(answers.length);
-    	for (int i = 0; i < answers.length; ++i){
-    		originalAnswerList.add(answers[i].getAnswerText());
-    	}
-      answerList = originalAnswerList;
-    }
+	@Override
+	public void setupLayout(View rootView) {
+		skipButton = new Button(getActivity());
+		disableSkipButton();
+		Question currentQuestion = getQuestion();
+		generalJumpID = currentQuestion.getJumpID();
+		Set<String> selectedAnswers = currentQuestion.getSelectedAnswers();
+		if (selectedAnswers.size() > 0) {
+			answerList = new ArrayList<String>(selectedAnswers);
+			enableSkipButton();
+		} else {
+			Answer answers[] = currentQuestion.getAnswers();
+			originalAnswerList = new ArrayList<String>(answers.length);
+			for (int i = 0; i < answers.length; ++i) {
+				originalAnswerList.add(answers[i].getAnswerText());
+			}
+			answerList = originalAnswerList;
+		}
 
-    answerLayout = (LinearLayout) rootView.findViewById(R.id.answer_layout);
-    answerLayout.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
-    answerLayout.setWeightSum(6f);
+		answerLayout = (LinearLayout) rootView.findViewById(R.id.answer_layout);
+		answerLayout.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
+		answerLayout.setWeightSum(6f);
 
-    answerListView = new DynamicListView(getActivity(), this);
-    answerListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-    answerListView.setOnTouchListener(new View.OnTouchListener() {
-      @Override
-      public boolean onTouch(View view, MotionEvent motionEvent) {
-        enableSkipButton();
-        return false;
-      }
-    });
+		answerListView = new DynamicListView(getActivity(), this);
+		answerListView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		answerListView.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View view, MotionEvent motionEvent) {
+				enableSkipButton();
+				return false;
+			}
+		});
 
-    LinearLayout.LayoutParams lParams1 = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
-    LinearLayout.LayoutParams lParams2 = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
-    lParams1.weight = 5f;
-    lParams2.weight = 1f;
+		LinearLayout.LayoutParams lParams1 = new LinearLayout.LayoutParams(
+				LayoutParams.MATCH_PARENT, 0);
+		LinearLayout.LayoutParams lParams2 = new LinearLayout.LayoutParams(
+				LayoutParams.MATCH_PARENT, 0);
+		lParams1.weight = 5f;
+		lParams2.weight = 1f;
 
-    answerLayout.addView(answerListView);
-    answerLayout.addView(skipButton);
-    answerListView.setLayoutParams(lParams1);
-    skipButton.setLayoutParams(lParams2);
-    skipButton.setOnClickListener(skipButtonOnClickListener);
+		answerLayout.addView(answerListView);
+		answerLayout.addView(skipButton);
+		answerListView.setLayoutParams(lParams1);
+		skipButton.setLayoutParams(lParams2);
+		skipButton.setOnClickListener(skipButtonOnClickListener);
 
-    resetLayout(answerList);
-  }
+		resetLayout(answerList);
+	}
 
-  private void resetLayout(List<String> answerList) {
-    StableArrayAdapter adapter = new StableArrayAdapter(getActivity(),
-        R.layout.ordered_answer, answerList);
-    answerListView.setCheeseList(answerList);
-    answerListView.setAdapter(adapter);
-    answerListView.invalidateViews();
-  }
+	private void resetLayout(List<String> answerList) {
+		StableArrayAdapter adapter = new StableArrayAdapter(getActivity(),
+				R.layout.ordered_answer, answerList);
+		answerListView.setCheeseList(answerList);
+		answerListView.setAdapter(adapter);
+		answerListView.invalidateViews();
+	}
 
-  private void enableSkipButton() {
-    skipButton.setEnabled(true);
-    skipButton.setText(R.string.skip_question);
-  }
+	private void enableSkipButton() {
+		skipButton.setEnabled(true);
+		skipButton.setText(R.string.skip_question);
+	}
 
-  private void disableSkipButton() {
-    skipButton.setEnabled(false);
-    skipButton.setText(R.string.question_skipped);
-  }
+	private void disableSkipButton() {
+		skipButton.setEnabled(false);
+		skipButton.setText(R.string.question_skipped);
+	}
 
-  @Override
-  public Set<String> getSelectedAnswers() {
-    if (skipButton.isEnabled()) {
-      LinkedHashSet<String> selectedAnswers = new LinkedHashSet<String>();
-      StableArrayAdapter adapter = (StableArrayAdapter) answerListView.getAdapter();
-      for (int i = 0; i < adapter.getCount(); ++i) {
-        selectedAnswers.add(adapter.getItem(i));
-      }
-      return selectedAnswers;
-    }
-    return new LinkedHashSet<String>();
-  }
+	@Override
+	public Set<String> getSelectedAnswers() {
+		if (skipButton.isEnabled()) {
+			LinkedHashSet<String> selectedAnswers = new LinkedHashSet<String>();
+			StableArrayAdapter adapter = (StableArrayAdapter) answerListView
+					.getAdapter();
+			for (int i = 0; i < adapter.getCount(); ++i) {
+				selectedAnswers.add(adapter.getItem(i));
+			}
+			return selectedAnswers;
+		}
+		return new LinkedHashSet<String>();
+	}
 }
