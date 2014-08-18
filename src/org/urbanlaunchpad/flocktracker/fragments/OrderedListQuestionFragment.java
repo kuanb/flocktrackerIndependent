@@ -123,4 +123,10 @@ public class OrderedListQuestionFragment extends QuestionFragment {
 		}
 		return new LinkedHashSet<String>();
 	}
+
+	@Override
+	public String getCurrentJump() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

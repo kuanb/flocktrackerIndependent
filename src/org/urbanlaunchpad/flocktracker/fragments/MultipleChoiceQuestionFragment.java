@@ -107,4 +107,10 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 		return Collections.singleton(answersLayout[selectedAnswerIndex]
 				.getAnswer().toString());
 	}
+
+	@Override
+	public String getCurrentJump() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

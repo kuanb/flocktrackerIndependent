@@ -65,6 +65,8 @@ public abstract class QuestionFragment extends Fragment {
   }
 
   public abstract Set<String> getSelectedAnswers();
+  
+  public abstract String getCurrentJump();
 
   /**
    * Enum to specify question type

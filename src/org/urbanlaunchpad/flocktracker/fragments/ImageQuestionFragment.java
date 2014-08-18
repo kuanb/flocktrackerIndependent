@@ -134,4 +134,10 @@ public class ImageQuestionFragment extends QuestionFragment {
 			}
 		}
 	}
+
+	@Override
+	public String getCurrentJump() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

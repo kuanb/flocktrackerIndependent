@@ -99,4 +99,10 @@ public class CheckBoxQuestionFragment extends QuestionFragment {
 		}
 		return answers;
 	}
+
+	@Override
+	public String getCurrentJump() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

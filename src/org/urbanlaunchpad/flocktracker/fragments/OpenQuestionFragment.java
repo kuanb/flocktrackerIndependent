@@ -56,4 +56,10 @@ public class OpenQuestionFragment extends QuestionFragment {
 		return Collections.singleton(answerView.getAnswer().toString());
 	}
 
+	@Override
+	public String getCurrentJump() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
