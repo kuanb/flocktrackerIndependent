@@ -22,6 +22,7 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 	private int selectedAnswerIndex = -1;
 	private String generalJumpID;
 	private String[] answerjumpid;
+	private String currentJumpID;
 
 	private OnClickListener onClickListener = new OnClickListener() {
 		@Override
@@ -30,9 +31,13 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 			if (selectedAnswerIndex != -1) {
 				answersLayout[selectedAnswerIndex].disable();
 			}
-
 			((AnswerView) v).enable();
 			selectedAnswerIndex = v.getId();
+			if (answerjumpid[selectedAnswerIndex] != null){
+				currentJumpID = answerjumpid[selectedAnswerIndex];
+			} else {
+				currentJumpID = generalJumpID;
+			}
 		}
 	};
 
