@@ -217,6 +217,7 @@ public class QuestionController {
 	public void switchToNextQuestion() {
 		Question currentQuestion = getCurrentQuestion();
 		if ((currentQuestionFragment.getCurrentJump() != null) && (!inLoop)) {
+			Toast.makeText(this.context, "ima here", Toast.LENGTH_SHORT).show();
 			goToJump(currentQuestionFragment.getCurrentJump());
 			showCurrentQuestion();
 			return;

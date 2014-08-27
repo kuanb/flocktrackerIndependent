@@ -59,7 +59,7 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 		answersLayout = new AnswerView[numAnswers];
 		
 		// getting jumps
-		
+		answerjumpid = new String[numAnswers];
 		for (int i = 0; i < answers.length; i++) {
 			answerjumpid[i] = answers[i].getJumpID();	
 		}
@@ -115,7 +115,6 @@ public class MultipleChoiceQuestionFragment extends QuestionFragment {
 
 	@Override
 	public String getCurrentJump() {
-		// TODO Auto-generated method stub
-		return null;
+		return currentJumpID;
 	}
 }
