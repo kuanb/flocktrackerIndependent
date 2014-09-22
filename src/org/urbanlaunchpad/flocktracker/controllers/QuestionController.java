@@ -215,13 +215,14 @@ public class QuestionController {
 	}
 
 	public void switchToNextQuestion() {
+		// Handling Jumps.
 		Question currentQuestion = getCurrentQuestion();
 		if ((currentQuestionFragment.getCurrentJump() != null) && (!inLoop)) {
-			Toast.makeText(this.context, "ima here", Toast.LENGTH_SHORT).show();
 			goToJump(currentQuestionFragment.getCurrentJump());
 			showCurrentQuestion();
 			return;
 		}
+		// Handling loops.
 		if (!inLoop
 				&& currentQuestion.getType() == QuestionType.LOOP
 				&& currentQuestionFragment.getSelectedAnswers().size() > 0
@@ -258,7 +259,7 @@ public class QuestionController {
 				return;
 			}
 		}
-
+		// Handling normal questions
 		if (isAskingTripQuestions) {
 			if (trackerQuestionPosition == trackingQuestions.length - 1) {
 				// show hub page and start tracking
@@ -281,29 +282,32 @@ public class QuestionController {
 	}
 
 	private void goToJump(String currentJump) {
-		if (inLoop) {
-			for (int j = 0; j < trackingQuestions.length; j++) {
-				if (currentJump.equals(trackingQuestions[j].getQuestionID())) {
-					trackerQuestionPosition = j;
-					break;
-				}
-			}
-		} else {
-			Boolean gotQuestion = false;
-			for (int i = 0; i < chapterList.length; i++) {
-				Question[] questions = chapterList[i].getQuestions();
-				for (int j = 0; j < questions.length; j++) {
-					if (currentJump.equals(questions[j].getQuestionID())) {
-						chapterPosition = i;
-						questionPosition = j;
-						gotQuestion = true;
+		if (!inLoop) {
+			if (isAskingTripQuestions) {
+				for (int j = 0; j < trackingQuestions.length; j++) {
+					if (currentJump
+							.equals(trackingQuestions[j].getQuestionID())) {
+						trackerQuestionPosition = j;
 						break;
 					}
 				}
-				if (gotQuestion)
-					break;
+			} else {
+				Boolean gotQuestion = false;
+				for (int i = 0; i < chapterList.length; i++) {
+					Question[] questions = chapterList[i].getQuestions();
+					for (int j = 0; j < questions.length; j++) {
+						if (currentJump.equals(questions[j].getQuestionID())) {
+							chapterPosition = i;
+							questionPosition = j;
+							gotQuestion = true;
+							break;
+						}
+					}
+					if (gotQuestion)
+						break;
+				}
 			}
-		}
+		}	
 	}
 
 	public void updateTrackerPosition(int questionPosition) {
@@ -384,6 +388,18 @@ public class QuestionController {
 			return false;
 		}
 		return currentQuestionFragment.isVisible();
+	}
+
+	public int getCurrenChapterPosition() {
+		return chapterPosition;
+	}
+
+	public int getCurrentQuestionPosition() {
+		return questionPosition;
+	}
+
+	public int getCurrentTrackerQuestionPosition() {
+		return trackerQuestionPosition;
 	}
 
 	private Chapter getCurrentChapter() {

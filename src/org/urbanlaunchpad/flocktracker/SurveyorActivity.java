@@ -294,6 +294,12 @@ public class SurveyorActivity extends Activity {
 
   @Subscribe
   public void onQuestionHidden(CommonEvents.QuestionHiddenEvent event) {
+		if (!questionController.isAskingTripQuestions()){
+			int fromJumpChapterPosition = questionController.getCurrenChapterPosition();
+			int fromJumpQuestionPosition = questionController.getCurrentQuestionPosition();
+		} else {
+			int fromJumpTrackerQuestionPosition = questionController.getCurrentTrackerQuestionPosition();
+		}	
     Question question = event.question;
     event.question.setSelectedAnswers(event.selectedAnswers);
   }

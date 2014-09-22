@@ -101,7 +101,7 @@ public class JSONUtil {
 		question.setType(QuestionUtil.getQuestionTypeFromString(jsonQuestion
 				.getString("Kind")));
 		question.setQuestionText(jsonQuestion.getString("Question"));
-		question.setjumpID(jsonQuestion.isNull("Jump") ? "" : jsonQuestion
+		question.setjumpID(jsonQuestion.isNull("Jump") ? null : jsonQuestion
 				.getString("Jump"));
 
 		if (!jsonQuestion.isNull("Other")) {
